@@ -15,3 +15,19 @@ impl Display for InstructionError {
         write!(f, "{}", self.message)
     }
 }
+
+pub struct ParseError {
+    message: String,
+}
+
+impl ParseError {
+    pub fn new(message: String) -> Self {
+        ParseError { message }
+    }
+}
+
+impl Display for ParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
