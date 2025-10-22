@@ -1,14 +1,6 @@
-use std::{fmt::Display, str::FromStr};
+use std::str::FromStr;
 
-pub struct InstructionError {
-    message: String,
-}
-
-impl Display for InstructionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.message)
-    }
-}
+use crate::InstructionError;
 
 /// Instructions available in the computer algebra system.
 #[derive(Debug)]
@@ -167,9 +159,7 @@ impl FromStr for Instruction {
             "N-13" | "GCF_NN_N" | "NaturalGCD" => Ok(Self::NaturalGCD),
             "N-14" | "LCM_NN_N" | "NaturalLCM" => Ok(Self::NaturalLCM),
 
-            _ => Err(InstructionError {
-                message: format!("unknown instruction: {}", s),
-            }),
+            _ => Err(InstructionError::new(format!("unknown instruction: {}", s))),
         }
     }
 }
