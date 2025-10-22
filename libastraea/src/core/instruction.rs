@@ -1,3 +1,15 @@
+use std::fmt::Display;
+
+pub struct InstructionError {
+    message: String,
+}
+
+impl Display for InstructionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
 /// Instructions available in the computer algebra system.
 pub enum Instruction {
     /// Compares two natural numbers.
