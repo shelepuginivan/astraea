@@ -1,18 +1,41 @@
 use std::str::FromStr;
 
-use crate::ParseError;
+use crate::{ParseError, ValueError};
 
 /// Represents a single digit of a natural number.
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Digit {
     pub value: u8,
 }
 
 impl Digit {
-    pub fn new(value: u8) -> Self {
-        Digit { value }
+    /// Creates a new instance of Digit. Value must be a valid digit, i.e. in range [0, 9].
+    ///
+    /// ```
+    /// use libastraea::Digit;
+    ///
+    /// let d = Digit::new(9).unwrap();
+    /// assert_eq!(d.value, 9)
+    /// ```
+    pub fn new(value: u8) -> Result<Self, ValueError> {
+        if value >= 10 {
+            return Err(ValueError::new(format!(
+                "expected value to be in range [0, 9], got {}",
+                value
+            )));
+        }
+
+        Ok(Digit { value })
     }
 
+    /// Parses Digit from char.
+    ///
+    /// ```
+    /// use libastraea::Digit;
+    ///
+    /// let d = Digit::from_char('7').unwrap();
+    /// assert_eq!(d.value, 7);
+    /// ```
     pub fn from_char(char: char) -> Result<Self, ParseError> {
         let digit: u8 = match char {
             '0' => 0,
@@ -31,6 +54,14 @@ impl Digit {
         Ok(Digit { value: digit })
     }
 
+    /// Converts Digit to char.
+    ///
+    /// ```
+    /// use libastraea::Digit;
+    ///
+    /// let d = Digit::new(4).unwrap();
+    /// assert_eq!(d.to_char(), '4');
+    /// ```
     pub fn to_char(&self) -> char {
         match self.value {
             0 => '0',
