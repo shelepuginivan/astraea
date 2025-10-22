@@ -11,6 +11,7 @@ impl Display for InstructionError {
 }
 
 /// Instructions available in the computer algebra system.
+#[derive(Debug)]
 pub enum Instruction {
     /// Compares two natural numbers.
     ///
@@ -98,6 +99,48 @@ pub enum Instruction {
     NaturalLCM,
 }
 
+impl Instruction {
+    /// Returns opcode of the instruction.
+    pub fn opcode(&self) -> String {
+        match self {
+            Instruction::NaturalCompare => "COM_NN_D".to_string(),
+            Instruction::NaturalIsZero => "NZER_N_B".to_string(),
+            Instruction::NaturalIncrement => "ADD_1N_N".to_string(),
+            Instruction::NaturalAdd => "ADD_NN_N".to_string(),
+            Instruction::NaturalSubtract => "SUB_NN_N".to_string(),
+            Instruction::NaturalMultiplyByDigit => "MUL_ND_N".to_string(),
+            Instruction::NaturalMultiplyByPowerOfTen => "MUL_Nk_N".to_string(),
+            Instruction::NaturalMultiply => "MUL_NN_N".to_string(),
+            Instruction::NaturalSubtractMultipliedByDigit => "SUB_NDN_N".to_string(),
+            Instruction::NaturalCalculateDivisionDigit => "DIV_NN_Dk".to_string(),
+            Instruction::NaturalQuotient => "DIV_NN_N".to_string(),
+            Instruction::NaturalRemainder => "MOD_NN_N".to_string(),
+            Instruction::NaturalGCD => "GCF_NN_N".to_string(),
+            Instruction::NaturalLCM => "LCM_NN_N".to_string(),
+        }
+    }
+
+    /// Returns index of the instruction.
+    pub fn index(&self) -> String {
+        match self {
+            Instruction::NaturalCompare => "N-1".to_string(),
+            Instruction::NaturalIsZero => "N-2".to_string(),
+            Instruction::NaturalIncrement => "N-3".to_string(),
+            Instruction::NaturalAdd => "N-4".to_string(),
+            Instruction::NaturalSubtract => "N-5".to_string(),
+            Instruction::NaturalMultiplyByDigit => "N-6".to_string(),
+            Instruction::NaturalMultiplyByPowerOfTen => "N-7".to_string(),
+            Instruction::NaturalMultiply => "N-8".to_string(),
+            Instruction::NaturalSubtractMultipliedByDigit => "N-9".to_string(),
+            Instruction::NaturalCalculateDivisionDigit => "N-10".to_string(),
+            Instruction::NaturalQuotient => "N-11".to_string(),
+            Instruction::NaturalRemainder => "N-12".to_string(),
+            Instruction::NaturalGCD => "N-13".to_string(),
+            Instruction::NaturalLCM => "N-14".to_string(),
+        }
+    }
+}
+
 impl FromStr for Instruction {
     type Err = InstructionError;
 
@@ -128,5 +171,11 @@ impl FromStr for Instruction {
                 message: format!("unknown instruction: {}", s),
             }),
         }
+    }
+}
+
+impl ToString for Instruction {
+    fn to_string(&self) -> String {
+        return format!("{:?}", self).to_string();
     }
 }
