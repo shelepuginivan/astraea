@@ -37,6 +37,15 @@ impl NaturalNumber {
     pub fn as_digits(&self) -> &Vec<Digit> {
         &self.digits
     }
+
+    /// Reports whether the number is zero.
+    pub fn is_zero(&self) -> bool {
+        if self.digits.len() > 1 {
+            return false;
+        }
+
+        self.digits.len() == 0 || self.digits[0] == digit!(0)
+    }
 }
 
 impl Add for NaturalNumber {
@@ -204,6 +213,14 @@ mod tests {
 
         assert_eq!(digits.len(), 12);
         assert_eq!(digits[0], digit!(4));
+    }
+
+    #[test]
+    fn test_natural_number_is_zero() {
+        assert!(NaturalNumber::new(vec![]).is_zero());
+        assert!(NaturalNumber::new(vec![digit!(0)]).is_zero());
+        assert!(!NaturalNumber::new(vec![digit!(1)]).is_zero());
+        assert!(!NaturalNumber::new(vec![digit!(0); 2]).is_zero());
     }
 
     #[test]
