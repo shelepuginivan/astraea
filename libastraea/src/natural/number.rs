@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::str::FromStr;
 
 use crate::{Digit, ParseError};
@@ -32,5 +33,42 @@ impl ToString for NaturalNumber {
             .rev()
             .map(|digit| digit.to_char())
             .collect()
+    }
+}
+
+impl PartialEq for NaturalNumber {
+    fn eq(&self, other: &Self) -> bool {
+        self.digits == other.digits
+    }
+}
+
+impl Eq for NaturalNumber {}
+
+impl PartialOrd for NaturalNumber {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let cmp_radix = self.digits.len().cmp(&other.digits.len());
+
+        if cmp_radix != Ordering::Equal {
+            return Some(cmp_radix);
+        }
+
+        let self_digits = self.digits.iter().rev();
+        let other_digits = other.digits.iter().rev();
+
+        for (lhs, rhs) in self_digits.zip(other_digits) {
+            let cmp_digit = lhs.cmp(rhs);
+
+            if cmp_digit != Ordering::Equal {
+                return Some(cmp_digit);
+            }
+        }
+
+        Some(Ordering::Equal)
+    }
+}
+
+impl Ord for NaturalNumber {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other).unwrap()
     }
 }
