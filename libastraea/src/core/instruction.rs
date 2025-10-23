@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
-use crate::InstructionError;
+use crate::core::InstructionError;
 
 /// Instructions available in the computer algebra system.
 #[derive(Debug, Eq, Hash, PartialEq)]

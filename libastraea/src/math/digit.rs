@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
-use crate::{ParseError, ValueError};
+use crate::core::{ParseError, ValueError};
 
 /// Creates a Digit from the argument.
 #[macro_export]
@@ -88,6 +88,30 @@ impl Digit {
             9 => '9',
             _ => unreachable!(),
         }
+    }
+}
+
+impl Add for Digit {
+    type Output = (Self, Self);
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let sum = self.value + rhs.value;
+        let result = sum % 10;
+        let carry = result / 10;
+
+        (digit!(result), digit!(carry))
+    }
+}
+
+impl Mul for Digit {
+    type Output = (Self, Self);
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let product = self.value * rhs.value;
+        let result = product % 10;
+        let carry = result / 10;
+
+        (digit!(result), digit!(carry))
     }
 }
 

@@ -2,7 +2,9 @@ use std::cmp::Ordering;
 use std::fmt::Display;
 use std::str::FromStr;
 
-use crate::{Digit, ParseError};
+use crate::core::ParseError;
+use crate::digit;
+use crate::math::Digit;
 
 /// Represents a natural number.
 #[derive(Clone, Default)]
@@ -15,7 +17,9 @@ impl NaturalNumber {
     /// Creates a new instance of NaturalNumber. Digits are
     ///
     /// ```
-    /// use libastraea::{Digit, NaturalNumber, digit};
+    /// use libastraea::digit;
+    /// use libastraea::math::Digit;
+    /// use libastraea::natural::NaturalNumber;
     ///
     /// let digits = vec![digit!(9); 999];
     /// let n = NaturalNumber::new(digits);

@@ -1,6 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 
-use crate::{Instruction, InstructionError};
+use crate::core::{Instruction, InstructionError};
 
 /// Parses arguments provided to the particular instruction and ensures their validity.
 pub fn ensure_args<T>(
