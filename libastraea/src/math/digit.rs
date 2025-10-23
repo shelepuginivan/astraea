@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::ops::{Add, Mul};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -24,7 +25,7 @@ impl Digit {
     /// Creates a new instance of Digit. Value must be a valid digit, i.e. in range [0, 9].
     ///
     /// ```
-    /// use libastraea::Digit;
+    /// use libastraea::math::Digit;
     ///
     /// let d = Digit::new(9).unwrap();
     /// assert_eq!(d.value, 9)
@@ -43,7 +44,7 @@ impl Digit {
     /// Parses Digit from char.
     ///
     /// ```
-    /// use libastraea::Digit;
+    /// use libastraea::math::Digit;
     ///
     /// let d = Digit::from_char('7').unwrap();
     /// assert_eq!(d.value, 7);
@@ -69,7 +70,7 @@ impl Digit {
     /// Converts Digit to char.
     ///
     /// ```
-    /// use libastraea::Digit;
+    /// use libastraea::math::Digit;
     ///
     /// let d = Digit::new(4).unwrap();
     /// assert_eq!(d.to_char(), '4');
@@ -94,10 +95,24 @@ impl Digit {
 impl Add for Digit {
     type Output = (Self, Self);
 
+    /// Returns sum of two digits. The first returned value is the digit in the same position, and
+    /// the second is the carry digit.
+    ///
+    /// ```
+    /// use libastraea::digit;
+    /// use libastraea::math::Digit;
+    ///
+    /// let lhs = digit!(6);
+    /// let rhs = digit!(7);
+    /// let (sum, carry) = lhs + rhs;
+    ///
+    /// assert_eq!(sum, digit!(3));
+    /// assert_eq!(carry, digit!(1));
+    /// ```
     fn add(self, rhs: Self) -> Self::Output {
         let sum = self.value + rhs.value;
         let result = sum % 10;
-        let carry = result / 10;
+        let carry = sum / 10;
 
         (digit!(result), digit!(carry))
     }
@@ -106,10 +121,24 @@ impl Add for Digit {
 impl Mul for Digit {
     type Output = (Self, Self);
 
+    /// Returns product of two digits. The first returned value is the digit in the same position,
+    /// and the second is the carry digit.
+    ///
+    /// ```
+    /// use libastraea::digit;
+    /// use libastraea::math::Digit;
+    ///
+    /// let lhs = digit!(6);
+    /// let rhs = digit!(7);
+    /// let (sum, carry) = lhs * rhs;
+    ///
+    /// assert_eq!(sum, digit!(2));
+    /// assert_eq!(carry, digit!(4));
+    /// ```
     fn mul(self, rhs: Self) -> Self::Output {
         let product = self.value * rhs.value;
         let result = product % 10;
-        let carry = result / 10;
+        let carry = product / 10;
 
         (digit!(result), digit!(carry))
     }
