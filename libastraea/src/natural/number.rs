@@ -94,3 +94,47 @@ impl Ord for NaturalNumber {
         self.partial_cmp(other).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::digit;
+    use std::cmp::Ordering;
+
+    #[test]
+    fn test_natural_number_cmp() {
+        let lhs = NaturalNumber::from_str("1234").unwrap();
+        let rhs = NaturalNumber::from_str("5478").unwrap();
+        assert_eq!(lhs.cmp(&rhs), Ordering::Less);
+
+        let lhs = NaturalNumber::new(vec![digit!(1); 1_000_000]);
+        let rhs = NaturalNumber::new(vec![digit!(1); 1_000_000]);
+        assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
+
+        let lhs_str = "2".to_owned() + "0".repeat(999_999).as_str();
+        let rhs_str = "1".to_owned() + "9".repeat(999_999).as_str();
+
+        let lhs = NaturalNumber::from_str(lhs_str.as_str()).unwrap();
+        let rhs = NaturalNumber::from_str(rhs_str.as_str()).unwrap();
+        assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_natural_number_as_digits() {
+        let n = NaturalNumber::from_str("123412341234").unwrap();
+        let digits = n.as_digits();
+
+        assert_eq!(digits.len(), 12);
+        assert_eq!(digits[0], digit!(4));
+    }
+
+    #[test]
+    fn test_natural_number_to_string() {
+        let digits = vec![digit!(9); 999];
+        let n = NaturalNumber::new(digits);
+        assert_eq!(n.to_string(), "9".repeat(999));
+
+        let n = NaturalNumber::from_str("3739847457938742").unwrap();
+        assert_eq!(n.to_string(), "3739847457938742");
+    }
+}
