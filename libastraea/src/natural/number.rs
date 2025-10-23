@@ -71,18 +71,25 @@ impl NaturalNumber {
 
     /// Increments number by 1.
     pub fn inc(self) -> Self {
-        let mut digits = self.as_digits();
-
-        if digits.len() == 0 {
+        if self.is_zero() {
             return Self {
                 digits: vec![digit!(1)],
             };
         }
 
-        let lsd = digits[0];
-        let (lsd, carry) = lsd + digit!(1);
-        digits[0] = lsd;
-        digits[1] = (digits[1] + carry).0;
+        let mut digits = self.as_digits();
+        let mut next_carry = digit!(1);
+
+        for idx in 0..digits.len() {
+            let (digit, carry) = digits[idx] + next_carry;
+
+            digits[idx] = digit;
+            next_carry = carry;
+
+            if next_carry == digit!(0) {
+                break;
+            }
+        }
 
         Self { digits }
     }
@@ -346,7 +353,7 @@ mod tests {
 
     use super::*;
     use crate::digit;
-    use std::cmp::Ordering;
+    use std::{cmp::Ordering, u32};
 
     #[test]
     fn test_natural_number_cmp() {
@@ -364,6 +371,20 @@ mod tests {
         let lhs = NaturalNumber::from_str(lhs_str.as_str()).unwrap();
         let rhs = NaturalNumber::from_str(rhs_str.as_str()).unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_natural_number_inc() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let v: u32 = rng.random_range(..u32::MAX - 1);
+            let n = NaturalNumber::from_str(&v.to_string()).unwrap();
+            let expected = (v + 1).to_string();
+            let actual = n.inc().to_string();
+
+            assert_eq!(expected, actual);
+        }
     }
 
     #[test]
