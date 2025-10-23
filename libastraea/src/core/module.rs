@@ -1,18 +1,16 @@
 use std::collections::HashSet;
+use std::fmt::Display;
 
 use crate::{Instruction, InstructionError};
 
 /// Module is a part of computer algebra system responsible for a set of instructions.
 pub trait Module {
-    /// Type for the data which module operates on.
-    type Data;
-
     /// Calls a method of the module specified by instruction, with given args.
-    fn call(
+    fn process_instruction(
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Self::Data, InstructionError>;
+    ) -> Result<Box<dyn Display>, InstructionError>;
 
     /// Reports whether module implements the given instruction.
     fn implements(&self, instruction: Instruction) -> bool;
