@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::iter;
-use std::ops::{Add, Sub};
+use std::ops::{Add, Mul, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -161,6 +161,47 @@ impl Sub for NaturalNumber {
     }
 }
 
+impl Mul<Digit> for NaturalNumber {
+    type Output = Self;
+
+    fn mul(self, rhs: Digit) -> Self::Output {
+        if rhs == digit!(0) {
+            return NaturalNumber {
+                digits: vec![digit!(0)],
+            };
+        }
+
+        if rhs == digit!(1) {
+            return self;
+        }
+
+        if self.digits.len() == 0 {
+            return NaturalNumber {
+                digits: vec![digit!(0)],
+            };
+        }
+
+        let mut digits = Vec::with_capacity(self.digits.len() + 1);
+        let mut next_carry = digit!(0);
+
+        for digit in self.digits {
+            let (prod, carry) = digit * rhs;
+            let (prod, self_carry) = prod + next_carry;
+            let (carry, _) = carry + self_carry;
+
+            digits.push(prod);
+
+            next_carry = carry;
+        }
+
+        if next_carry != digit!(0) {
+            digits.push(next_carry);
+        }
+
+        Self { digits }
+    }
+}
+
 impl FromStr for NaturalNumber {
     type Err = ParseError;
 
@@ -304,6 +345,23 @@ mod tests {
         let actual = (lhs - rhs).unwrap().to_string();
 
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_natural_number_mul_digit() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs = rng.random_range(..2u32.pow(28));
+            let rhs = rng.random_range(0..9);
+            let expected = lhs * rhs;
+
+            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let rhs = digit!(rhs as u8);
+            let actual = lhs * rhs;
+
+            assert_eq!(expected.to_string(), actual.to_string());
+        }
     }
 
     #[test]
