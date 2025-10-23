@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::{Digit, ParseError};
@@ -48,13 +49,16 @@ impl FromStr for NaturalNumber {
     }
 }
 
-impl ToString for NaturalNumber {
-    fn to_string(&self) -> String {
-        self.digits
+impl Display for NaturalNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s: String = self
+            .digits
             .iter()
             .rev()
             .map(|digit| digit.to_char())
-            .collect()
+            .collect();
+
+        write!(f, "{}", s)
     }
 }
 
