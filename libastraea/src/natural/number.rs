@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::iter;
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Index, Mul, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -38,6 +38,21 @@ impl NaturalNumber {
         Self {
             digits: vec![digit!(0)],
         }
+    }
+
+    /// Returns length of the NaturalNumber.
+    pub fn len(&self) -> usize {
+        self.digits.len()
+    }
+
+    /// Returns digit by index, starting from 0 for the least significant digit of the number.
+    pub fn lsd_at(&self, idx: usize) -> Digit {
+        self.digits[idx]
+    }
+
+    /// Returns digit by index, starting from 0 for the most significant digit of the number.
+    pub fn msd_at(&self, idx: usize) -> Digit {
+        self.digits[self.digits.len() - idx - 1]
     }
 
     /// Returns digits of the NaturalNumber, in reverse order.
@@ -307,6 +322,15 @@ impl PartialOrd for NaturalNumber {
 impl Ord for NaturalNumber {
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other).unwrap()
+    }
+}
+
+impl Index<usize> for NaturalNumber {
+    type Output = Digit;
+
+    /// Returns digit by index, starting from 0 for the most significant digit of the number.
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.digits[self.digits.len() - index - 1]
     }
 }
 
