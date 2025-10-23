@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::InstructionError;
@@ -164,8 +165,8 @@ impl FromStr for Instruction {
     }
 }
 
-impl ToString for Instruction {
-    fn to_string(&self) -> String {
-        return format!("{:?}", self).to_string();
+impl Display for Instruction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
