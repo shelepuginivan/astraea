@@ -46,6 +46,24 @@ impl NaturalNumber {
 
         self.digits.len() == 0 || self.digits[0] == digit!(0)
     }
+
+    /// Increments number by 1.
+    pub fn inc(self) -> Self {
+        let mut digits = self.as_digits();
+
+        if digits.len() == 0 {
+            return Self {
+                digits: vec![digit!(1)],
+            };
+        }
+
+        let lsd = digits[0];
+        let (lsd, carry) = lsd + digit!(1);
+        digits[0] = lsd;
+        digits[1] = (digits[1] + carry).0;
+
+        Self { digits }
+    }
 }
 
 impl Add for NaturalNumber {
