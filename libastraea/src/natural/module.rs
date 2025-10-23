@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Display};
 use crate::core::{Instruction, InstructionError, Module};
 use crate::math::sign::ToSign;
 use crate::natural::NaturalNumber;
-use crate::validate::ensure_args;
+use crate::validate;
 
 pub struct NaturalModule {}
 
@@ -21,13 +21,25 @@ impl Module for NaturalModule {
     ) -> Result<Box<dyn Display>, InstructionError> {
         match instruction {
             Instruction::NaturalCompare => {
-                let args: Vec<NaturalNumber> = ensure_args(instruction, args, 2)?;
-                let lhs = &args[0];
-                let rhs = &args[1];
-                let result = lhs.cmp(rhs).to_sign();
-
-                Ok(Box::new(result))
+                let (lhs, rhs) = validate::two_args::<NaturalNumber>(instruction, args)?;
+                Ok(Box::new(lhs.cmp(&rhs).to_sign()))
             }
+
+            Instruction::NaturalIsZero => {
+                let n: NaturalNumber = validate::one_arg(instruction, args)?;
+                Ok(Box::new(n.is_zero()))
+            }
+
+            Instruction::NaturalIncrement => {
+                let n: NaturalNumber = validate::one_arg(instruction, args)?;
+                Ok(Box::new(n.inc()))
+            }
+
+            Instruction::NaturalAdd => {
+                let (lhs, rhs) = validate::two_args::<NaturalNumber>(instruction, args)?;
+                Ok(Box::new(lhs + rhs))
+            }
+
             _ => Err(InstructionError::new(format!(
                 "unknown instruction: {:?}",
                 instruction
