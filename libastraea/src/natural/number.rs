@@ -114,6 +114,12 @@ impl FromStr for NaturalNumber {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let length = s.len();
+        if length == 0 {
+            return Err(ParseError::new(
+                "cannot create natural number from empty string",
+            ));
+        }
+
         let mut digits: Vec<Digit> = vec![Digit::default(); length];
 
         for (index, char) in s.chars().enumerate() {
