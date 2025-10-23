@@ -1,5 +1,6 @@
 use std::fmt::Display;
-use std::ops::{Add, Mul};
+use std::i16;
+use std::ops::{Add, Mul, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -115,6 +116,33 @@ impl Add for Digit {
         let carry = sum / 10;
 
         (digit!(result), digit!(carry))
+    }
+}
+
+impl Sub for Digit {
+    type Output = (Self, Self);
+
+    /// Returns difference between two digits. The first returned value is the digit in the same
+    /// position, and the second is the carry digit.
+    ///
+    /// ```
+    /// use libastraea::digit;
+    /// use libastraea::math::Digit;
+    ///
+    /// let lhs = digit!(6);
+    /// let rhs = digit!(9);
+    /// let (diff, carry) = lhs - rhs;
+    ///
+    /// assert_eq!(diff, digit!(7));
+    /// assert_eq!(carry, digit!(1));
+    /// ```
+    fn sub(self, rhs: Self) -> Self::Output {
+        let diff = (self.value as i16) - (rhs.value as i16);
+        let res = (diff + 10) % 10;
+        let result = digit!(res as u8);
+        let carry = if diff >= 0 { digit!(0) } else { digit!(1) };
+
+        (result, carry)
     }
 }
 
