@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::iter;
-use std::ops::{Add, Index, IndexMut, Mul, Sub};
+use std::ops::{Add, Div, Index, IndexMut, Mul, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -55,6 +55,14 @@ impl NaturalNumber {
         self.digits[self.digits.len() - idx - 1]
     }
 
+    /// Appends digit to the number as least significant digit.
+    pub fn append(self, lsd: Digit) -> Self {
+        let mut digits = self.times_pow10(1).as_digits();
+        digits[0] = lsd;
+
+        Self { digits }
+    }
+
     /// Returns digits of the NaturalNumber, in reverse order.
     pub fn as_digits(self) -> Vec<Digit> {
         self.digits
@@ -102,6 +110,31 @@ impl NaturalNumber {
 
         let digits = [vec![digit!(0); k], self.as_digits()].concat();
         return Self { digits };
+    }
+
+    /// Divides number by denominator, returning the quotient and the remainder.
+    /// Value error is returned if and only if the denominator is zero.
+    pub fn divide(self, denominator: Self) -> Result<(Self, Self), ValueError> {
+        if denominator.is_zero() {
+            return Err(ValueError::new("denominator must not be 0"));
+        }
+
+        let mut quotient = Self::zero();
+        let mut remainder = Self::zero();
+
+        for i in 0..self.len() {
+            remainder = remainder.append(self[i]);
+
+            let mut q_digit = 0;
+            while remainder >= denominator {
+                remainder = (remainder - denominator.clone())?;
+                q_digit += 1;
+            }
+
+            quotient = quotient.append(digit!(q_digit));
+        }
+
+        Ok((quotient, remainder))
     }
 }
 
@@ -257,6 +290,22 @@ impl Mul<Self> for NaturalNumber {
         }
 
         sum
+    }
+}
+
+impl Div for NaturalNumber {
+    type Output = Result<Self, ValueError>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        self.divide(rhs).and_then(|res| Ok(res.0))
+    }
+}
+
+impl Rem for NaturalNumber {
+    type Output = Result<Self, ValueError>;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        self.divide(rhs).and_then(|res| Ok(res.1))
     }
 }
 
@@ -465,6 +514,40 @@ mod tests {
             let actual = lhs * rhs;
 
             assert_eq!(expected.to_string(), actual.to_string());
+        }
+    }
+
+    #[test]
+    fn test_natural_number_div() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs = rng.random_range(..u32::MAX);
+            let rhs = rng.random_range(1..u32::MAX);
+            let expected = lhs / rhs;
+
+            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let actual = lhs / rhs;
+
+            assert_eq!(expected.to_string(), actual.unwrap().to_string());
+        }
+    }
+
+    #[test]
+    fn test_natural_number_rem() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs = rng.random_range(..u32::MAX);
+            let rhs = rng.random_range(1..u32::MAX);
+            let expected = lhs % rhs;
+
+            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let actual = lhs % rhs;
+
+            assert_eq!(expected.to_string(), actual.unwrap().to_string());
         }
     }
 
