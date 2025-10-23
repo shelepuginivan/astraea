@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::iter;
-use std::ops::{Add, Index, Mul, Sub};
+use std::ops::{Add, Index, IndexMut, Mul, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -331,6 +331,12 @@ impl Index<usize> for NaturalNumber {
     /// Returns digit by index, starting from 0 for the most significant digit of the number.
     fn index(&self, index: usize) -> &Self::Output {
         &self.digits[self.digits.len() - index - 1]
+    }
+}
+
+impl IndexMut<usize> for NaturalNumber {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.digits[index]
     }
 }
 
