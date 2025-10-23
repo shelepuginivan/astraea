@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crate::InstructionError;
 
 /// Instructions available in the computer algebra system.
-#[derive(Debug)]
+#[derive(Debug, Eq, Hash, PartialEq)]
 pub enum Instruction {
     /// Compares two natural numbers.
     ///
