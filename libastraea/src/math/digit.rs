@@ -16,7 +16,7 @@ macro_rules! digit {
 }
 
 /// Represents a single digit of a natural number.
-#[derive(Clone, Debug, Default, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, PartialOrd, Ord)]
 pub struct Digit {
     pub value: u8,
 }
