@@ -1,6 +1,6 @@
 use std::fmt::Display;
 use std::i16;
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -169,6 +169,15 @@ impl Mul for Digit {
         let carry = product / 10;
 
         (digit!(result), digit!(carry))
+    }
+}
+
+impl Div for Digit {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let value = self.value / rhs.value;
+        Self { value }
     }
 }
 
