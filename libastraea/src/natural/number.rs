@@ -7,7 +7,29 @@ use crate::{Digit, ParseError};
 #[derive(Clone, Default)]
 pub struct NaturalNumber {
     /// Digits of the natural number, stored in reverse order.
-    pub digits: Vec<Digit>,
+    digits: Vec<Digit>,
+}
+
+impl NaturalNumber {
+    /// Creates a new instance of NaturalNumber. Digits are
+    ///
+    /// ```
+    /// use libastraea::{Digit, NaturalNumber, digit};
+    ///
+    /// let digits = vec![digit!(9); 999];
+    /// let n = NaturalNumber::new(digits);
+    ///
+    /// assert_eq!(n.to_string(), "9".repeat(999));
+    /// ```
+    pub fn new(mut digits: Vec<Digit>) -> Self {
+        digits.reverse();
+        NaturalNumber { digits }
+    }
+
+    /// Returns digits of the NaturalNumber, in reverse order.
+    pub fn as_digits(&self) -> &Vec<Digit> {
+        &self.digits
+    }
 }
 
 impl FromStr for NaturalNumber {
