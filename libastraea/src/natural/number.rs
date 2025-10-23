@@ -64,6 +64,16 @@ impl NaturalNumber {
 
         Self { digits }
     }
+
+    /// Multiplies number by 10<sup>k</sup>.
+    pub fn times_pow10(self, k: usize) -> Self {
+        if self.is_zero() {
+            return self;
+        }
+
+        let digits = [vec![digit!(0); k], self.as_digits()].concat();
+        return Self { digits };
+    }
 }
 
 impl Add for NaturalNumber {
@@ -379,6 +389,15 @@ mod tests {
         assert!(NaturalNumber::new(vec![digit!(0)]).is_zero());
         assert!(!NaturalNumber::new(vec![digit!(1)]).is_zero());
         assert!(!NaturalNumber::new(vec![digit!(0); 2]).is_zero());
+    }
+
+    #[test]
+    fn test_natural_number_times_pow10() {
+        let n = NaturalNumber::from_str("123").unwrap();
+        let expected = "12300000000000000";
+        let actual = n.times_pow10(14).to_string();
+
+        assert_eq!(expected, actual);
     }
 
     #[test]
