@@ -34,8 +34,8 @@ impl NaturalNumber {
     }
 
     /// Returns digits of the NaturalNumber, in reverse order.
-    pub fn as_digits(&self) -> &Vec<Digit> {
-        &self.digits
+    pub fn as_digits(self) -> Vec<Digit> {
+        self.digits
     }
 
     /// Reports whether the number is zero.
