@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::str::FromStr;
 
 use crate::{ParseError, ValueError};
@@ -90,9 +91,9 @@ impl Digit {
     }
 }
 
-impl ToString for Digit {
-    fn to_string(&self) -> String {
-        self.value.to_string()
+impl Display for Digit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
     }
 }
 
