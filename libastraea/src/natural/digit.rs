@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crate::{ParseError, ValueError};
 
 /// Represents a single digit of a natural number.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq, PartialOrd, Ord)]
 pub struct Digit {
     pub value: u8,
 }
@@ -94,5 +94,26 @@ impl FromStr for Digit {
         }
 
         Self::from_char(s.chars().next().unwrap())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cmp::Ordering;
+
+    #[test]
+    fn test_digit_cmp() {
+        let lhs = Digit::new(9).unwrap();
+        let rhs = Digit::new(8).unwrap();
+        assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
+
+        let lhs = Digit::new(3).unwrap();
+        let rhs = Digit::new(4).unwrap();
+        assert_eq!(lhs.cmp(&rhs), Ordering::Less);
+
+        let lhs = Digit::new(6).unwrap();
+        let rhs = Digit::new(6).unwrap();
+        assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
     }
 }
