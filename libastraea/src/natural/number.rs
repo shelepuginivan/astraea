@@ -33,6 +33,13 @@ impl NaturalNumber {
         NaturalNumber { digits }
     }
 
+    /// Returns zero-value NaturalNumber.
+    pub fn zero() -> Self {
+        Self {
+            digits: vec![digit!(0)],
+        }
+    }
+
     /// Returns digits of the NaturalNumber, in reverse order.
     pub fn as_digits(self) -> Vec<Digit> {
         self.digits
@@ -212,6 +219,25 @@ impl Mul<Digit> for NaturalNumber {
     }
 }
 
+impl Mul<Self> for NaturalNumber {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        if self.is_zero() || rhs.is_zero() {
+            return Self::zero();
+        }
+
+        let mut sum = Self::zero();
+
+        for (k, digit) in rhs.digits.into_iter().enumerate() {
+            let prod = self.clone() * digit;
+            sum = sum + prod.times_pow10(k);
+        }
+
+        sum
+    }
+}
+
 impl FromStr for NaturalNumber {
     type Err = ParseError;
 
@@ -368,6 +394,23 @@ mod tests {
 
             let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
             let rhs = digit!(rhs as u8);
+            let actual = lhs * rhs;
+
+            assert_eq!(expected.to_string(), actual.to_string());
+        }
+    }
+
+    #[test]
+    fn test_natural_number_mul() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs = rng.random_range(..2u32.pow(16));
+            let rhs = rng.random_range(..2u32.pow(16));
+            let expected = lhs * rhs;
+
+            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
             let actual = lhs * rhs;
 
             assert_eq!(expected.to_string(), actual.to_string());
