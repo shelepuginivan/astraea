@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Display};
 use crate::core::{Instruction, InstructionError, Module};
 use crate::math::sign::ToSign;
 use crate::natural::NaturalNumber;
-use crate::parse::ensure_args;
+use crate::validate::ensure_args;
 
 pub struct NaturalModule {}
 
