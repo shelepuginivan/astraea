@@ -1,5 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
+use std::iter;
+use std::ops::Add;
 use std::str::FromStr;
 
 use crate::core::ParseError;
@@ -34,6 +36,49 @@ impl NaturalNumber {
     /// Returns digits of the NaturalNumber, in reverse order.
     pub fn as_digits(&self) -> &Vec<Digit> {
         &self.digits
+    }
+}
+
+impl Add for NaturalNumber {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let result_digit_cap = self.digits.len().max(rhs.digits.len()) + 1;
+        if result_digit_cap == 1 {
+            return NaturalNumber {
+                digits: vec![digit!(0)],
+            };
+        }
+
+        let mut digits: Vec<Digit> = Vec::with_capacity(result_digit_cap);
+        let mut next_carry = digit!(0);
+
+        let lhs_digits = self.digits.into_iter();
+        let rhs_digits = rhs.digits.into_iter();
+
+        let (shorter, longer) = if lhs_digits.len() > rhs_digits.len() {
+            (rhs_digits, lhs_digits)
+        } else {
+            (lhs_digits, rhs_digits)
+        };
+
+        let radix = longer.zip(shorter.chain(iter::repeat(digit!(0))));
+
+        for (lhs_digit, rhs_digit) in radix {
+            let (sum, carry) = lhs_digit + rhs_digit;
+            let (sum, self_carry) = sum + next_carry;
+            let (carry, _) = carry + self_carry;
+
+            digits.push(sum);
+
+            next_carry = carry;
+        }
+
+        if next_carry != digit!(0) {
+            digits.push(next_carry);
+        }
+
+        Self { digits }
     }
 }
 
@@ -105,6 +150,8 @@ impl Ord for NaturalNumber {
 
 #[cfg(test)]
 mod tests {
+    use rand::Rng;
+
     use super::*;
     use crate::digit;
     use std::cmp::Ordering;
@@ -112,7 +159,7 @@ mod tests {
     #[test]
     fn test_natural_number_cmp() {
         let lhs = NaturalNumber::from_str("1234").unwrap();
-        let rhs = NaturalNumber::from_str("5478").unwrap();
+        let rhs = NaturalNumber::from_str("5678").unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Less);
 
         let lhs = NaturalNumber::new(vec![digit!(1); 1_000_000]);
@@ -125,6 +172,29 @@ mod tests {
         let lhs = NaturalNumber::from_str(lhs_str.as_str()).unwrap();
         let rhs = NaturalNumber::from_str(rhs_str.as_str()).unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
+    }
+
+    #[test]
+    fn test_natural_number_add() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs: u32 = rng.random_range(..2u32.pow(31));
+            let rhs: u32 = rng.random_range(..2u32.pow(31));
+            let expected = lhs + rhs;
+
+            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            assert_eq!((lhs + rhs).to_string(), expected.to_string());
+        }
+
+        let lhs = NaturalNumber::from_str(&"9".repeat(999_999)).unwrap();
+        let rhs = NaturalNumber::from_str("1").unwrap();
+
+        let expected = "1".to_owned() + &"0".repeat(999_999);
+        let actual = (lhs + rhs).to_string();
+
+        assert_eq!(expected, actual);
     }
 
     #[test]
