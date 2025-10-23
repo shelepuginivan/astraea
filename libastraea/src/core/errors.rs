@@ -2,12 +2,14 @@ use std::fmt::Display;
 
 #[derive(Debug)]
 pub struct InstructionError {
-    message: String,
+    pub message: String,
 }
 
 impl InstructionError {
-    pub fn new(message: String) -> Self {
-        InstructionError { message }
+    pub fn new<S: Into<String>>(message: S) -> Self {
+        Self {
+            message: message.into(),
+        }
     }
 }
 
@@ -19,12 +21,14 @@ impl Display for InstructionError {
 
 #[derive(Debug)]
 pub struct ParseError {
-    message: String,
+    pub message: String,
 }
 
 impl ParseError {
-    pub fn new(message: String) -> Self {
-        ParseError { message }
+    pub fn new<S: Into<String>>(message: S) -> Self {
+        Self {
+            message: message.into(),
+        }
     }
 }
 
@@ -36,12 +40,14 @@ impl Display for ParseError {
 
 #[derive(Debug)]
 pub struct ValueError {
-    message: String
+    pub message: String,
 }
 
 impl ValueError {
-    pub fn new(message: String) -> Self {
-        ValueError { message }
+    pub fn new<S: Into<String>>(message: S) -> Self {
+        Self {
+            message: message.into(),
+        }
     }
 }
 
