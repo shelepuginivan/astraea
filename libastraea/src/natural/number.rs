@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::iter;
-use std::ops::Add;
+use std::ops::{Add, Sub};
 use std::str::FromStr;
 
-use crate::core::ParseError;
+use crate::core::{ParseError, ValueError};
 use crate::digit;
 use crate::math::Digit;
 
@@ -70,7 +70,10 @@ impl Add for NaturalNumber {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let result_digit_cap = self.digits.len().max(rhs.digits.len()) + 1;
+        let lhs_len = self.digits.len();
+        let rhs_len = rhs.digits.len();
+
+        let result_digit_cap = lhs_len.max(rhs_len) + 1;
         if result_digit_cap == 1 {
             return NaturalNumber {
                 digits: vec![digit!(0)],
@@ -83,7 +86,7 @@ impl Add for NaturalNumber {
         let lhs_digits = self.digits.into_iter();
         let rhs_digits = rhs.digits.into_iter();
 
-        let (shorter, longer) = if lhs_digits.len() > rhs_digits.len() {
+        let (shorter, longer) = if lhs_len > rhs_len {
             (rhs_digits, lhs_digits)
         } else {
             (lhs_digits, rhs_digits)
@@ -106,6 +109,55 @@ impl Add for NaturalNumber {
         }
 
         Self { digits }
+    }
+}
+
+impl Sub for NaturalNumber {
+    type Output = Result<Self, ValueError>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        if self.digits.len() < rhs.digits.len() {
+            return Err(ValueError::new(
+                "the right-hand side operand must not be greater than the left-hand side operand",
+            ));
+        }
+
+        let result_digit_cap = self.digits.len();
+        if result_digit_cap == 0 {
+            return Ok(NaturalNumber {
+                digits: vec![digit!(0)],
+            });
+        }
+
+        let mut digits: Vec<Digit> = Vec::with_capacity(result_digit_cap);
+        let mut next_carry = digit!(0);
+
+        let lhs_digits = self.digits.into_iter();
+        let rhs_digits = rhs.digits.into_iter();
+
+        let radix = lhs_digits.zip(rhs_digits.chain(iter::repeat(digit!(0))));
+
+        for (lhs_digit, rhs_digit) in radix {
+            let (diff, carry) = lhs_digit - rhs_digit;
+            let (diff, self_carry) = diff - next_carry;
+            let (carry, _) = carry + self_carry;
+
+            digits.push(diff);
+
+            next_carry = carry;
+        }
+
+        if next_carry != digit!(0) {
+            return Err(ValueError::new(
+                "the right-hand side operand must not be greater than the left-hand side operand",
+            ));
+        }
+
+        while digits.len() > 1 && *digits.last().unwrap() == digit!(0) {
+            digits.pop();
+        }
+
+        Ok(Self { digits })
     }
 }
 
@@ -226,6 +278,30 @@ mod tests {
 
         let expected = "1".to_owned() + &"0".repeat(999_999);
         let actual = (lhs + rhs).to_string();
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_natural_number_sub() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let rhs: u32 = rng.random_range(..2u32.pow(31));
+            let lhs: u32 = rng.random_range(rhs..=u32::MAX);
+            let expected = lhs - rhs;
+
+            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            assert_eq!((lhs - rhs).unwrap().to_string(), expected.to_string());
+        }
+
+        let lhs_value = "1".to_owned() + &"0".repeat(999_999);
+        let lhs = NaturalNumber::from_str(&lhs_value).unwrap();
+        let rhs = NaturalNumber::from_str("1").unwrap();
+
+        let expected = "9".repeat(999_999);
+        let actual = (lhs - rhs).unwrap().to_string();
 
         assert_eq!(expected, actual);
     }
