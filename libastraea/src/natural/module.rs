@@ -1,16 +1,15 @@
-use std::{cmp::Ordering, collections::HashSet, fmt::Display, str::FromStr};
+use std::{collections::HashSet, fmt::Display};
 
-use crate::{Instruction, InstructionError, Module, NaturalNumber, math::sign::ToSign};
+use crate::{
+    Instruction, InstructionError, Module, NaturalNumber, math::sign::ToSign,
+    parse::parse::ensure_args,
+};
 
 pub struct NaturalModule {}
 
 impl NaturalModule {
     pub fn new() -> Self {
         NaturalModule {}
-    }
-
-    pub fn compare(lhs: NaturalNumber, rhs: NaturalNumber) -> Ordering {
-        lhs.cmp(&rhs)
     }
 }
 
@@ -22,34 +21,10 @@ impl Module for NaturalModule {
     ) -> Result<Box<dyn Display>, InstructionError> {
         match instruction {
             Instruction::NaturalCompare => {
-                if args.len() != 2 {
-                    return Err(InstructionError::new(format!(
-                        "expected 2 arguments, got {}",
-                        args.len(),
-                    )));
-                }
-
-                let lhs = match NaturalNumber::from_str(&args[0]) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(InstructionError::new(format!(
-                            "cannot parse first argument: {}",
-                            e.message
-                        )));
-                    }
-                };
-
-                let rhs = match NaturalNumber::from_str(&args[1]) {
-                    Ok(v) => v,
-                    Err(e) => {
-                        return Err(InstructionError::new(format!(
-                            "cannot parse second argument: {}",
-                            e.message
-                        )));
-                    }
-                };
-
-                let result = Self::compare(lhs, rhs).to_sign();
+                let args: Vec<NaturalNumber> = ensure_args(instruction, args, 2)?;
+                let lhs = &args[0];
+                let rhs = &args[1];
+                let result = lhs.cmp(rhs).to_sign();
 
                 Ok(Box::new(result))
             }
