@@ -1,6 +1,7 @@
 use std::{cmp::Ordering, fmt::Display};
 
 /// Sign represents sign of the number.
+#[derive(Debug, Eq, PartialEq)]
 pub enum Sign {
     Negative,
     Zero,
