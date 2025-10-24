@@ -136,6 +136,28 @@ impl NaturalNumber {
 
         Ok((quotient, remainder))
     }
+
+    pub fn gcd(self, other: Self) -> Self {
+        if other.is_zero() {
+            return self;
+        } else if self.is_zero() {
+            return other;
+        }
+
+        let (low, high) = match self.cmp(&other) {
+            Ordering::Less => (self, other),
+            Ordering::Equal => return self,
+            Ordering::Greater => (other, self),
+        };
+
+        let r = (high % low.clone()).unwrap();
+
+        if r.is_zero() {
+            return low;
+        }
+
+        low.gcd(r)
+    }
 }
 
 impl Add for NaturalNumber {
@@ -549,6 +571,25 @@ mod tests {
 
             assert_eq!(expected.to_string(), actual.unwrap().to_string());
         }
+    }
+
+    #[test]
+    fn test_natural_number_gcd() {
+        let lhs = NaturalNumber::from_str("21").unwrap();
+        let rhs = NaturalNumber::from_str("6").unwrap();
+        assert_eq!("3", lhs.gcd(rhs).to_string());
+
+        let lhs = NaturalNumber::from_str("8").unwrap();
+        let rhs = NaturalNumber::from_str("0").unwrap();
+        assert_eq!("8", lhs.gcd(rhs).to_string());
+
+        let lhs = NaturalNumber::from_str("0").unwrap();
+        let rhs = NaturalNumber::from_str("6").unwrap();
+        assert_eq!("6", lhs.gcd(rhs).to_string());
+
+        let lhs = NaturalNumber::from_str("0").unwrap();
+        let rhs = NaturalNumber::from_str("0").unwrap();
+        assert_eq!("0", lhs.gcd(rhs).to_string());
     }
 
     #[test]
