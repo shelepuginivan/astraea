@@ -158,6 +158,20 @@ impl NaturalNumber {
 
         low.gcd(r)
     }
+
+    pub fn lcm(self, other: Self) -> Self {
+        if self.is_zero() || other.is_zero() {
+            return Self::zero();
+        }
+
+        let prod = self.clone() * other.clone();
+        let gcd = self.gcd(other);
+
+        match prod / gcd {
+            Ok(v) => v,
+            Err(_) => Self::zero(),
+        }
+    }
 }
 
 impl Add for NaturalNumber {
@@ -590,6 +604,25 @@ mod tests {
         let lhs = NaturalNumber::from_str("0").unwrap();
         let rhs = NaturalNumber::from_str("0").unwrap();
         assert_eq!("0", lhs.gcd(rhs).to_string());
+    }
+
+    #[test]
+    fn test_natural_number_lcm() {
+        let lhs = NaturalNumber::from_str("21").unwrap();
+        let rhs = NaturalNumber::from_str("14").unwrap();
+        assert_eq!("42", lhs.lcm(rhs).to_string());
+
+        let lhs = NaturalNumber::from_str("8").unwrap();
+        let rhs = NaturalNumber::from_str("0").unwrap();
+        assert_eq!("0", lhs.lcm(rhs).to_string());
+
+        let lhs = NaturalNumber::from_str("0").unwrap();
+        let rhs = NaturalNumber::from_str("6").unwrap();
+        assert_eq!("0", lhs.lcm(rhs).to_string());
+
+        let lhs = NaturalNumber::from_str("0").unwrap();
+        let rhs = NaturalNumber::from_str("0").unwrap();
+        assert_eq!("0", lhs.lcm(rhs).to_string());
     }
 
     #[test]
