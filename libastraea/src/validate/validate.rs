@@ -1,10 +1,44 @@
 use std::{fmt::Display, str::FromStr};
 
-use crate::core::{Instruction, InstructionError};
+use crate::{
+    core::{Instruction, InstructionError},
+    math::Digit,
+    natural::NaturalNumber,
+};
+
+pub fn ensure_args_count(
+    instruction: &Instruction,
+    args: &Vec<String>,
+    expected: usize,
+) -> Result<(), InstructionError> {
+    if args.len() != expected {
+        return Err(InstructionError::new(format!(
+            "{} expected {} arg(s), got {}",
+            instruction,
+            expected,
+            args.len()
+        )));
+    }
+
+    Ok(())
+}
+
+pub fn digit(value: &str) -> Result<Digit, InstructionError> {
+    Digit::from_str(value).or_else(|e| Err(InstructionError::new(e.message)))
+}
+
+pub fn natural(value: &str) -> Result<NaturalNumber, InstructionError> {
+    NaturalNumber::from_str(value).or_else(|e| Err(InstructionError::new(e.message)))
+}
+
+pub fn usize(value: &str) -> Result<usize, InstructionError> {
+    usize::from_str(value)
+        .or_else(|_| Err(InstructionError::new(r#"cannot convert "{}" to usize"#)))
+}
 
 /// Parses arguments provided to the particular instruction and ensures their validity.
 pub fn ensure_args<T>(
-    instruction: Instruction,
+    instruction: &Instruction,
     args: Vec<String>,
     count: usize,
 ) -> Result<Vec<T>, InstructionError>
@@ -12,14 +46,7 @@ where
     T: FromStr,
     T::Err: Display,
 {
-    if args.len() != count {
-        return Err(InstructionError::new(format!(
-            "{} expected {} arg(s), got {}",
-            instruction,
-            count,
-            args.len()
-        )));
-    }
+    ensure_args_count(instruction, &args, count)?;
 
     let mut res = Vec::with_capacity(count);
 
@@ -41,7 +68,7 @@ where
     Ok(res)
 }
 
-pub fn one_arg<T>(instruction: Instruction, args: Vec<String>) -> Result<T, InstructionError>
+pub fn one_arg<T>(instruction: &Instruction, args: Vec<String>) -> Result<T, InstructionError>
 where
     T: FromStr,
     T::Err: Display,
@@ -53,7 +80,7 @@ where
     Ok(first)
 }
 
-pub fn two_args<T>(instruction: Instruction, args: Vec<String>) -> Result<(T, T), InstructionError>
+pub fn two_args<T>(instruction: &Instruction, args: Vec<String>) -> Result<(T, T), InstructionError>
 where
     T: FromStr,
     T::Err: Display,
@@ -67,7 +94,7 @@ where
 }
 
 pub fn three_args<T>(
-    instruction: Instruction,
+    instruction: &Instruction,
     args: Vec<String>,
 ) -> Result<(T, T, T), InstructionError>
 where
