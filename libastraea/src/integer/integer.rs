@@ -11,6 +11,30 @@ pub struct Integer {
     sign: Sign,
 }
 
+impl Integer {
+    pub fn zero() -> Self {
+        Self {
+            value: NaturalNumber::zero(),
+            sign: Sign::Zero,
+        }
+    }
+
+    pub fn abs(self) -> Self {
+        if self.is_zero() {
+            return Self::zero();
+        }
+
+        Self {
+            value: self.value,
+            sign: self.sign,
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.value.is_zero() || self.sign == Sign::Zero
+    }
+}
+
 impl Display for Integer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let sign = if self.sign == Sign::Negative { "-" } else { "" };
@@ -67,4 +91,3 @@ mod tests {
         }
     }
 }
-
