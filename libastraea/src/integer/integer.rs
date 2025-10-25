@@ -4,7 +4,6 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
-use crate::digit;
 use crate::math::Sign;
 use crate::natural::NaturalNumber;
 
