@@ -93,6 +93,20 @@ impl Integer {
 
         Ok((quotient, remainder))
     }
+
+    pub fn gcd(self, other: Self) -> Self {
+        Self {
+            value: self.value.gcd(other.value),
+            sign: Sign::Positive,
+        }
+    }
+
+    pub fn lcm(self, other: Self) -> Self {
+        Self {
+            value: self.value.lcm(other.value),
+            sign: Sign::Positive,
+        }
+    }
 }
 
 impl Add for Integer {
