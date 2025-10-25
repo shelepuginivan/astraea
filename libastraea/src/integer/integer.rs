@@ -2,7 +2,7 @@ use std::fmt::Display;
 use std::ops::Neg;
 use std::str::FromStr;
 
-use crate::core::ParseError;
+use crate::core::{ParseError, ValueError};
 use crate::math::Sign;
 use crate::natural::NaturalNumber;
 
@@ -13,6 +13,22 @@ pub struct Integer {
 }
 
 impl Integer {
+    pub fn from_natural(n: NaturalNumber) -> Self {
+        Self {
+            value: n,
+            sign: Sign::Positive,
+        }
+    }
+
+    pub fn to_natural(self) -> Result<NaturalNumber, ValueError> {
+        match self.sign {
+            Sign::Negative => Err(ValueError::new(
+                "cannot convert negative integer to natural",
+            )),
+            _ => Ok(self.value),
+        }
+    }
+
     pub fn zero() -> Self {
         Self {
             value: NaturalNumber::zero(),
