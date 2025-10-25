@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
-use std::ops::{Add, Neg, Sub};
+use std::ops::{Add, Mul, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -95,6 +95,17 @@ impl Sub for Integer {
 
     fn sub(self, rhs: Self) -> Self::Output {
         self.add(-rhs)
+    }
+}
+
+impl Mul for Integer {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self {
+            value: self.value * rhs.value,
+            sign: self.sign * rhs.sign,
+        }
     }
 }
 
@@ -200,6 +211,26 @@ mod tests {
             let lhs = Integer::from_str(&lhs.to_string()).unwrap();
             let rhs = Integer::from_str(&rhs.to_string()).unwrap();
             let actual = (lhs - rhs).to_string();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_integer_mul() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let min_value = i16::MIN as i32;
+            let max_value = i16::MAX as i32;
+
+            let lhs = rng.random_range(min_value..max_value);
+            let rhs = rng.random_range(min_value..max_value);
+            let expected = (lhs * rhs).to_string();
+
+            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
+            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let actual = (lhs * rhs).to_string();
 
             assert_eq!(expected, actual);
         }
