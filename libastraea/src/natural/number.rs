@@ -116,7 +116,7 @@ impl NaturalNumber {
     /// Value error is returned if and only if the denominator is zero.
     pub fn divide(self, denominator: Self) -> Result<(Self, Self), ValueError> {
         if denominator.is_zero() {
-            return Err(ValueError::new("denominator must not be 0"));
+            return Err(ValueError::new("division by 0 is not allowed"));
         }
 
         let mut quotient = Self::zero();
