@@ -1,11 +1,12 @@
 mod cli;
+mod report;
 
-use std::{process, str::FromStr};
+use std::str::FromStr;
 
-use crate::cli::Args;
+use crate::{cli::Args, report::Error};
 use clap::Parser;
 use libastraea::{
-    core::{Instruction, Module, ModuleGroup},
+    core::{Instruction, InstructionErrorReason, Module, ModuleGroup},
     integer::IntegerModule,
     natural::NaturalModule,
 };
@@ -19,23 +20,30 @@ fn main() {
 
     let instruction = match Instruction::from_str(&args.instruction) {
         Ok(i) => i,
-        Err(e) => {
-            eprintln!("{}", e.message);
-            process::exit(1);
-        }
+        Err(..) => Error::UnknownInstruction.print(&args),
     };
 
     if !modules.implements(instruction) {
-        eprintln!("instruction {} is not implemented", instruction);
-        process::exit(1);
+        Error::InstructionNotImplemented.print(&args)
     }
 
-    let result = match modules.process_instruction(instruction, args.params) {
+    let result = match modules.process_instruction(instruction, args.args.clone()) {
         Ok(res) => res,
-        Err(e) => {
-            eprintln!("{}", e.message);
-            process::exit(1);
-        }
+        Err(e) => match e.reason {
+            InstructionErrorReason::Argument(arg_index) => {
+                Error::InvalidArgument(arg_index, e.message).print(&args)
+            }
+
+            InstructionErrorReason::ArgumentsCount(expected, actual) => {
+                Error::InvalidNumberOfArguments(expected, actual).print(&args)
+            }
+
+            InstructionErrorReason::Calculation => {
+                Error::Calculation(e.message).print(&args);
+            }
+
+            InstructionErrorReason::Instruction => unreachable!(),
+        },
     };
 
     println!("{}", result);

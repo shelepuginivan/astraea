@@ -9,5 +9,5 @@ pub struct Args {
 
     /// Parameters of the instruction.
     #[arg(short, long, num_args = 1.., allow_hyphen_values = true)]
-    pub params: Vec<String>,
+    pub args: Vec<String>,
 }
