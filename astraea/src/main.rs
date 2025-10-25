@@ -1,15 +1,14 @@
 mod cli;
-mod report;
 
-use std::str::FromStr;
-
-use crate::{cli::Args, report::Error};
 use clap::Parser;
 use libastraea::{
     core::{Instruction, InstructionErrorReason, Module, ModuleGroup},
     integer::IntegerModule,
     natural::NaturalModule,
 };
+use std::str::FromStr;
+
+use crate::cli::{Args, Error};
 
 fn main() {
     let args = Args::parse();
