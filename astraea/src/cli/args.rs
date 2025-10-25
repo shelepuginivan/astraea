@@ -1,7 +1,7 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version, about = "astraea - Computer algebra system")]
 pub struct Args {
     /// Instruction to be called.
     #[arg(short, long)]
