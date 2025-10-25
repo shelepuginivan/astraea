@@ -90,6 +90,66 @@ pub enum Instruction {
     /// - Index: N-14
     /// - Opcode: LCM_NN_N
     NaturalLCM,
+
+    /// Returns absolute value of the integer.
+    ///
+    /// - Index: Z-1
+    /// - Opcode: ABS_Z_Z
+    IntegerAbs,
+
+    /// Returns sign of the integer.
+    ///
+    /// - Index: Z-2
+    /// - Opcode: SGN_Z_D
+    IntegerSgn,
+
+    /// Multiplies integer by -1.
+    ///
+    /// - Index: Z-3
+    /// - Opcode: NEG_ZM_Z
+    IntegerNeg,
+
+    /// Converts natural number to integer.
+    ///
+    /// - Index: Z-4
+    /// - Opcode: TRANS_N_Z
+    IntegerFromNatural,
+
+    /// Converts integer to natural number.
+    ///
+    /// - Index: Z-5
+    /// - Opcode: TRANS_Z_N
+    IntegerToNatural,
+
+    /// Adds two integers.
+    ///
+    /// - Index: Z-6
+    /// - Opcode: ADD_ZZ_Z
+    IntegerAdd,
+
+    /// Subtracts second natural number from first.
+    ///
+    /// - Index: Z-7
+    /// - Opcode: SUB_ZZ_Z
+    IntegerSubtract,
+
+    /// Multiplies two integers.
+    ///
+    /// - Index: Z-8
+    /// - Opcode: MUL_ZZ_Z
+    IntegerMultiply,
+
+    /// Calculates the quotient of dividing the first integer by the second.
+    ///
+    /// - Index: Z-9
+    /// - Opcode: DIV_ZZ_Z
+    IntegerQuotient,
+
+    /// Calculates the remainder of dividing the first integer by the second.
+    ///
+    /// - Index: Z-10
+    /// - Opcode: MOD_ZZ_Z
+    IntegerRemainder,
 }
 
 impl Instruction {
@@ -110,6 +170,17 @@ impl Instruction {
             Instruction::NaturalRemainder => "MOD_NN_N".to_string(),
             Instruction::NaturalGCD => "GCF_NN_N".to_string(),
             Instruction::NaturalLCM => "LCM_NN_N".to_string(),
+
+            Instruction::IntegerAbs => "ABS_Z_Z".to_string(),
+            Instruction::IntegerSgn => "SGN_Z_D".to_string(),
+            Instruction::IntegerNeg => "NEG_ZM_Z".to_string(),
+            Instruction::IntegerFromNatural => "TRANS_N_Z".to_string(),
+            Instruction::IntegerToNatural => "TRANS_Z_N".to_string(),
+            Instruction::IntegerAdd => "ADD_ZZ_Z".to_string(),
+            Instruction::IntegerSubtract => "SUB_ZZ_Z".to_string(),
+            Instruction::IntegerMultiply => "MUL_ZZ_Z".to_string(),
+            Instruction::IntegerQuotient => "DIV_ZZ_Z".to_string(),
+            Instruction::IntegerRemainder => "MOD_ZZ_Z".to_string(),
         }
     }
 
@@ -130,6 +201,17 @@ impl Instruction {
             Instruction::NaturalRemainder => "N-12".to_string(),
             Instruction::NaturalGCD => "N-13".to_string(),
             Instruction::NaturalLCM => "N-14".to_string(),
+
+            Instruction::IntegerAbs => "Z-1".to_string(),
+            Instruction::IntegerSgn => "Z-2".to_string(),
+            Instruction::IntegerNeg => "Z-3".to_string(),
+            Instruction::IntegerFromNatural => "Z-4".to_string(),
+            Instruction::IntegerToNatural => "Z-5".to_string(),
+            Instruction::IntegerAdd => "Z-6".to_string(),
+            Instruction::IntegerSubtract => "Z-7".to_string(),
+            Instruction::IntegerMultiply => "Z-8".to_string(),
+            Instruction::IntegerQuotient => "Z-9".to_string(),
+            Instruction::IntegerRemainder => "Z-10".to_string(),
         }
     }
 }
@@ -159,6 +241,17 @@ impl FromStr for Instruction {
             "N-12" | "MOD_NN_N" | "NaturalRemainder" => Ok(Self::NaturalRemainder),
             "N-13" | "GCF_NN_N" | "NaturalGCD" => Ok(Self::NaturalGCD),
             "N-14" | "LCM_NN_N" | "NaturalLCM" => Ok(Self::NaturalLCM),
+
+            "Z-1" | "ABS_Z_Z" | "IntegerAbs" => Ok(Self::IntegerAbs),
+            "Z-2" | "SGN_Z_D" | "IntegerSgn" => Ok(Self::IntegerSgn),
+            "Z-3" | "NEG_ZM_Z" | "IntegerNeg" => Ok(Self::IntegerNeg),
+            "Z-4" | "TRANS_N_Z" | "IntegerFromNatural" => Ok(Self::IntegerFromNatural),
+            "Z-5" | "TRANS_Z_N" | "IntegerToNatural" => Ok(Self::IntegerToNatural),
+            "Z-6" | "ADD_ZZ_Z" | "IntegerAdd" => Ok(Self::IntegerAdd),
+            "Z-7" | "SUB_ZZ_Z" | "IntegerSubtract" => Ok(Self::IntegerSubtract),
+            "Z-8" | "MUL_ZZ_Z" | "IntegerMultiply" => Ok(Self::IntegerMultiply),
+            "Z-9" | "DIV_ZZ_Z" | "IntegerQuotient" => Ok(Self::IntegerQuotient),
+            "Z-10" | "MOD_ZZ_Z" | "IntegerRemainder" => Ok(Self::IntegerRemainder),
 
             _ => Err(InstructionError::new(format!("unknown instruction: {}", s))),
         }
