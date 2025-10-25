@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
-use std::ops::{Add, Neg};
+use std::ops::{Add, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -90,6 +90,14 @@ impl Add for Integer {
     }
 }
 
+impl Sub for Integer {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.add(-rhs)
+    }
+}
+
 impl Neg for Integer {
     type Output = Self;
 
@@ -172,6 +180,26 @@ mod tests {
             let lhs = Integer::from_str(&lhs.to_string()).unwrap();
             let rhs = Integer::from_str(&rhs.to_string()).unwrap();
             let actual = (lhs + rhs).to_string();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_integer_sub() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let min_value = i32::MIN / 2;
+            let max_value = i32::MAX / 2;
+
+            let lhs = rng.random_range(min_value..max_value);
+            let rhs = rng.random_range(min_value..max_value);
+            let expected = (lhs - rhs).to_string();
+
+            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
+            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let actual = (lhs - rhs).to_string();
 
             assert_eq!(expected, actual);
         }
