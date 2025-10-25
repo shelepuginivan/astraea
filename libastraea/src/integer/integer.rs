@@ -44,7 +44,7 @@ impl Integer {
 
         Self {
             value: self.value,
-            sign: self.sign,
+            sign: Sign::Positive,
         }
     }
 
