@@ -1,5 +1,6 @@
+use std::cmp::Ordering;
 use std::fmt::Display;
-use std::ops::Neg;
+use std::ops::{Add, Neg};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -53,6 +54,39 @@ impl Integer {
 
     pub fn sign(&self) -> Sign {
         self.sign
+    }
+}
+
+impl Add for Integer {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        match (self.is_zero(), rhs.is_zero()) {
+            (true, true) => return Self::zero(),
+            (true, false) => return rhs,
+            (false, true) => return self,
+            (false, false) => {}
+        }
+
+        let (max, min, diff_sign) = match self.value.cmp(&rhs.value) {
+            Ordering::Less => (rhs.value, self.value, rhs.sign),
+            Ordering::Equal => (self.value, rhs.value, Sign::Zero),
+            Ordering::Greater => (self.value, rhs.value, self.sign),
+        };
+
+        match (self.sign, rhs.sign) {
+            (Sign::Positive, Sign::Positive) | (Sign::Negative, Sign::Negative) => Self {
+                value: max + min,
+                sign: self.sign,
+            },
+
+            (Sign::Positive, Sign::Negative) | (Sign::Negative, Sign::Positive) => Self {
+                value: (max - min).unwrap(),
+                sign: diff_sign,
+            },
+
+            _ => unreachable!(),
+        }
     }
 }
 
@@ -118,6 +152,26 @@ mod tests {
             let i: i64 = rng.random();
             let expected = i.to_string();
             let actual = Integer::from_str(expected.as_str()).unwrap().to_string();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_integer_add() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let min_value = i32::MIN / 2;
+            let max_value = i32::MAX / 2;
+
+            let lhs = rng.random_range(min_value..max_value);
+            let rhs = rng.random_range(min_value..max_value);
+            let expected = (lhs + rhs).to_string();
+
+            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
+            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let actual = (lhs + rhs).to_string();
 
             assert_eq!(expected, actual);
         }
