@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::ops::Neg;
 use std::str::FromStr;
 
 use crate::core::ParseError;
@@ -32,6 +33,21 @@ impl Integer {
 
     pub fn is_zero(&self) -> bool {
         self.value.is_zero() || self.sign == Sign::Zero
+    }
+
+    pub fn sign(&self) -> Sign {
+        self.sign
+    }
+}
+
+impl Neg for Integer {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self {
+            value: self.value,
+            sign: -self.sign,
+        }
     }
 }
 

@@ -1,7 +1,7 @@
-use std::{cmp::Ordering, fmt::Display};
+use std::{cmp::Ordering, fmt::Display, ops::Neg};
 
 /// Sign represents sign of the number.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Sign {
     Negative,
     Zero,
@@ -31,6 +31,18 @@ impl Sign {
 impl Display for Sign {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value())
+    }
+}
+
+impl Neg for Sign {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        match self {
+            Self::Positive => Self::Negative,
+            Self::Zero => Self::Zero,
+            Self::Negative => Self::Positive,
+        }
     }
 }
 
