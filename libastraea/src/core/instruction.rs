@@ -4,7 +4,7 @@ use std::str::FromStr;
 use crate::core::InstructionError;
 
 /// Instructions available in the computer algebra system.
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Instruction {
     /// Compares two natural numbers.
     ///
