@@ -73,7 +73,7 @@ where
     T: FromStr,
     T::Err: Display,
 {
-    let args = ensure_args(instruction, args, 2)?;
+    let args = ensure_args(instruction, args, 1)?;
     let mut args_iter = args.into_iter();
     let first = args_iter.next().unwrap();
 
@@ -85,7 +85,7 @@ where
     T: FromStr,
     T::Err: Display,
 {
-    let args = ensure_args(instruction, args, 1)?;
+    let args = ensure_args(instruction, args, 2)?;
     let mut args_iter = args.into_iter();
     let first = args_iter.next().unwrap();
     let second = args_iter.next().unwrap();
