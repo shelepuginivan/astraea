@@ -1,9 +1,10 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
+use crate::digit;
 use crate::math::Sign;
 use crate::natural::NaturalNumber;
 
@@ -52,8 +53,45 @@ impl Integer {
         self.value.is_zero() || self.sign == Sign::Zero
     }
 
+    pub fn is_positive(&self) -> bool {
+        self.sign == Sign::Positive
+    }
+
+    pub fn is_negative(&self) -> bool {
+        self.sign == Sign::Negative
+    }
+
     pub fn sign(&self) -> Sign {
         self.sign
+    }
+
+    pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
+        if rhs.is_zero() {
+            return Err(ValueError::new("division by 0 is not allowed"));
+        }
+
+        if rhs.value > self.value {
+            return Ok((Self::zero(), self));
+        }
+
+        let res_sign = self.sign * rhs.sign;
+        let (quotient, remainder) = self.value.divide(rhs.value).unwrap();
+
+        let quotient = Self {
+            value: quotient,
+            sign: res_sign,
+        };
+
+        let remainder = if remainder.is_zero() {
+            Self::zero()
+        } else {
+            Self {
+                value: remainder,
+                sign: self.sign,
+            }
+        };
+
+        Ok((quotient, remainder))
     }
 }
 
@@ -106,6 +144,22 @@ impl Mul for Integer {
             value: self.value * rhs.value,
             sign: self.sign * rhs.sign,
         }
+    }
+}
+
+impl Div for Integer {
+    type Output = Result<Self, ValueError>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Ok(self.divide(rhs)?.0)
+    }
+}
+
+impl Rem for Integer {
+    type Output = Result<Self, ValueError>;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        Ok(self.divide(rhs)?.1)
     }
 }
 
@@ -231,6 +285,54 @@ mod tests {
             let lhs = Integer::from_str(&lhs.to_string()).unwrap();
             let rhs = Integer::from_str(&rhs.to_string()).unwrap();
             let actual = (lhs * rhs).to_string();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_integer_div() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let min_value = i16::MIN as i32;
+            let max_value = i16::MAX as i32;
+
+            let lhs = rng.random_range(min_value..max_value);
+            let rhs = rng.random_range(min_value..max_value);
+            if rhs == 0 {
+                continue;
+            }
+
+            let expected = (lhs / rhs).to_string();
+
+            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
+            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let actual = (lhs / rhs).unwrap().to_string();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_integer_rem() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let min_value = i16::MIN as i32;
+            let max_value = i16::MAX as i32;
+
+            let lhs = rng.random_range(min_value..max_value);
+            let rhs = rng.random_range(min_value..max_value);
+            if rhs == 0 {
+                continue;
+            }
+
+            let expected = (lhs % rhs).to_string();
+
+            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
+            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let actual = (lhs % rhs).unwrap().to_string();
 
             assert_eq!(expected, actual);
         }
