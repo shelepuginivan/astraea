@@ -37,8 +37,8 @@ fn main() {
                 Error::InvalidNumberOfArguments(expected, actual).print(&args)
             }
 
-            InstructionErrorReason::Calculation => {
-                Error::Calculation(e.message).print(&args);
+            InstructionErrorReason::Calculation(caused_by) => {
+                Error::Calculation(caused_by, e.message).print(&args);
             }
 
             InstructionErrorReason::Instruction => unreachable!(),

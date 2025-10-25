@@ -49,7 +49,7 @@ impl Module for IntegerModule {
 
                 match v.to_natural() {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Err(InstructionError::calculation(e.message)),
+                    Err(e) => Err(InstructionError::calculation(0, e.message)),
                 }
             }
 
@@ -76,7 +76,7 @@ impl Module for IntegerModule {
 
                 match lhs / rhs {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Err(InstructionError::calculation(e.message)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
                 }
             }
 
@@ -85,7 +85,7 @@ impl Module for IntegerModule {
 
                 match lhs % rhs {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Err(InstructionError::calculation(e.message)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
                 }
             }
 

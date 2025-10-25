@@ -5,7 +5,7 @@ pub enum InstructionErrorReason {
     Instruction,
     Argument(usize),
     ArgumentsCount(usize, usize),
-    Calculation,
+    Calculation(usize),
 }
 
 #[derive(Debug)]
@@ -29,10 +29,10 @@ impl InstructionError {
         }
     }
 
-    pub fn calculation<S: Into<String>>(message: S) -> Self {
+    pub fn calculation<S: Into<String>>(caused_by_arg: usize, message: S) -> Self {
         Self {
             message: message.into(),
-            reason: InstructionErrorReason::Calculation,
+            reason: InstructionErrorReason::Calculation(caused_by_arg),
         }
     }
 

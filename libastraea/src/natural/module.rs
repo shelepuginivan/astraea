@@ -47,7 +47,7 @@ impl Module for NaturalModule {
 
                 match lhs - rhs {
                     Ok(res) => Ok(Box::new(res)),
-                    Err(err) => Err(InstructionError::calculation(err.message)),
+                    Err(err) => Err(InstructionError::calculation(1, err.message)),
                 }
             }
 
@@ -83,7 +83,7 @@ impl Module for NaturalModule {
 
                 match lhs - rhs * digit {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Err(InstructionError::calculation(e.message)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
                 }
             }
 
@@ -109,7 +109,7 @@ impl Module for NaturalModule {
 
                 match lhs / rhs {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Err(InstructionError::calculation(e.message)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
                 }
             }
 
@@ -118,7 +118,7 @@ impl Module for NaturalModule {
 
                 match lhs % rhs {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Err(InstructionError::calculation(e.message)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
                 }
             }
 

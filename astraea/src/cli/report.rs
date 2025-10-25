@@ -9,7 +9,7 @@ pub enum Error {
     InstructionNotImplemented,
     InvalidArgument(usize, String),
     InvalidNumberOfArguments(usize, usize),
-    Calculation(String),
+    Calculation(usize, String),
 }
 
 impl Error {
@@ -32,7 +32,7 @@ impl Error {
                 "Invalid number of arguments (expected {}, got {})",
                 expected, actual
             ),
-            Self::Calculation(msg) => msg.to_owned(),
+            Self::Calculation(.., msg) => msg.to_owned(),
         }
     }
 
@@ -54,7 +54,7 @@ impl Error {
                     format!("Consider removing {} extra {}", diff, word_args)
                 }
             }
-            Self::Calculation(..) => "".to_string(),
+            Self::Calculation(..) => "Caused by this argument".to_string(),
         }
     }
 
@@ -62,7 +62,9 @@ impl Error {
         match self {
             Self::UnknownInstruction => args.instruction.clone(),
             Self::InstructionNotImplemented => args.instruction.clone(),
-            Self::InvalidArgument(index, ..) => args.args[*index].clone(),
+            Self::InvalidArgument(index, ..) | Self::Calculation(index, ..) => {
+                args.args[*index].clone()
+            }
             Self::InvalidNumberOfArguments(expected, actual) => {
                 if expected > actual {
                     match args.args.last() {
@@ -82,7 +84,6 @@ impl Error {
                     extra_args.join(" ")
                 }
             }
-            Self::Calculation(..) => "".to_string(),
         }
     }
 
@@ -101,10 +102,6 @@ impl Error {
     }
 
     pub fn print(&self, args: &Args) -> ! {
-        if let Self::Calculation(msg) = self {
-            self.print_short(msg);
-        }
-
         let cli_args: Vec<String> = env::args().collect();
         let cli_args = cli_args.join(" ");
         let source_name = "Command line arguments";
@@ -121,12 +118,6 @@ impl Error {
             .print((source_name, Source::from(cli_args)))
             .unwrap();
 
-        process::exit(self.code());
-    }
-
-    fn print_short(&self, message: &str) -> ! {
-        let prefix = format!("[0{}] Error:", self.code());
-        println!("{} {}", prefix.fg(Color::Red), message);
         process::exit(self.code());
     }
 }
