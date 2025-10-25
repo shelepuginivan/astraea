@@ -1,4 +1,8 @@
-use std::{cmp::Ordering, fmt::Display, ops::Neg};
+use std::{
+    cmp::Ordering,
+    fmt::Display,
+    ops::{Mul, Neg},
+};
 
 /// Sign represents sign of the number.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -43,6 +47,22 @@ impl Neg for Sign {
             Self::Zero => Self::Zero,
             Self::Negative => Self::Positive,
         }
+    }
+}
+
+impl Mul for Sign {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        if self == Self::Zero || rhs == Self::Zero {
+            return Self::Zero;
+        }
+
+        if self != rhs {
+            return Self::Negative;
+        }
+
+        Self::Positive
     }
 }
 
