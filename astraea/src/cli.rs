@@ -1,0 +1,13 @@
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+pub struct Args {
+    /// Instruction to be called.
+    #[arg(short, long)]
+    pub instruction: String,
+
+    /// Parameters of the instruction.
+    #[arg(short, long, num_args = 1.., allow_hyphen_values = true)]
+    pub params: Vec<String>,
+}
