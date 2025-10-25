@@ -253,7 +253,7 @@ impl FromStr for Instruction {
             "Z-9" | "DIV_ZZ_Z" | "IntegerQuotient" => Ok(Self::IntegerQuotient),
             "Z-10" | "MOD_ZZ_Z" | "IntegerRemainder" => Ok(Self::IntegerRemainder),
 
-            _ => Err(InstructionError::new(format!("unknown instruction: {}", s))),
+            _ => Err(InstructionError::unknown_instruction(s)),
         }
     }
 }
@@ -261,5 +261,11 @@ impl FromStr for Instruction {
 impl Display for Instruction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
+    }
+}
+
+impl Into<String> for Instruction {
+    fn into(self) -> String {
+        self.to_string()
     }
 }

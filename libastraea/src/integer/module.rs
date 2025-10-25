@@ -21,78 +21,75 @@ impl Module for IntegerModule {
     ) -> Result<Box<dyn Display>, InstructionError> {
         match instruction {
             Instruction::IntegerAbs => {
-                let v: Integer = one_arg(&instruction, args)?;
+                let v: Integer = one_arg(args)?;
 
                 Ok(Box::new(v.abs()))
             }
 
             Instruction::IntegerSgn => {
-                let v: Integer = one_arg(&instruction, args)?;
+                let v: Integer = one_arg(args)?;
 
                 Ok(Box::new(v.abs()))
             }
 
             Instruction::IntegerNeg => {
-                let v: Integer = one_arg(&instruction, args)?;
+                let v: Integer = one_arg(args)?;
 
                 Ok(Box::new(-v))
             }
 
             Instruction::IntegerFromNatural => {
-                let v: NaturalNumber = one_arg(&instruction, args)?;
+                let v: NaturalNumber = one_arg(args)?;
 
                 Ok(Box::new(Integer::from_natural(v)))
             }
 
             Instruction::IntegerToNatural => {
-                let v: Integer = one_arg(&instruction, args)?;
+                let v: Integer = one_arg(args)?;
 
                 match v.to_natural() {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Ok(Box::new(InstructionError::new(e.message))),
+                    Err(e) => Ok(Box::new(InstructionError::calculation(e.message))),
                 }
             }
 
             Instruction::IntegerAdd => {
-                let (lhs, rhs) = two_args::<Integer>(&instruction, args)?;
+                let (lhs, rhs) = two_args::<Integer>(args)?;
 
                 Ok(Box::new(lhs + rhs))
             }
 
             Instruction::IntegerSubtract => {
-                let (lhs, rhs) = two_args::<Integer>(&instruction, args)?;
+                let (lhs, rhs) = two_args::<Integer>(args)?;
 
                 Ok(Box::new(lhs - rhs))
             }
 
             Instruction::IntegerMultiply => {
-                let (lhs, rhs) = two_args::<Integer>(&instruction, args)?;
+                let (lhs, rhs) = two_args::<Integer>(args)?;
 
                 Ok(Box::new(lhs * rhs))
             }
 
             Instruction::IntegerQuotient => {
-                let (lhs, rhs) = two_args::<Integer>(&instruction, args)?;
+                let (lhs, rhs) = two_args::<Integer>(args)?;
 
                 match lhs / rhs {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Ok(Box::new(InstructionError::new(e.message))),
+                    Err(e) => Ok(Box::new(InstructionError::calculation(e.message))),
                 }
             }
 
             Instruction::IntegerRemainder => {
-                let (lhs, rhs) = two_args::<Integer>(&instruction, args)?;
+                let (lhs, rhs) = two_args::<Integer>(args)?;
 
                 match lhs % rhs {
                     Ok(v) => Ok(Box::new(v)),
-                    Err(e) => Ok(Box::new(InstructionError::new(e.message))),
+                    Err(e) => Ok(Box::new(InstructionError::calculation(e.message))),
                 }
             }
 
-            _ => Err(InstructionError::new(format!(
-                "unknown instruction: {:?}",
-                instruction
-            ))),
+            _ => Err(InstructionError::unknown_instruction(instruction)),
         }
     }
 

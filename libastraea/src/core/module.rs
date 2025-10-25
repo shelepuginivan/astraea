@@ -46,10 +46,7 @@ impl Module for ModuleGroup {
             }
         }
 
-        Err(InstructionError::new(format!(
-            "unknown instruction: {:?}",
-            instruction
-        )))
+        Err(InstructionError::unknown_instruction(instruction))
     }
 
     fn implements(&self, instruction: Instruction) -> bool {

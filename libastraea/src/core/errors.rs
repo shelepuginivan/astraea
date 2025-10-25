@@ -1,14 +1,55 @@
-use std::fmt::Display;
+use std::{fmt::Display, usize};
+
+#[derive(Debug)]
+pub enum InstructionErrorReason {
+    Instruction,
+    Argument(usize),
+    ArgumentsCount(usize, usize),
+    Calculation,
+}
 
 #[derive(Debug)]
 pub struct InstructionError {
     pub message: String,
+    pub reason: InstructionErrorReason,
 }
 
 impl InstructionError {
-    pub fn new<S: Into<String>>(message: S) -> Self {
+    pub fn new<S: Into<String>>(message: S, reason: InstructionErrorReason) -> Self {
+        Self {
+            reason,
+            message: message.into(),
+        }
+    }
+
+    pub fn unknown_instruction<S: Into<String>>(instruction: S) -> Self {
+        Self {
+            message: format!("unknown instruction: \"{}\"", instruction.into()),
+            reason: InstructionErrorReason::Instruction,
+        }
+    }
+
+    pub fn calculation<S: Into<String>>(message: S) -> Self {
         Self {
             message: message.into(),
+            reason: InstructionErrorReason::Calculation,
+        }
+    }
+
+    pub fn invalid_arg<S: Into<String>>(message: S, arg_index: usize) -> Self {
+        Self {
+            message: message.into(),
+            reason: InstructionErrorReason::Argument(arg_index),
+        }
+    }
+
+    pub fn count(expected: usize, got: usize) -> Self {
+        let args_word = if expected == 1 { "arg" } else { "args" };
+        let message = format!("expected {} {}, got {}", expected, args_word, got);
+
+        Self {
+            message,
+            reason: InstructionErrorReason::ArgumentsCount(expected, got),
         }
     }
 }
