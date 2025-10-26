@@ -24,6 +24,13 @@ impl RationalNumber {
         })
     }
 
+    pub fn from_integer(integer: Integer) -> Self {
+        Self {
+            numerator: integer,
+            denominator: NaturalNumber::one(),
+        }
+    }
+
     pub fn reduce(self) -> Self {
         let Self {
             numerator,
