@@ -4,7 +4,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
-use crate::math::{Sign, Signed};
+use crate::math::{IntegralDomain, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
@@ -12,6 +12,23 @@ use crate::natural::NaturalNumber;
 pub struct Integer {
     value: NaturalNumber,
     sign: Sign,
+}
+
+impl IntegralDomain for Integer {}
+impl Ring for Integer {
+    fn zero() -> Self {
+        Self {
+            value: NaturalNumber::zero(),
+            sign: Sign::Zero,
+        }
+    }
+
+    fn one() -> Self {
+        Self {
+            value: NaturalNumber::one(),
+            sign: Sign::Positive,
+        }
+    }
 }
 
 impl Integer {
@@ -32,20 +49,6 @@ impl Integer {
                 "cannot convert negative integer to natural",
             )),
             _ => Ok(self.value),
-        }
-    }
-
-    pub fn zero() -> Self {
-        Self {
-            value: NaturalNumber::zero(),
-            sign: Sign::Zero,
-        }
-    }
-
-    pub fn one() -> Self {
-        Self {
-            value: NaturalNumber::one(),
-            sign: Sign::Positive,
         }
     }
 

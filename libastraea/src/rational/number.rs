@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
 use crate::integer::Integer;
-use crate::math::{Sign, Signed};
+use crate::math::{Field, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -12,6 +12,23 @@ use crate::natural::NaturalNumber;
 pub struct RationalNumber {
     numerator: Integer,
     denominator: NaturalNumber,
+}
+
+impl Field for RationalNumber {}
+impl Ring for RationalNumber {
+    fn zero() -> Self {
+        Self {
+            numerator: Integer::zero(),
+            denominator: NaturalNumber::one(),
+        }
+    }
+
+    fn one() -> Self {
+        Self {
+            numerator: Integer::one(),
+            denominator: NaturalNumber::one(),
+        }
+    }
 }
 
 impl RationalNumber {
@@ -29,20 +46,6 @@ impl RationalNumber {
     pub fn from_integer(integer: Integer) -> Self {
         Self {
             numerator: integer,
-            denominator: NaturalNumber::one(),
-        }
-    }
-
-    pub fn zero() -> Self {
-        Self {
-            numerator: Integer::zero(),
-            denominator: NaturalNumber::one(),
-        }
-    }
-
-    pub fn one() -> Self {
-        Self {
-            numerator: Integer::one(),
             denominator: NaturalNumber::one(),
         }
     }

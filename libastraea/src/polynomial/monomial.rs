@@ -2,7 +2,7 @@ use std::{char, fmt::Display, ops::Neg, str::FromStr};
 
 use crate::{
     core::ParseError,
-    math::{Sign, Signed},
+    math::{Ring, Sign, Signed},
     natural::NaturalNumber,
     rational::RationalNumber,
 };

@@ -6,13 +6,28 @@ use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
 use crate::digit;
-use crate::math::Digit;
+use crate::math::{Digit, IntegralDomain, Ring};
 
 /// Represents a natural number.
 #[derive(Clone, Default)]
 pub struct NaturalNumber {
     /// Digits of the natural number, stored in reverse order.
     digits: Vec<Digit>,
+}
+
+impl IntegralDomain for NaturalNumber {}
+impl Ring for NaturalNumber {
+    fn zero() -> Self {
+        Self {
+            digits: vec![digit!(0)],
+        }
+    }
+
+    fn one() -> Self {
+        Self {
+            digits: vec![digit!(1)],
+        }
+    }
 }
 
 impl NaturalNumber {
@@ -31,19 +46,6 @@ impl NaturalNumber {
     pub fn new(mut digits: Vec<Digit>) -> Self {
         digits.reverse();
         NaturalNumber { digits }
-    }
-
-    /// Returns zero-value NaturalNumber.
-    pub fn zero() -> Self {
-        Self {
-            digits: vec![digit!(0)],
-        }
-    }
-
-    pub fn one() -> Self {
-        Self {
-            digits: vec![digit!(1)],
-        }
     }
 
     /// Returns length of the NaturalNumber.
