@@ -1,11 +1,11 @@
-use std::{
-    char,
-    fmt::Display,
-    ops::{Mul, Neg},
-    str::FromStr,
-};
+use std::{char, fmt::Display, ops::Neg, str::FromStr};
 
-use crate::{core::ParseError, math::Sign, natural::NaturalNumber, rational::RationalNumber};
+use crate::{
+    core::ParseError,
+    math::{Sign, Signed},
+    natural::NaturalNumber,
+    rational::RationalNumber,
+};
 
 /// Monomial represents a single term of a polynomial, written as k &middot; x<sup>a</sup>, where k
 /// is a rational coefficient and a is a natural exponent.
@@ -37,14 +37,9 @@ impl Neg for Monomial {
     }
 }
 
-impl Mul<Sign> for Monomial {
-    type Output = Self;
-
-    fn mul(self, rhs: Sign) -> Self::Output {
-        Self {
-            coefficient: self.coefficient * rhs,
-            exponent: self.exponent,
-        }
+impl Signed for Monomial {
+    fn sign(&self) -> Sign {
+        self.coefficient.sign()
     }
 }
 

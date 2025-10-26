@@ -2,8 +2,8 @@ use std::{collections::LinkedList, fmt::Display, str::FromStr};
 
 use crate::{
     core::ParseError,
-    math::Sign,
-    polynomial::{Monomial},
+    math::{Sign, Signed},
+    polynomial::Monomial,
 };
 
 pub struct Polynomial {
@@ -22,8 +22,7 @@ impl Polynomial {
             match chars[cursor] {
                 '+' => {
                     let monomial_str: String = monomial_chars.iter().collect();
-                    let monomial = Monomial::from_str(monomial_str.as_str())?;
-                    let monomial = monomial * next_sign;
+                    let monomial = Monomial::from_str(monomial_str.as_str())?.with_sign(next_sign);
                     monomials.push_back(monomial);
                     monomial_chars.clear();
                     next_sign = Sign::Positive;
@@ -32,8 +31,7 @@ impl Polynomial {
 
                 '-' => {
                     let monomial_str: String = monomial_chars.iter().collect();
-                    let monomial = Monomial::from_str(monomial_str.as_str())?;
-                    let monomial = monomial * next_sign;
+                    let monomial = Monomial::from_str(monomial_str.as_str())?.with_sign(next_sign);
                     monomials.push_back(monomial);
                     monomial_chars.clear();
                     next_sign = Sign::Negative;
@@ -48,8 +46,7 @@ impl Polynomial {
         }
 
         let monomial_str: String = monomial_chars.iter().collect();
-        let monomial = Monomial::from_str(monomial_str.as_str())?;
-        let monomial = monomial * next_sign;
+        let monomial = Monomial::from_str(monomial_str.as_str())?.with_sign(next_sign);
         monomials.push_back(monomial);
 
         Ok(Self { monomials })
@@ -90,9 +87,7 @@ mod tests {
 
     #[test]
     fn test_polynomial_from_canonical_form() {
-        let tests = vec![
-            ("x^2 - 2x + 1", "1/1*x^2 -2/1*x^1 +1/1*x^0"),
-        ];
+        let tests = vec![("x^2 - 2x + 1", "1/1*x^2 -2/1*x^1 +1/1*x^0")];
 
         for (canonical_form, expected) in tests {
             let p = Polynomial::from_canonical_form(canonical_form).unwrap();

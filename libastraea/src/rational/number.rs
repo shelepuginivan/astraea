@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
 use crate::integer::Integer;
-use crate::math::Sign;
+use crate::math::{Sign, Signed};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -49,10 +49,6 @@ impl RationalNumber {
 
     pub fn is_zero(&self) -> bool {
         self.numerator.is_zero()
-    }
-
-    pub fn sign(&self) -> Sign {
-        self.numerator.sign()
     }
 
     pub fn reduce(self) -> Self {
@@ -190,14 +186,9 @@ impl Mul for RationalNumber {
     }
 }
 
-impl Mul<Sign> for RationalNumber {
-    type Output = Self;
-
-    fn mul(self, rhs: Sign) -> Self::Output {
-        Self {
-            numerator: self.numerator * rhs,
-            denominator: self.denominator,
-        }
+impl Signed for RationalNumber {
+    fn sign(&self) -> Sign {
+        self.numerator.sign()
     }
 }
 

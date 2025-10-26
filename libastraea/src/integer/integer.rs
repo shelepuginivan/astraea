@@ -4,7 +4,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
-use crate::math::Sign;
+use crate::math::{Sign, Signed};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
@@ -62,18 +62,6 @@ impl Integer {
 
     pub fn is_zero(&self) -> bool {
         self.value.is_zero() || self.sign == Sign::Zero
-    }
-
-    pub fn is_positive(&self) -> bool {
-        self.sign == Sign::Positive
-    }
-
-    pub fn is_negative(&self) -> bool {
-        self.sign == Sign::Negative
-    }
-
-    pub fn sign(&self) -> Sign {
-        self.sign
     }
 
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
@@ -172,17 +160,6 @@ impl Mul for Integer {
     }
 }
 
-impl Mul<Sign> for Integer {
-    type Output = Self;
-
-    fn mul(self, rhs: Sign) -> Self::Output {
-        Self {
-            sign: self.sign * rhs,
-            value: self.value,
-        }
-    }
-}
-
 impl Div for Integer {
     type Output = Result<Self, ValueError>;
 
@@ -207,6 +184,12 @@ impl Neg for Integer {
             value: self.value,
             sign: -self.sign,
         }
+    }
+}
+
+impl Signed for Integer {
+    fn sign(&self) -> Sign {
+        self.sign
     }
 }
 
