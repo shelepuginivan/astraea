@@ -42,6 +42,12 @@ impl RationalNumber {
             denominator,
         }
     }
+
+    pub fn is_integer(&self) -> bool {
+        let rem = self.numerator.clone() % Integer::from_natural(self.denominator.clone());
+
+        rem.unwrap().is_zero()
+    }
 }
 
 impl FromStr for RationalNumber {
@@ -87,6 +93,8 @@ impl Display for RationalNumber {
 
 #[cfg(test)]
 mod tests {
+    use rand::Rng;
+
     use super::*;
 
     #[test]
@@ -153,5 +161,43 @@ mod tests {
             .reduce()
             .to_string();
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_rational_number_is_integer() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let numerator: i32 = rng.random();
+            let denominator: i32 = rng.random();
+            if denominator == 0 {
+                continue;
+            }
+
+            let expected = numerator % denominator == 0;
+            let actual = RationalNumber::from_str(&format!("{}/{}", numerator, denominator))
+                .unwrap()
+                .is_integer();
+
+            assert_eq!(expected, actual);
+        }
+
+        let is_integer = RationalNumber::from_str("8/4").unwrap().is_integer();
+        assert!(is_integer);
+
+        let is_integer = RationalNumber::from_str("2/3").unwrap().is_integer();
+        assert!(!is_integer);
+
+        let is_integer = RationalNumber::from_str("30/42").unwrap().is_integer();
+        assert!(!is_integer);
+
+        let is_integer = RationalNumber::from_str("900/30").unwrap().is_integer();
+        assert!(is_integer);
+
+        let is_integer = RationalNumber::from_str("0/1").unwrap().is_integer();
+        assert!(is_integer);
+
+        let is_integer = RationalNumber::from_str("1").unwrap().is_integer();
+        assert!(is_integer);
     }
 }
