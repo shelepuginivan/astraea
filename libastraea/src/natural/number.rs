@@ -40,6 +40,12 @@ impl NaturalNumber {
         }
     }
 
+    pub fn one() -> Self {
+        Self {
+            digits: vec![digit!(1)],
+        }
+    }
+
     /// Returns length of the NaturalNumber.
     pub fn len(&self) -> usize {
         self.digits.len()
