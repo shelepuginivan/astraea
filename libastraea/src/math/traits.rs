@@ -25,7 +25,7 @@ pub trait IntegralDomain: Ring + Div + Rem {}
 /// A field is a set with addition, subtraction, multiplication, and division.
 pub trait Field: Ring + Div {}
 
-pub trait Signed: Neg<Output = Self> + Sized {
+pub trait Signed: Neg<Output = Self> + Ring {
     fn sign(&self) -> Sign;
 
     fn is_positive(&self) -> bool {
@@ -39,7 +39,16 @@ pub trait Signed: Neg<Output = Self> + Sized {
     fn with_sign(self, sign: Sign) -> Self {
         match sign {
             Sign::Negative => -self,
-            _ => self,
+            Sign::Zero => Self::zero(),
+            Sign::Positive => self,
+        }
+    }
+
+    fn abs(self) -> Self {
+        match self.sign() {
+            Sign::Negative => -self,
+            Sign::Zero => Self::zero(),
+            Sign::Positive => self,
         }
     }
 }
