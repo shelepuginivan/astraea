@@ -45,6 +45,21 @@ impl NaturalNumber {
     /// ```
     pub fn new(mut digits: Vec<Digit>) -> Self {
         digits.reverse();
+        Self::from_reversed(digits)
+    }
+
+    pub fn from_reversed(mut digits: Vec<Digit>) -> Self {
+        loop {
+            match digits.pop_if(|d| *d == digit!(0)) {
+                Some(..) => {}
+                None => break,
+            };
+        }
+
+        if digits.len() == 0 {
+            digits.push(digit!(0));
+        }
+
         NaturalNumber { digits }
     }
 
@@ -68,7 +83,7 @@ impl NaturalNumber {
         let mut digits = self.times_pow10(1).as_digits();
         digits[0] = lsd;
 
-        Self { digits }
+        Self::from_reversed(digits)
     }
 
     /// Returns digits of the NaturalNumber, in reverse order.
@@ -107,7 +122,7 @@ impl NaturalNumber {
             }
         }
 
-        Self { digits }
+        Self::from_reversed(digits)
     }
 
     /// Multiplies number by 10<sup>k</sup>.
@@ -117,7 +132,8 @@ impl NaturalNumber {
         }
 
         let digits = [vec![digit!(0); k], self.as_digits()].concat();
-        return Self { digits };
+
+        Self::from_reversed(digits)
     }
 
     /// Divides number by denominator, returning the quotient and the remainder.
@@ -224,7 +240,7 @@ impl Add for NaturalNumber {
             digits.push(next_carry);
         }
 
-        Self { digits }
+        Self::from_reversed(digits)
     }
 }
 
@@ -273,7 +289,7 @@ impl Sub for NaturalNumber {
             digits.pop();
         }
 
-        Ok(Self { digits })
+        Ok(Self::from_reversed(digits))
     }
 }
 
@@ -314,7 +330,7 @@ impl Mul<Digit> for NaturalNumber {
             digits.push(next_carry);
         }
 
-        Self { digits }
+        Self::from_reversed(digits)
     }
 }
 
@@ -371,7 +387,7 @@ impl FromStr for NaturalNumber {
             digits[length - index - 1] = digit;
         }
 
-        Ok(NaturalNumber { digits })
+        Ok(NaturalNumber::from_reversed(digits))
     }
 }
 
@@ -647,7 +663,7 @@ mod tests {
         assert!(NaturalNumber::new(vec![]).is_zero());
         assert!(NaturalNumber::new(vec![digit!(0)]).is_zero());
         assert!(!NaturalNumber::new(vec![digit!(1)]).is_zero());
-        assert!(!NaturalNumber::new(vec![digit!(0); 2]).is_zero());
+        assert!(NaturalNumber::new(vec![digit!(0); 2]).is_zero());
     }
 
     #[test]
