@@ -1,6 +1,19 @@
-use std::ops::Neg;
+use std::ops::{Add, Mul, Neg, Sub};
 
 use crate::math::Sign;
+
+/// Ring represents an algebraic ring structure.
+///
+/// A ring is a set equipped with two binary operations: addition and multiplication,
+/// satisfying properties such as associativity, distributivity, and the existence of
+/// additive and multiplicative identities.
+pub trait Ring: Add + Sub + Mul + Sized {
+    /// Returns the additive identity.
+    fn zero() -> Self;
+
+    /// Returns the multiplicative identity.
+    fn one() -> Self;
+}
 
 pub trait Signed: Neg<Output = Self> + Sized {
     fn sign(&self) -> Sign;
