@@ -172,6 +172,17 @@ impl Mul for Integer {
     }
 }
 
+impl Mul<Sign> for Integer {
+    type Output = Self;
+
+    fn mul(self, rhs: Sign) -> Self::Output {
+        Self {
+            sign: self.sign * rhs,
+            value: self.value,
+        }
+    }
+}
+
 impl Div for Integer {
     type Output = Result<Self, ValueError>;
 

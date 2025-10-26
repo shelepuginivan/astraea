@@ -1,5 +1,5 @@
-pub mod number;
 pub mod module;
+pub mod number;
 
-pub use number::*;
 pub use module::*;
+pub use number::*;

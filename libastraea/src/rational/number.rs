@@ -190,6 +190,17 @@ impl Mul for RationalNumber {
     }
 }
 
+impl Mul<Sign> for RationalNumber {
+    type Output = Self;
+
+    fn mul(self, rhs: Sign) -> Self::Output {
+        Self {
+            numerator: self.numerator * rhs,
+            denominator: self.denominator,
+        }
+    }
+}
+
 impl Div for RationalNumber {
     type Output = Result<Self, ValueError>;
 
