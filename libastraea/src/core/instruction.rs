@@ -127,7 +127,7 @@ pub enum Instruction {
     /// - Opcode: ADD_ZZ_Z
     IntegerAdd,
 
-    /// Subtracts second natural number from first.
+    /// Subtracts second integer from first.
     ///
     /// - Index: Z-7
     /// - Opcode: SUB_ZZ_Z
@@ -150,6 +150,54 @@ pub enum Instruction {
     /// - Index: Z-10
     /// - Opcode: MOD_ZZ_Z
     IntegerRemainder,
+
+    /// Reduces rational number.
+    ///
+    /// - Index: Q-1
+    /// - Opcode: RED_Q_Q
+    RationalReduce,
+
+    /// Reports whether rational number is integer.
+    ///
+    /// - Index: Q-2
+    /// - Opcode: INT_Q_B
+    RationalIsInteger,
+
+    /// Converts integer to rational number.
+    ///
+    /// - Index: Q-3
+    /// - Opcode: TRANS_Z_Q
+    RationalFromInteger,
+
+    /// Converts rational number to integer, if possible.
+    ///
+    /// - Index: Q-4
+    /// - Opcode: TRANS_Q_Z
+    RationalToInteger,
+
+    /// Adds two rational numbers.
+    ///
+    /// - Index: Q-5
+    /// - Opcode: ADD_QQ_Q
+    RationalAdd,
+
+    /// Subtracts second rational number from first.
+    ///
+    /// - Index: Q-6
+    /// - Opcode: SUB_QQ_Q
+    RationalSubtract,
+
+    /// Multiplies two rational numbers.
+    ///
+    /// - Index: Q-7
+    /// - Opcode: MUL_QQ_Q
+    RationalMultiply,
+
+    /// Divides first rational number by second.
+    ///
+    /// - Index: Q-8
+    /// - Opcode: DIV_QQ_Q
+    RationalDivide,
 }
 
 impl Instruction {
@@ -181,6 +229,15 @@ impl Instruction {
             Instruction::IntegerMultiply => "MUL_ZZ_Z".to_string(),
             Instruction::IntegerQuotient => "DIV_ZZ_Z".to_string(),
             Instruction::IntegerRemainder => "MOD_ZZ_Z".to_string(),
+
+            Instruction::RationalReduce => "RED_Q_Q".to_string(),
+            Instruction::RationalIsInteger => "INT_Q_B".to_string(),
+            Instruction::RationalFromInteger => "TRANS_Z_Q".to_string(),
+            Instruction::RationalToInteger => "TRANS_Q_Z".to_string(),
+            Instruction::RationalAdd => "ADD_QQ_Q".to_string(),
+            Instruction::RationalSubtract => "SUB_QQ_Q".to_string(),
+            Instruction::RationalMultiply => "MUL_QQ_Q".to_string(),
+            Instruction::RationalDivide => "DIV_QQ_Q".to_string(),
         }
     }
 
@@ -212,6 +269,15 @@ impl Instruction {
             Instruction::IntegerMultiply => "Z-8".to_string(),
             Instruction::IntegerQuotient => "Z-9".to_string(),
             Instruction::IntegerRemainder => "Z-10".to_string(),
+
+            Instruction::RationalReduce => "Q-1".to_string(),
+            Instruction::RationalIsInteger => "Q-2".to_string(),
+            Instruction::RationalFromInteger => "Q-3".to_string(),
+            Instruction::RationalToInteger => "Q-4".to_string(),
+            Instruction::RationalAdd => "Q-5".to_string(),
+            Instruction::RationalSubtract => "Q-6".to_string(),
+            Instruction::RationalMultiply => "Q-7".to_string(),
+            Instruction::RationalDivide => "Q-8".to_string(),
         }
     }
 }
@@ -252,6 +318,15 @@ impl FromStr for Instruction {
             "Z-8" | "MUL_ZZ_Z" | "IntegerMultiply" => Ok(Self::IntegerMultiply),
             "Z-9" | "DIV_ZZ_Z" | "IntegerQuotient" => Ok(Self::IntegerQuotient),
             "Z-10" | "MOD_ZZ_Z" | "IntegerRemainder" => Ok(Self::IntegerRemainder),
+
+            "Q-1" | "RED_Q_Q" | "RationalReduce" => Ok(Self::RationalReduce),
+            "Q-2" | "INT_Q_B" | "RationalIsInteger" => Ok(Self::RationalIsInteger),
+            "Q-3" | "TRANS_Z_Q" | "RationalFromInteger" => Ok(Self::RationalFromInteger),
+            "Q-4" | "TRANS_Q_Z" | "RationalToInteger" => Ok(Self::RationalToInteger),
+            "Q-5" | "ADD_QQ_Q" | "RationalAdd" => Ok(Self::RationalAdd),
+            "Q-6" | "SUB_QQ_Q" | "RationalSubtract" => Ok(Self::RationalSubtract),
+            "Q-7" | "MUL_QQ_Q" | "RationalMultiply" => Ok(Self::RationalMultiply),
+            "Q-8" | "DIV_QQ_Q" | "RationalDivide" => Ok(Self::RationalDivide),
 
             _ => Err(InstructionError::unknown_instruction(s)),
         }
