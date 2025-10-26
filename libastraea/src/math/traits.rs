@@ -20,6 +20,11 @@ pub trait Ring: Add + Sub + Mul + Sized {
 /// Supports integer division and remainder operations.
 pub trait IntegralDomain: Ring + Div + Rem {}
 
+/// Field represents an algebraic field structure.
+///
+/// A field is a set with addition, subtraction, multiplication, and division.
+pub trait Field: Ring + Div {}
+
 pub trait Signed: Neg<Output = Self> + Sized {
     fn sign(&self) -> Sign;
 
