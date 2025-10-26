@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::ops::Add;
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -31,6 +32,24 @@ impl RationalNumber {
         }
     }
 
+    pub fn zero() -> Self {
+        Self {
+            numerator: Integer::zero(),
+            denominator: NaturalNumber::one(),
+        }
+    }
+
+    pub fn one() -> Self {
+        Self {
+            numerator: Integer::one(),
+            denominator: NaturalNumber::one(),
+        }
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.numerator.is_zero()
+    }
+
     pub fn reduce(self) -> Self {
         let Self {
             numerator,
@@ -54,6 +73,16 @@ impl RationalNumber {
         let rem = self.numerator.clone() % Integer::from_natural(self.denominator.clone());
 
         rem.unwrap().is_zero()
+    }
+
+    pub fn to_integer(self) -> Result<Integer, ValueError> {
+        let reduced = self.reduce();
+
+        if reduced.denominator != NaturalNumber::one() {
+            return Err(ValueError::new("not an integer"));
+        }
+
+        Ok(reduced.numerator)
     }
 }
 
@@ -92,6 +121,40 @@ impl FromStr for RationalNumber {
     }
 }
 
+impl Add for RationalNumber {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        if self.is_zero() && rhs.is_zero() {
+            return Self::zero();
+        }
+
+        if self.is_zero() {
+            return rhs;
+        }
+
+        if rhs.is_zero() {
+            return self;
+        }
+
+        let lhs_denominator = Integer::from_natural(self.denominator.clone());
+        let rhs_denominator = Integer::from_natural(rhs.denominator.clone());
+
+        let lcm = lhs_denominator.clone().lcm(rhs_denominator.clone());
+        let lhs_factor = (lcm.clone() / lhs_denominator).unwrap();
+        let rhs_factor = (lcm.clone() / rhs_denominator).unwrap();
+        let lhs_numerator = self.numerator * lhs_factor;
+        let rhs_numerator = rhs.numerator * rhs_factor;
+        let numerator = lhs_numerator + rhs_numerator;
+        let denominator = lcm.to_natural().unwrap();
+
+        Self {
+            numerator,
+            denominator,
+        }
+    }
+}
+
 impl Display for RationalNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.numerator, self.denominator)
@@ -103,6 +166,10 @@ mod tests {
     use rand::Rng;
 
     use super::*;
+
+    fn rat(numerator: i32, denominator: u32) -> RationalNumber {
+        RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
+    }
 
     #[test]
     fn test_rational_number_from_str() {
@@ -206,5 +273,38 @@ mod tests {
 
         let is_integer = RationalNumber::from_str("1").unwrap().is_integer();
         assert!(is_integer);
+    }
+
+    #[test]
+    fn test_rational_number_add() {
+        let expected = "5/6";
+        let lhs = rat(1, 2);
+        let rhs = rat(1, 3);
+        let actual = (lhs + rhs).to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/2";
+        let lhs = rat(1, 4);
+        let rhs = rat(1, 4);
+        let actual = (lhs + rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "124253465/1231232314";
+        let lhs = rat(0, 2343425);
+        let rhs = rat(124253465, 1231232314);
+        let actual = (lhs + rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "999999/1111111";
+        let lhs = rat(999999, 1111111);
+        let rhs = rat(0, 4269426942);
+        let actual = (lhs + rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "0/1";
+        let lhs = rat(0, 777);
+        let rhs = rat(0, 888);
+        let actual = (lhs + rhs).reduce().to_string();
+        assert_eq!(expected, actual);
     }
 }
