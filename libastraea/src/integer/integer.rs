@@ -52,17 +52,6 @@ impl Integer {
         }
     }
 
-    pub fn abs(self) -> Self {
-        if self.is_zero() {
-            return Self::zero();
-        }
-
-        Self {
-            value: self.value,
-            sign: Sign::Positive,
-        }
-    }
-
     pub fn is_zero(&self) -> bool {
         self.value.is_zero() || self.sign == Sign::Zero
     }

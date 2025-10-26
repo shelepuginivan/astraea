@@ -2,6 +2,7 @@ use std::{collections::HashSet, fmt::Display};
 
 use crate::core::{Instruction, InstructionError, Module};
 use crate::integer::Integer;
+use crate::math::Signed;
 use crate::natural::NaturalNumber;
 use crate::validate::{one_arg, two_args};
 
