@@ -1,63 +1,115 @@
 use std::fmt::Display;
-use std::str::FromStr;
-
-use crate::core::InstructionError;
+use strum::{EnumProperty, EnumString};
 
 /// Instructions available in the computer algebra system.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, EnumProperty, EnumString)]
 pub enum Instruction {
     /// Compares two natural numbers.
     ///
     /// - Index: N-1
     /// - Opcode: COM_NN_D
+    #[strum(
+        props(opcode = "COM_NN_D", index = "N-1"),
+        serialize = "COM_NN_D",
+        serialize = "N-1",
+        serialize = "NaturalCompare"
+    )]
     NaturalCompare,
 
     /// Reports whether the natural number is zero.
     ///
     /// - Index: N-2
     /// - Opcode: NZER_N_B
+    #[strum(
+        props(opcode = "NZER_N_B", index = "N-2"),
+        serialize = "NZER_N_B",
+        serialize = "N-2",
+        serialize = "NaturalIsZero"
+    )]
     NaturalIsZero,
 
     /// Increments the natural number.
     ///
     /// - Index: N-3
     /// - Opcode: ADD_1N_N
+    #[strum(
+        props(opcode = "ADD_1N_N", index = "N-3"),
+        serialize = "ADD_1N_N",
+        serialize = "N-3",
+        serialize = "NaturalIncrement"
+    )]
     NaturalIncrement,
 
     /// Adds two natural numbers.
     ///
     /// - Index: N-4
     /// - Opcode: ADD_NN_N
+    #[strum(
+        props(opcode = "ADD_NN_N", index = "N-4"),
+        serialize = "ADD_NN_N",
+        serialize = "N-4",
+        serialize = "NaturalAdd"
+    )]
     NaturalAdd,
 
     /// Subtracts second natural number from first.
     ///
     /// - Index: N-5
     /// - Opcode: SUB_NN_N
+    #[strum(
+        props(opcode = "SUB_NN_N", index = "N-5"),
+        serialize = "SUB_NN_N",
+        serialize = "N-5",
+        serialize = "NaturalSubtract"
+    )]
     NaturalSubtract,
 
     /// Multiplies natural number by a single digit.
     ///
     /// - Index: N-6
     /// - Opcode: MUL_ND_N
+    #[strum(
+        props(opcode = "MUL_ND_N", index = "N-6"),
+        serialize = "MUL_ND_N",
+        serialize = "N-6",
+        serialize = "NaturalMultiplyByDigit"
+    )]
     NaturalMultiplyByDigit,
 
     /// Multiplies natural number by a power of 10, essentially performing a left shift.
     ///
     /// - Index: N-7
     /// - Opcode: MUL_Nk_N
+    #[strum(
+        props(opcode = "MUL_Nk_N", index = "N-7"),
+        serialize = "MUL_Nk_N",
+        serialize = "N-7",
+        serialize = "NaturalMultiplyByPowerOfTen"
+    )]
     NaturalMultiplyByPowerOfTen,
 
     /// Multiplies two natural numbers.
     ///
     /// - Index: N-8
     /// - Opcode: MUL_NN_N
+    #[strum(
+        props(opcode = "MUL_NN_N", index = "N-8"),
+        serialize = "MUL_NN_N",
+        serialize = "N-8",
+        serialize = "NaturalMultiply"
+    )]
     NaturalMultiply,
 
     /// Subtracts natural number multiplied by digit from another natural number.
     ///
     /// - Index: N-9
     /// - Opcode: SUB_NDN_N
+    #[strum(
+        props(opcode = "SUB_NDN_N", index = "N-9"),
+        serialize = "SUB_NDN_N",
+        serialize = "N-9",
+        serialize = "NaturalSubtractMultipliedByDigit"
+    )]
     NaturalSubtractMultipliedByDigit,
 
     /// Calculates the first digit of the division of a larger natural number by a smaller one,
@@ -65,271 +117,288 @@ pub enum Instruction {
     ///
     /// - Index: N-10
     /// - Opcode: DIV_NN_Dk
+    #[strum(
+        props(opcode = "DIV_NN_Dk", index = "N-10"),
+        serialize = "DIV_NN_Dk",
+        serialize = "N-10",
+        serialize = "NaturalCalculateDivisionDigit"
+    )]
     NaturalCalculateDivisionDigit,
 
     /// Calculates the quotient of dividing the first natural number by the second.
     ///
     /// - Index: N-11
     /// - Opcode: DIV_NN_N
+    #[strum(
+        props(opcode = "DIV_NN_N", index = "N-11"),
+        serialize = "DIV_NN_N",
+        serialize = "N-11",
+        serialize = "NaturalQuotient"
+    )]
     NaturalQuotient,
 
     /// Calculates the remainder of dividing the first natural number by the second.
     ///
     /// - Index: N-12
     /// - Opcode: MOD_NN_N
+    #[strum(
+        props(opcode = "MOD_NN_N", index = "N-12"),
+        serialize = "MOD_NN_N",
+        serialize = "N-12",
+        serialize = "NaturalRemainder"
+    )]
     NaturalRemainder,
 
     /// Calculates GCD (greatest common divisor) of two natural numbers.
     ///
     /// - Index: N-13
     /// - Opcode: GCF_NN_N
+    #[strum(
+        props(opcode = "GCF_NN_N", index = "N-13"),
+        serialize = "GCF_NN_N",
+        serialize = "N-13",
+        serialize = "NaturalGCD"
+    )]
     NaturalGCD,
 
     /// Calculates LCM (least common multiplier) of two natural numbers.
     ///
     /// - Index: N-14
     /// - Opcode: LCM_NN_N
+    #[strum(
+        props(opcode = "LCM_NN_N", index = "N-14"),
+        serialize = "LCM_NN_N",
+        serialize = "N-14",
+        serialize = "NaturalLCM"
+    )]
     NaturalLCM,
 
     /// Returns absolute value of the integer.
     ///
     /// - Index: Z-1
     /// - Opcode: ABS_Z_Z
+    #[strum(
+        props(opcode = "ABS_Z_Z", index = "Z-1"),
+        serialize = "ABS_Z_Z",
+        serialize = "Z-1",
+        serialize = "IntegerAbs"
+    )]
     IntegerAbs,
 
     /// Returns sign of the integer.
     ///
     /// - Index: Z-2
     /// - Opcode: SGN_Z_D
+    #[strum(
+        props(opcode = "SGN_Z_D", index = "Z-2"),
+        serialize = "SGN_Z_D",
+        serialize = "Z-2",
+        serialize = "IntegerSgn"
+    )]
     IntegerSgn,
 
     /// Multiplies integer by -1.
     ///
     /// - Index: Z-3
     /// - Opcode: NEG_ZM_Z
+    #[strum(
+        props(opcode = "NEG_ZM_Z", index = "Z-3"),
+        serialize = "NEG_ZM_Z",
+        serialize = "Z-3",
+        serialize = "IntegerNeg"
+    )]
     IntegerNeg,
 
     /// Converts natural number to integer.
     ///
     /// - Index: Z-4
     /// - Opcode: TRANS_N_Z
+    #[strum(
+        props(opcode = "TRANS_N_Z", index = "Z-4"),
+        serialize = "TRANS_N_Z",
+        serialize = "Z-4",
+        serialize = "IntegerFromNatural"
+    )]
     IntegerFromNatural,
 
     /// Converts integer to natural number.
     ///
     /// - Index: Z-5
     /// - Opcode: TRANS_Z_N
+    #[strum(
+        props(opcode = "TRANS_Z_N", index = "Z-5"),
+        serialize = "TRANS_Z_N",
+        serialize = "Z-5",
+        serialize = "IntegerToNatural"
+    )]
     IntegerToNatural,
 
     /// Adds two integers.
     ///
     /// - Index: Z-6
     /// - Opcode: ADD_ZZ_Z
+    #[strum(
+        props(opcode = "ADD_ZZ_Z", index = "Z-6"),
+        serialize = "ADD_ZZ_Z",
+        serialize = "Z-6",
+        serialize = "IntegerAdd"
+    )]
     IntegerAdd,
 
     /// Subtracts second integer from first.
     ///
     /// - Index: Z-7
     /// - Opcode: SUB_ZZ_Z
+    #[strum(
+        props(opcode = "SUB_ZZ_Z", index = "Z-7"),
+        serialize = "SUB_ZZ_Z",
+        serialize = "Z-7",
+        serialize = "IntegerSubtract"
+    )]
     IntegerSubtract,
 
     /// Multiplies two integers.
     ///
     /// - Index: Z-8
     /// - Opcode: MUL_ZZ_Z
+    #[strum(
+        props(opcode = "MUL_ZZ_Z", index = "Z-8"),
+        serialize = "MUL_ZZ_Z",
+        serialize = "Z-8",
+        serialize = "IntegerMultiply"
+    )]
     IntegerMultiply,
 
     /// Calculates the quotient of dividing the first integer by the second.
     ///
     /// - Index: Z-9
     /// - Opcode: DIV_ZZ_Z
+    #[strum(
+        props(opcode = "DIV_ZZ_Z", index = "Z-9"),
+        serialize = "DIV_ZZ_Z",
+        serialize = "Z-9",
+        serialize = "IntegerQuotient"
+    )]
     IntegerQuotient,
 
     /// Calculates the remainder of dividing the first integer by the second.
     ///
     /// - Index: Z-10
     /// - Opcode: MOD_ZZ_Z
+    #[strum(
+        props(opcode = "MOD_ZZ_Z", index = "Z-10"),
+        serialize = "MOD_ZZ_Z",
+        serialize = "Z-10",
+        serialize = "IntegerRemainder"
+    )]
     IntegerRemainder,
 
     /// Reduces rational number.
     ///
     /// - Index: Q-1
     /// - Opcode: RED_Q_Q
+    #[strum(
+        props(opcode = "RED_Q_Q", index = "Q-1"),
+        serialize = "RED_Q_Q",
+        serialize = "Q-1",
+        serialize = "RationalReduce"
+    )]
     RationalReduce,
 
     /// Reports whether rational number is integer.
     ///
     /// - Index: Q-2
     /// - Opcode: INT_Q_B
+    #[strum(
+        props(opcode = "INT_Q_B", index = "Q-2"),
+        serialize = "INT_Q_B",
+        serialize = "Q-2",
+        serialize = "RationalIsInteger"
+    )]
     RationalIsInteger,
 
     /// Converts integer to rational number.
     ///
     /// - Index: Q-3
     /// - Opcode: TRANS_Z_Q
+    #[strum(
+        props(opcode = "TRANS_Z_Q", index = "Q-3"),
+        serialize = "TRANS_Z_Q",
+        serialize = "Q-3",
+        serialize = "RationalFromInteger"
+    )]
     RationalFromInteger,
 
     /// Converts rational number to integer, if possible.
     ///
     /// - Index: Q-4
     /// - Opcode: TRANS_Q_Z
+    #[strum(
+        props(opcode = "TRANS_Q_Z", index = "Q-4"),
+        serialize = "TRANS_Q_Z",
+        serialize = "Q-4",
+        serialize = "RationalToInteger"
+    )]
     RationalToInteger,
 
     /// Adds two rational numbers.
     ///
     /// - Index: Q-5
     /// - Opcode: ADD_QQ_Q
+    #[strum(
+        props(opcode = "ADD_QQ_Q", index = "Q-5"),
+        serialize = "ADD_QQ_Q",
+        serialize = "Q-5",
+        serialize = "RationalAdd"
+    )]
     RationalAdd,
 
     /// Subtracts second rational number from first.
     ///
     /// - Index: Q-6
     /// - Opcode: SUB_QQ_Q
+    #[strum(
+        props(opcode = "SUB_QQ_Q", index = "Q-6"),
+        serialize = "SUB_QQ_Q",
+        serialize = "Q-6",
+        serialize = "RationalSubtract"
+    )]
     RationalSubtract,
 
     /// Multiplies two rational numbers.
     ///
     /// - Index: Q-7
     /// - Opcode: MUL_QQ_Q
+    #[strum(
+        props(opcode = "MUL_QQ_Q", index = "Q-7"),
+        serialize = "MUL_QQ_Q",
+        serialize = "Q-7",
+        serialize = "RationalMultiply"
+    )]
     RationalMultiply,
 
     /// Divides first rational number by second.
     ///
     /// - Index: Q-8
     /// - Opcode: DIV_QQ_Q
+    #[strum(
+        props(opcode = "DIV_QQ_Q", index = "Q-8"),
+        serialize = "DIV_QQ_Q",
+        serialize = "Q-8",
+        serialize = "RationalDivide"
+    )]
     RationalDivide,
 }
 
 impl Instruction {
     /// Returns opcode of the instruction.
-    pub fn opcode(&self) -> String {
-        match self {
-            Instruction::NaturalCompare => "COM_NN_D".to_string(),
-            Instruction::NaturalIsZero => "NZER_N_B".to_string(),
-            Instruction::NaturalIncrement => "ADD_1N_N".to_string(),
-            Instruction::NaturalAdd => "ADD_NN_N".to_string(),
-            Instruction::NaturalSubtract => "SUB_NN_N".to_string(),
-            Instruction::NaturalMultiplyByDigit => "MUL_ND_N".to_string(),
-            Instruction::NaturalMultiplyByPowerOfTen => "MUL_Nk_N".to_string(),
-            Instruction::NaturalMultiply => "MUL_NN_N".to_string(),
-            Instruction::NaturalSubtractMultipliedByDigit => "SUB_NDN_N".to_string(),
-            Instruction::NaturalCalculateDivisionDigit => "DIV_NN_Dk".to_string(),
-            Instruction::NaturalQuotient => "DIV_NN_N".to_string(),
-            Instruction::NaturalRemainder => "MOD_NN_N".to_string(),
-            Instruction::NaturalGCD => "GCF_NN_N".to_string(),
-            Instruction::NaturalLCM => "LCM_NN_N".to_string(),
-
-            Instruction::IntegerAbs => "ABS_Z_Z".to_string(),
-            Instruction::IntegerSgn => "SGN_Z_D".to_string(),
-            Instruction::IntegerNeg => "NEG_ZM_Z".to_string(),
-            Instruction::IntegerFromNatural => "TRANS_N_Z".to_string(),
-            Instruction::IntegerToNatural => "TRANS_Z_N".to_string(),
-            Instruction::IntegerAdd => "ADD_ZZ_Z".to_string(),
-            Instruction::IntegerSubtract => "SUB_ZZ_Z".to_string(),
-            Instruction::IntegerMultiply => "MUL_ZZ_Z".to_string(),
-            Instruction::IntegerQuotient => "DIV_ZZ_Z".to_string(),
-            Instruction::IntegerRemainder => "MOD_ZZ_Z".to_string(),
-
-            Instruction::RationalReduce => "RED_Q_Q".to_string(),
-            Instruction::RationalIsInteger => "INT_Q_B".to_string(),
-            Instruction::RationalFromInteger => "TRANS_Z_Q".to_string(),
-            Instruction::RationalToInteger => "TRANS_Q_Z".to_string(),
-            Instruction::RationalAdd => "ADD_QQ_Q".to_string(),
-            Instruction::RationalSubtract => "SUB_QQ_Q".to_string(),
-            Instruction::RationalMultiply => "MUL_QQ_Q".to_string(),
-            Instruction::RationalDivide => "DIV_QQ_Q".to_string(),
-        }
+    pub fn opcode(&self) -> &str {
+        self.get_str("opcode").unwrap()
     }
 
     /// Returns index of the instruction.
-    pub fn index(&self) -> String {
-        match self {
-            Instruction::NaturalCompare => "N-1".to_string(),
-            Instruction::NaturalIsZero => "N-2".to_string(),
-            Instruction::NaturalIncrement => "N-3".to_string(),
-            Instruction::NaturalAdd => "N-4".to_string(),
-            Instruction::NaturalSubtract => "N-5".to_string(),
-            Instruction::NaturalMultiplyByDigit => "N-6".to_string(),
-            Instruction::NaturalMultiplyByPowerOfTen => "N-7".to_string(),
-            Instruction::NaturalMultiply => "N-8".to_string(),
-            Instruction::NaturalSubtractMultipliedByDigit => "N-9".to_string(),
-            Instruction::NaturalCalculateDivisionDigit => "N-10".to_string(),
-            Instruction::NaturalQuotient => "N-11".to_string(),
-            Instruction::NaturalRemainder => "N-12".to_string(),
-            Instruction::NaturalGCD => "N-13".to_string(),
-            Instruction::NaturalLCM => "N-14".to_string(),
-
-            Instruction::IntegerAbs => "Z-1".to_string(),
-            Instruction::IntegerSgn => "Z-2".to_string(),
-            Instruction::IntegerNeg => "Z-3".to_string(),
-            Instruction::IntegerFromNatural => "Z-4".to_string(),
-            Instruction::IntegerToNatural => "Z-5".to_string(),
-            Instruction::IntegerAdd => "Z-6".to_string(),
-            Instruction::IntegerSubtract => "Z-7".to_string(),
-            Instruction::IntegerMultiply => "Z-8".to_string(),
-            Instruction::IntegerQuotient => "Z-9".to_string(),
-            Instruction::IntegerRemainder => "Z-10".to_string(),
-
-            Instruction::RationalReduce => "Q-1".to_string(),
-            Instruction::RationalIsInteger => "Q-2".to_string(),
-            Instruction::RationalFromInteger => "Q-3".to_string(),
-            Instruction::RationalToInteger => "Q-4".to_string(),
-            Instruction::RationalAdd => "Q-5".to_string(),
-            Instruction::RationalSubtract => "Q-6".to_string(),
-            Instruction::RationalMultiply => "Q-7".to_string(),
-            Instruction::RationalDivide => "Q-8".to_string(),
-        }
-    }
-}
-
-impl FromStr for Instruction {
-    type Err = InstructionError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "N-1" | "COM_NN_D" | "NaturalCompare" => Ok(Self::NaturalCompare),
-            "N-2" | "NZER_N_B" | "NaturalIsZero" => Ok(Self::NaturalIsZero),
-            "N-3" | "ADD_1N_N" | "NaturalIncrement" => Ok(Self::NaturalIncrement),
-            "N-4" | "ADD_NN_N" | "NaturalAdd" => Ok(Self::NaturalAdd),
-            "N-5" | "SUB_NN_N" | "NaturalSubtract" => Ok(Self::NaturalSubtract),
-            "N-6" | "MUL_ND_N" | "NaturalMultiplyByDigit" => Ok(Self::NaturalMultiplyByDigit),
-            "N-7" | "MUL_Nk_N" | "NaturalMultiplyByPowerOfTen" => {
-                Ok(Self::NaturalMultiplyByPowerOfTen)
-            }
-            "N-8" | "MUL_NN_N" | "NaturalMultiply" => Ok(Self::NaturalMultiply),
-            "N-9" | "SUB_NDN_N" | "NaturalSubtractMultipliedByDigit" => {
-                Ok(Self::NaturalSubtractMultipliedByDigit)
-            }
-            "N-10" | "DIV_NN_Dk" | "NaturalCalculateDivisionDigit" => {
-                Ok(Self::NaturalCalculateDivisionDigit)
-            }
-            "N-11" | "DIV_NN_N" | "NaturalQuotient" => Ok(Self::NaturalQuotient),
-            "N-12" | "MOD_NN_N" | "NaturalRemainder" => Ok(Self::NaturalRemainder),
-            "N-13" | "GCF_NN_N" | "NaturalGCD" => Ok(Self::NaturalGCD),
-            "N-14" | "LCM_NN_N" | "NaturalLCM" => Ok(Self::NaturalLCM),
-
-            "Z-1" | "ABS_Z_Z" | "IntegerAbs" => Ok(Self::IntegerAbs),
-            "Z-2" | "SGN_Z_D" | "IntegerSgn" => Ok(Self::IntegerSgn),
-            "Z-3" | "NEG_ZM_Z" | "IntegerNeg" => Ok(Self::IntegerNeg),
-            "Z-4" | "TRANS_N_Z" | "IntegerFromNatural" => Ok(Self::IntegerFromNatural),
-            "Z-5" | "TRANS_Z_N" | "IntegerToNatural" => Ok(Self::IntegerToNatural),
-            "Z-6" | "ADD_ZZ_Z" | "IntegerAdd" => Ok(Self::IntegerAdd),
-            "Z-7" | "SUB_ZZ_Z" | "IntegerSubtract" => Ok(Self::IntegerSubtract),
-            "Z-8" | "MUL_ZZ_Z" | "IntegerMultiply" => Ok(Self::IntegerMultiply),
-            "Z-9" | "DIV_ZZ_Z" | "IntegerQuotient" => Ok(Self::IntegerQuotient),
-            "Z-10" | "MOD_ZZ_Z" | "IntegerRemainder" => Ok(Self::IntegerRemainder),
-
-            "Q-1" | "RED_Q_Q" | "RationalReduce" => Ok(Self::RationalReduce),
-            "Q-2" | "INT_Q_B" | "RationalIsInteger" => Ok(Self::RationalIsInteger),
-            "Q-3" | "TRANS_Z_Q" | "RationalFromInteger" => Ok(Self::RationalFromInteger),
-            "Q-4" | "TRANS_Q_Z" | "RationalToInteger" => Ok(Self::RationalToInteger),
-            "Q-5" | "ADD_QQ_Q" | "RationalAdd" => Ok(Self::RationalAdd),
-            "Q-6" | "SUB_QQ_Q" | "RationalSubtract" => Ok(Self::RationalSubtract),
-            "Q-7" | "MUL_QQ_Q" | "RationalMultiply" => Ok(Self::RationalMultiply),
-            "Q-8" | "DIV_QQ_Q" | "RationalDivide" => Ok(Self::RationalDivide),
-
-            _ => Err(InstructionError::unknown_instruction(s)),
-        }
+    pub fn index(&self) -> &str {
+        self.get_str("index").unwrap()
     }
 }
 

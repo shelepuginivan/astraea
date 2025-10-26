@@ -60,8 +60,8 @@ impl Error {
 
     fn needle(&self, args: &Args) -> String {
         match self {
-            Self::UnknownInstruction => args.instruction.clone(),
-            Self::InstructionNotImplemented => args.instruction.clone(),
+            Self::UnknownInstruction => args.instruction.to_string(),
+            Self::InstructionNotImplemented => args.instruction.to_string(),
             Self::InvalidArgument(index, ..) | Self::Calculation(index, ..) => {
                 args.args[*index].clone()
             }
