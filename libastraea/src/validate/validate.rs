@@ -86,17 +86,3 @@ where
 
     Ok((first, second))
 }
-
-pub fn three_args<T>(args: Vec<String>) -> Result<(T, T, T), InstructionError>
-where
-    T: FromStr,
-    T::Err: Display,
-{
-    let args = ensure_args(args, 3)?;
-    let mut args_iter = args.into_iter();
-    let first = args_iter.next().unwrap();
-    let second = args_iter.next().unwrap();
-    let third = args_iter.next().unwrap();
-
-    Ok((first, second, third))
-}
