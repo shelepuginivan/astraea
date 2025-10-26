@@ -8,7 +8,7 @@ use crate::math::Sign;
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq)]
 pub struct Integer {
     value: NaturalNumber,
     sign: Sign,
