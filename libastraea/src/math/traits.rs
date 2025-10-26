@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 use crate::math::Sign;
 
@@ -14,6 +14,11 @@ pub trait Ring: Add + Sub + Mul + Sized {
     /// Returns the multiplicative identity.
     fn one() -> Self;
 }
+
+/// IntegralDomain represents an integral domain.
+///
+/// Supports integer division and remainder operations.
+pub trait IntegralDomain: Ring + Div + Rem {}
 
 pub trait Signed: Neg<Output = Self> + Sized {
     fn sign(&self) -> Sign;
