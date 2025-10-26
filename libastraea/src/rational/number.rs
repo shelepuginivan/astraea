@@ -6,6 +6,7 @@ use crate::integer::Integer;
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
+#[derive(Clone)]
 pub struct RationalNumber {
     numerator: Integer,
     denominator: NaturalNumber,
@@ -21,6 +22,25 @@ impl RationalNumber {
             numerator,
             denominator,
         })
+    }
+
+    pub fn reduce(self) -> Self {
+        let Self {
+            numerator,
+            denominator,
+        } = self;
+
+        let gcd = numerator
+            .clone()
+            .gcd(Integer::from_natural(denominator.clone()));
+
+        let numerator = (numerator / gcd.clone()).unwrap();
+        let denominator = (denominator / gcd.to_natural().unwrap()).unwrap();
+
+        Self {
+            numerator,
+            denominator,
+        }
     }
 }
 
@@ -95,5 +115,43 @@ mod tests {
         assert!(RationalNumber::from_str("/23435").is_err());
         assert!(RationalNumber::from_str("   / ").is_err());
         assert!(RationalNumber::from_str("1/0").is_err());
+    }
+
+    #[test]
+    fn test_rational_number_reduce() {
+        let expected = "2/1";
+        let actual = RationalNumber::from_str("8/4")
+            .unwrap()
+            .reduce()
+            .to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "2/3";
+        let actual = RationalNumber::from_str("2/3")
+            .unwrap()
+            .reduce()
+            .to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/334";
+        let actual = RationalNumber::from_str("1324234 / 442294156")
+            .unwrap()
+            .reduce()
+            .to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "0/1";
+        let actual = RationalNumber::from_str("0/2495734985739854")
+            .unwrap()
+            .reduce()
+            .to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "7/5";
+        let actual = RationalNumber::from_str("42/30")
+            .unwrap()
+            .reduce()
+            .to_string();
+        assert_eq!(expected, actual);
     }
 }
