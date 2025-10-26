@@ -8,12 +8,17 @@ use crate::math::Sign;
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
+#[derive(Clone)]
 pub struct Integer {
     value: NaturalNumber,
     sign: Sign,
 }
 
 impl Integer {
+    pub fn new(value: NaturalNumber, sign: Sign) -> Self {
+        Self { value, sign }
+    }
+
     pub fn from_natural(n: NaturalNumber) -> Self {
         Self {
             value: n,
@@ -34,6 +39,13 @@ impl Integer {
         Self {
             value: NaturalNumber::zero(),
             sign: Sign::Zero,
+        }
+    }
+
+    pub fn one() -> Self {
+        Self {
+            value: NaturalNumber::one(),
+            sign: Sign::Positive,
         }
     }
 
