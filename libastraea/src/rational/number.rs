@@ -1,5 +1,5 @@
 use std::fmt::Display;
-use std::ops::Add;
+use std::ops::{Add, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
@@ -121,6 +121,17 @@ impl FromStr for RationalNumber {
     }
 }
 
+impl Neg for RationalNumber {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self {
+            numerator: -self.numerator,
+            denominator: self.denominator,
+        }
+    }
+}
+
 impl Add for RationalNumber {
     type Output = Self;
 
@@ -155,6 +166,14 @@ impl Add for RationalNumber {
     }
 }
 
+impl Sub for RationalNumber {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.add(-rhs)
+    }
+}
+
 impl Display for RationalNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.numerator, self.denominator)
@@ -167,7 +186,7 @@ mod tests {
 
     use super::*;
 
-    fn rat(numerator: i32, denominator: u32) -> RationalNumber {
+    fn rat(numerator: i32, denominator: i32) -> RationalNumber {
         RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
     }
 
@@ -297,7 +316,7 @@ mod tests {
 
         let expected = "999999/1111111";
         let lhs = rat(999999, 1111111);
-        let rhs = rat(0, 4269426942);
+        let rhs = rat(0, 42694269);
         let actual = (lhs + rhs).reduce().to_string();
         assert_eq!(expected, actual);
 
@@ -305,6 +324,57 @@ mod tests {
         let lhs = rat(0, 777);
         let rhs = rat(0, 888);
         let actual = (lhs + rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_rational_number_sub() {
+        let expected = "1/6";
+        let lhs = rat(1, 2);
+        let rhs = rat(1, 3);
+        let actual = (lhs - rhs).to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "0/1";
+        let lhs = rat(1, 4);
+        let rhs = rat(1, 4);
+        let actual = (lhs - rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "-1/6";
+        let lhs = rat(1, 3);
+        let rhs = rat(1, 2);
+        let actual = (lhs - rhs).to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "124253465/1231232314";
+        let lhs = rat(124253465, 1231232314);
+        let rhs = rat(0, 2343425);
+        let actual = (lhs - rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "-999999/1111111";
+        let lhs = rat(0, 42694269);
+        let rhs = rat(999999, 1111111);
+        let actual = (lhs - rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "0/1";
+        let lhs = rat(0, 777);
+        let rhs = rat(0, 888);
+        let actual = (lhs - rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/2";
+        let lhs = rat(3, 4);
+        let rhs = rat(1, 4);
+        let actual = (lhs - rhs).reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/6";
+        let lhs = rat(1, -2);
+        let rhs = rat(2, -3);
+        let actual = (lhs - rhs).reduce().to_string();
         assert_eq!(expected, actual);
     }
 }
