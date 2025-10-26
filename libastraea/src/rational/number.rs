@@ -1,9 +1,10 @@
 use std::fmt::Display;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
 use crate::integer::Integer;
+use crate::math::Sign;
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -48,6 +49,10 @@ impl RationalNumber {
 
     pub fn is_zero(&self) -> bool {
         self.numerator.is_zero()
+    }
+
+    pub fn sign(&self) -> Sign {
+        self.numerator.sign()
     }
 
     pub fn reduce(self) -> Self {
@@ -182,6 +187,32 @@ impl Mul for RationalNumber {
             numerator: self.numerator * rhs.numerator,
             denominator: self.denominator * rhs.denominator,
         }
+    }
+}
+
+impl Div for RationalNumber {
+    type Output = Result<Self, ValueError>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        if rhs.is_zero() {
+            return Err(ValueError::new("division by 0 is not allowed"));
+        }
+
+        let sign = self.sign() * rhs.sign();
+
+        let lhs_numerator = self.numerator.abs().to_natural().unwrap();
+        let rhs_numerator = rhs.numerator.abs().to_natural().unwrap();
+
+        let lhs_denominator = self.denominator;
+        let rhs_denominator = rhs.denominator;
+
+        let numerator = lhs_numerator * rhs_denominator;
+        let denominator = rhs_numerator * lhs_denominator;
+
+        Ok(Self {
+            numerator: Integer::new(numerator, sign),
+            denominator,
+        })
     }
 }
 
@@ -462,5 +493,94 @@ mod tests {
         let rhs = rat(3, 2);
         let actual = (lhs * rhs).reduce().to_string();
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_rational_number_div() {
+        let expected = "3/2";
+        let lhs = rat(1, 2);
+        let rhs = rat(1, 3);
+        let actual = (lhs / rhs).unwrap().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "3/4";
+        let lhs = rat(3, 4);
+        let rhs = rat(1, 1);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/1";
+        let lhs = rat(3, 4);
+        let rhs = rat(3, 4);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "0/1";
+        let lhs = rat(0, 777);
+        let rhs = rat(999999, 1111111);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "16/9";
+        let lhs = rat(4, 3);
+        let rhs = rat(3, 4);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "2/3";
+        let lhs = rat(4, 15);
+        let rhs = rat(2, 5);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "-2/1";
+        let lhs = rat(1, 2);
+        let rhs = rat(-1, 4);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "2/1";
+        let lhs = rat(-1, 2);
+        let rhs = rat(-1, 4);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "-2/1";
+        let lhs = rat(1, 2);
+        let rhs = rat(1, -4);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/2";
+        let lhs = rat(12345, 49380);
+        let rhs = rat(24690, 49380);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "5/6";
+        let lhs = rat(10, 18);
+        let rhs = rat(12, 18);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "8/15";
+        let lhs = rat(2, 3);
+        let rhs = rat(5, 4);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let expected = "1/1";
+        let lhs = rat(4, 6);
+        let rhs = rat(2, 3);
+        let actual = (lhs / rhs).unwrap().reduce().to_string();
+        assert_eq!(expected, actual);
+
+        let lhs = rat(4, 6);
+        let rhs = rat(0, 3);
+        assert!((lhs / rhs).is_err());
+
+        let lhs = rat(0, 1);
+        let rhs = rat(0, 1);
+        assert!((lhs / rhs).is_err());
     }
 }
