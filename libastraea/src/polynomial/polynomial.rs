@@ -1,72 +1,85 @@
-use std::{collections::LinkedList, fmt::Display, str::FromStr};
+use std::collections::LinkedList;
+use std::fmt::Display;
+use std::str::FromStr;
 
-use crate::{
-    core::ParseError,
-    math::{Sign, Signed},
-    polynomial::Monomial,
-};
+use crate::core::ParseError;
+use crate::math::{Ring, Sign, Signed};
+use crate::polynomial::Monomial;
+use crate::rational::RationalNumber;
 
 pub struct Polynomial {
-    monomials: LinkedList<Monomial>,
+    coefficients: Vec<RationalNumber>,
 }
 
 impl Polynomial {
-    pub fn from_canonical_form(s: &str) -> Result<Self, ParseError> {
+    pub fn from_canonical_form<S: Into<String>>(s: S) -> Result<Self, ParseError> {
+        let chars: Vec<char> = s.into().trim().chars().collect();
+
         let mut monomials: LinkedList<Monomial> = LinkedList::new();
+        let mut polynomial_degree = 0;
         let mut cursor = 0;
-        let chars: Vec<char> = s.trim().chars().collect();
         let mut monomial_chars: Vec<char> = Vec::new();
         let mut next_sign = Sign::Positive;
 
         while cursor < chars.len() {
             match chars[cursor] {
-                '+' => {
+                '+' | '-' => {
                     let monomial_str: String = monomial_chars.iter().collect();
-                    let monomial = Monomial::from_str(monomial_str.as_str())?.with_sign(next_sign);
+                    let mut monomial = Monomial::from_str(monomial_str.as_str())?;
+                    polynomial_degree = polynomial_degree.max(monomial.exponent);
+                    monomial.coefficient = monomial.coefficient.with_sign(next_sign);
                     monomials.push_back(monomial);
+                    next_sign = Sign::from_char(chars[cursor])?;
                     monomial_chars.clear();
-                    next_sign = Sign::Positive;
-                    cursor += 1;
-                }
-
-                '-' => {
-                    let monomial_str: String = monomial_chars.iter().collect();
-                    let monomial = Monomial::from_str(monomial_str.as_str())?.with_sign(next_sign);
-                    monomials.push_back(monomial);
-                    monomial_chars.clear();
-                    next_sign = Sign::Negative;
-                    cursor += 1;
                 }
 
                 char => {
                     monomial_chars.push(char);
-                    cursor += 1;
                 }
             }
+
+            cursor += 1;
         }
 
         let monomial_str: String = monomial_chars.iter().collect();
-        let monomial = Monomial::from_str(monomial_str.as_str())?.with_sign(next_sign);
+        let mut monomial = Monomial::from_str(monomial_str.as_str())?;
+        polynomial_degree = polynomial_degree.max(monomial.exponent);
+        monomial.coefficient = monomial.coefficient.with_sign(next_sign);
         monomials.push_back(monomial);
 
-        Ok(Self { monomials })
+        let mut coefficients = vec![RationalNumber::zero(); polynomial_degree + 1];
+
+        for monomial in monomials {
+            coefficients[monomial.exponent] = monomial.coefficient;
+        }
+
+        Ok(Self { coefficients })
     }
 }
 
 impl Display for Polynomial {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (i, monomial) in self.monomials.iter().enumerate() {
-            if i == 0 {
-                write!(f, "{}", monomial)?;
+        let mut is_first_coefficient = true;
+
+        for (exponent, coefficient) in self.coefficients.iter().enumerate().rev() {
+            if coefficient.is_zero() {
                 continue;
             }
 
-            let sign = if monomial.sign() == Sign::Positive {
+            let variable = match exponent {
+                0 => "".to_string(),
+                1 => "*x".to_string(),
+                e => format!("*x^{}", e),
+            };
+            let separator = if is_first_coefficient { "" } else { " " };
+            let sign = if !is_first_coefficient && coefficient.is_positive() {
                 "+"
             } else {
                 ""
             };
-            write!(f, " {}{}", sign, monomial)?;
+
+            write!(f, "{}{}{}{}", separator, sign, coefficient, variable)?;
+            is_first_coefficient = false;
         }
 
         Ok(())
@@ -85,15 +98,24 @@ impl FromStr for Polynomial {
 mod tests {
     use super::*;
 
+    fn q(numerator: i32, denominator: i32) -> RationalNumber {
+        RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
+    }
+
     #[test]
     fn test_polynomial_from_canonical_form() {
-        let tests = vec![("x^2 - 2x + 1", "1/1*x^2 -2/1*x^1 +1/1*x^0")];
+        let tests = vec![
+            ("x^2 - 2x + 1", vec![q(1, 1), q(-2, 1), q(1, 1)]),
+            ("5/6", vec![q(5, 6)]),
+        ];
 
         for (canonical_form, expected) in tests {
-            let p = Polynomial::from_canonical_form(canonical_form).unwrap();
-            let actual = p.to_string();
+            let p = Polynomial::from_canonical_form(canonical_form)
+                .expect(&format!("failed to parse '{}'", canonical_form));
 
-            assert_eq!(expected, actual);
+            for (expected_exponent, actual_exponent) in expected.iter().zip(p.coefficients) {
+                assert_eq!(expected_exponent.to_string(), actual_exponent.to_string());
+            }
         }
     }
 }
