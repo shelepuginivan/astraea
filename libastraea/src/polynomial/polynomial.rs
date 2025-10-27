@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::LinkedList;
 use std::fmt::Display;
-use std::ops::{Add, Neg, Sub};
+use std::ops::{Add, Mul, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::ParseError;
@@ -106,6 +106,21 @@ impl Add for Polynomial {
         }
 
         max.normalize()
+    }
+}
+
+impl Mul<RationalNumber> for Polynomial {
+    type Output = Self;
+
+    fn mul(self, rhs: RationalNumber) -> Self::Output {
+        Self {
+            coefficients: self
+                .coefficients
+                .into_iter()
+                .map(|c| c * rhs.clone())
+                .collect(),
+        }
+        .normalize()
     }
 }
 
