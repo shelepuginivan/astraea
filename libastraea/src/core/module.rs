@@ -1,7 +1,6 @@
 use std::collections::HashSet;
-use std::fmt::Display;
 
-use crate::core::{Instruction, InstructionError};
+use crate::core::{Instruction, InstructionError, Pretty};
 
 /// Module is a part of computer algebra system responsible for a set of instructions.
 pub trait Module {
@@ -10,7 +9,7 @@ pub trait Module {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Display>, InstructionError>;
+    ) -> Result<Box<dyn Pretty>, InstructionError>;
 
     /// Reports whether module implements the given instruction.
     fn implements(&self, instruction: Instruction) -> bool;
@@ -39,7 +38,7 @@ impl Module for ModuleGroup {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Display>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError> {
         for module in &self.modules {
             if module.implements(instruction) {
                 return module.process_instruction(instruction, args);

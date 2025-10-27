@@ -1,6 +1,6 @@
-use std::{collections::HashSet, fmt::Display};
+use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module};
+use crate::core::{Instruction, InstructionError, Module, Pretty};
 use crate::integer::Integer;
 use crate::math::Signed;
 use crate::natural::NaturalNumber;
@@ -19,7 +19,7 @@ impl Module for IntegerModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Display>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::IntegerAbs => {
                 let v: Integer = one_arg(args)?;

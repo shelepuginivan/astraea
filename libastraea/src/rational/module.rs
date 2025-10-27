@@ -1,6 +1,6 @@
-use std::{collections::HashSet, fmt::Display};
+use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module};
+use crate::core::{Instruction, InstructionError, Module, Pretty};
 use crate::integer::Integer;
 use crate::rational::RationalNumber;
 use crate::validate;
@@ -18,7 +18,7 @@ impl Module for RationalModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Display>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::RationalReduce => {
                 let v: RationalNumber = validate::one_arg(args)?;

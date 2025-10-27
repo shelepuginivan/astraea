@@ -1,6 +1,6 @@
-use std::{collections::HashSet, fmt::Display};
+use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module};
+use crate::core::{Instruction, InstructionError, Module, Pretty};
 use crate::digit;
 use crate::math::Digit;
 use crate::math::sign::ToSign;
@@ -20,7 +20,7 @@ impl Module for NaturalModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Display>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::NaturalCompare => {
                 let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
