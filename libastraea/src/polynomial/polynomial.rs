@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::LinkedList;
 use std::fmt::Display;
-use std::ops::Add;
+use std::ops::{Add, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::ParseError;
@@ -81,6 +81,16 @@ impl Polynomial {
     }
 }
 
+impl Neg for Polynomial {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self {
+            coefficients: self.coefficients.into_iter().map(|c| -c).collect(),
+        }
+    }
+}
+
 impl Add for Polynomial {
     type Output = Self;
 
@@ -96,6 +106,14 @@ impl Add for Polynomial {
         }
 
         max.normalize()
+    }
+}
+
+impl Sub for Polynomial {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.add(-rhs)
     }
 }
 
