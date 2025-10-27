@@ -4,7 +4,7 @@ use std::iter;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::core::{ParseError, Pretty, ValueError};
 use crate::digit;
 use crate::math::{Digit, IntegralDomain, Ring};
 
@@ -401,6 +401,12 @@ impl Display for NaturalNumber {
             .collect();
 
         write!(f, "{}", s)
+    }
+}
+
+impl Pretty for NaturalNumber {
+    fn prettify(&self) -> String {
+        self.to_string()
     }
 }
 
