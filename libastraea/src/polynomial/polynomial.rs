@@ -79,6 +79,12 @@ impl Polynomial {
             .or_else(|| Some(RationalNumber::zero()))
             .unwrap()
     }
+
+    pub fn times_pow_x(self, k: usize) -> Self {
+        Self {
+            coefficients: [vec![RationalNumber::zero(); k], self.coefficients].concat(),
+        }
+    }
 }
 
 impl Neg for Polynomial {
