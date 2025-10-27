@@ -3,7 +3,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::core::{ParseError, Pretty, ValueError};
 use crate::math::{IntegralDomain, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
@@ -189,6 +189,12 @@ impl Display for Integer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let sign = if self.sign == Sign::Negative { "-" } else { "" };
         write!(f, "{}{}", sign, self.value)
+    }
+}
+
+impl Pretty for Integer {
+    fn prettify(&self) -> String {
+        self.to_string()
     }
 }
 
