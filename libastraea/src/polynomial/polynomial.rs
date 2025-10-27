@@ -1,5 +1,7 @@
+use std::cmp::Ordering;
 use std::collections::LinkedList;
 use std::fmt::Display;
+use std::ops::Add;
 use std::str::FromStr;
 
 use crate::core::ParseError;
@@ -76,6 +78,24 @@ impl Polynomial {
             .and_then(|v| Some(v.clone()))
             .or_else(|| Some(RationalNumber::zero()))
             .unwrap()
+    }
+}
+
+impl Add for Polynomial {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let (min, mut max) = match self.degree().cmp(&rhs.degree()) {
+            Ordering::Greater | Ordering::Equal => (rhs, self),
+            Ordering::Less => (self, rhs),
+        };
+
+        for (exponent, rhs_coefficient) in min.coefficients.into_iter().enumerate() {
+            let lhs_coefficient = max.coefficients[exponent].clone();
+            max.coefficients[exponent] = lhs_coefficient + rhs_coefficient;
+        }
+
+        max.normalize()
     }
 }
 
@@ -158,6 +178,67 @@ mod tests {
             let actual = p.leading_coefficient();
 
             assert_eq!(expected.to_string(), actual.to_string());
+        }
+    }
+
+    #[test]
+    fn test_polynomial_addition() {
+        let tests = vec![
+            (
+                vec![q(1, 1), q(2, 3), q(5, 4)],
+                vec![q(3, 1), q(1, 3), q(1, 4)],
+                vec![q(4, 1), q(3, 3), q(6, 4)],
+            ),
+            (
+                vec![q(1, 1), q(2, 3)],
+                vec![q(3, 1), q(1, 3), q(1, 4)],
+                vec![q(4, 1), q(3, 3), q(1, 4)],
+            ),
+            (
+                vec![q(3, 1), q(1, 3), q(1, 4)],
+                vec![q(1, 1), q(2, 3)],
+                vec![q(4, 1), q(3, 3), q(1, 4)],
+            ),
+            (vec![q(1, 1), q(2, 3)], vec![], vec![q(1, 1), q(2, 3)]),
+            (
+                vec![q(1, 1), q(-2, 3), q(3, 4)],
+                vec![q(-1, 1), q(2, 3), q(-3, 4)],
+                vec![],
+            ),
+            (
+                vec![q(-3, 2), q(4, 5)],
+                vec![q(3, 2), q(-1, 5)],
+                vec![q(0, 2), q(3, 5)],
+            ),
+            (vec![q(5, 1)], vec![q(2, 1)], vec![q(7, 1)]),
+        ];
+
+        for (lhs_coeffs, rhs_coeffs, expected_coeffs) in tests {
+            let lhs = Polynomial::new(lhs_coeffs);
+            let rhs = Polynomial::new(rhs_coeffs);
+            let expected = Polynomial::new(expected_coeffs);
+
+            let actual = lhs + rhs;
+
+            assert_eq!(
+                expected.coefficients.len(),
+                actual.coefficients.len(),
+                "Coefficient length mismatch",
+            );
+
+            for (i, (expected, actual)) in expected
+                .coefficients
+                .iter()
+                .zip(actual.coefficients.iter())
+                .enumerate()
+            {
+                assert_eq!(
+                    expected.to_string(),
+                    actual.to_string(),
+                    "Mismatch at coefficient index {}",
+                    i,
+                );
+            }
         }
     }
 }
