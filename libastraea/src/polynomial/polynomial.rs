@@ -61,6 +61,18 @@ impl Polynomial {
 
         Ok(Self { coefficients })
     }
+
+    pub fn degree(&self) -> usize {
+        self.coefficients.len().max(1) - 1
+    }
+
+    pub fn leading_coefficient(&self) -> RationalNumber {
+        self.coefficients
+            .last()
+            .and_then(|v| Some(v.clone()))
+            .or_else(|| Some(RationalNumber::zero()))
+            .unwrap()
+    }
 }
 
 impl Display for Polynomial {
@@ -122,6 +134,25 @@ mod tests {
             for (expected_exponent, actual_exponent) in expected.iter().zip(p.coefficients) {
                 assert_eq!(expected_exponent.to_string(), actual_exponent.to_string());
             }
+        }
+    }
+
+    #[test]
+    fn test_polynomial_leading_coefficient() {
+        let tests = vec![
+            (vec![q(1, 1), q(2, 3), q(5, 4)], q(5, 4)),
+            (vec![q(7, 2)], q(7, 2)),
+            (vec![q(0, 1), q(0, 1), q(0, 1)], q(0, 1)),
+            (vec![], q(0, 1)),
+            (vec![q(1, 1), q(0, 1), q(0, 1)], q(1, 1)),
+            (vec![q(3, 2), q(-7, 3)], q(-7, 3)),
+        ];
+
+        for (coefficients, expected) in tests {
+            let p = Polynomial::new(coefficients);
+            let actual = p.leading_coefficient();
+
+            assert_eq!(expected.to_string(), actual.to_string());
         }
     }
 }
