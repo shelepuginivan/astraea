@@ -4,7 +4,7 @@ use std::{
     ops::{Mul, Neg},
 };
 
-use crate::core::ParseError;
+use crate::core::{ParseError, Pretty};
 
 /// Sign represents sign of the number.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -47,6 +47,12 @@ impl Sign {
 impl Display for Sign {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value())
+    }
+}
+
+impl Pretty for Sign {
+    fn prettify(&self) -> String {
+        self.to_string()
     }
 }
 

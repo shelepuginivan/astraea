@@ -3,7 +3,7 @@ use std::i16;
 use std::ops::{Add, Div, Mul, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::core::{ParseError, Pretty, ValueError};
 
 /// Creates a Digit from the argument.
 #[macro_export]
@@ -184,6 +184,12 @@ impl Div for Digit {
 impl Display for Digit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value)
+    }
+}
+
+impl Pretty for Digit {
+    fn prettify(&self) -> String {
+        self.to_string()
     }
 }
 
