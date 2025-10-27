@@ -2,7 +2,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::core::{ParseError, Pretty, ValueError};
 use crate::integer::Integer;
 use crate::math::{Field, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
@@ -224,6 +224,17 @@ impl Div for RationalNumber {
 impl Display for RationalNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.numerator, self.denominator)
+    }
+}
+
+impl Pretty for RationalNumber {
+    fn prettify(&self) -> String {
+        let r = self.clone().reduce();
+
+        match r.is_integer() {
+            true => r.to_integer().unwrap().prettify(),
+            false => r.to_string(),
+        }
     }
 }
 
