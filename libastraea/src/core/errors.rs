@@ -1,4 +1,4 @@
-use std::{fmt::Display, usize};
+use std::fmt::Display;
 
 #[derive(Debug)]
 pub enum InstructionErrorReason {
