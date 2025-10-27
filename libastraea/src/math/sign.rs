@@ -4,6 +4,8 @@ use std::{
     ops::{Mul, Neg},
 };
 
+use crate::core::ParseError;
+
 /// Sign represents sign of the number.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Sign {
@@ -28,6 +30,16 @@ impl Sign {
             Ordering::Less => Self::Negative,
             Ordering::Equal => Self::Zero,
             Ordering::Greater => Self::Positive,
+        }
+    }
+
+    /// Converts char ("+", "-") to Sign.
+    pub fn from_char(c: char) -> Result<Self, ParseError> {
+        match c {
+            '-' => Ok(Self::Negative),
+            '+' => Ok(Self::Positive),
+
+            _ => Err(ParseError::new(format!("'{}' is not a sign", c))),
         }
     }
 }
