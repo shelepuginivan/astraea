@@ -1,46 +1,15 @@
-use std::{char, fmt::Display, ops::Neg, str::FromStr};
+use std::str::FromStr;
+use std::usize;
 
-use crate::{
-    core::ParseError,
-    math::{Ring, Sign, Signed},
-    natural::NaturalNumber,
-    rational::RationalNumber,
-};
+use crate::core::ParseError;
+use crate::math::Ring;
+use crate::rational::RationalNumber;
 
 /// Monomial represents a single term of a polynomial, written as k &middot; x<sup>a</sup>, where k
-/// is a rational coefficient and a is a natural exponent.
+/// is a rational coefficient and a is an exponent of type usize.
 pub struct Monomial {
-    coefficient: RationalNumber,
-    exponent: NaturalNumber,
-}
-
-impl Monomial {
-    pub fn sign(&self) -> Sign {
-        self.coefficient.sign()
-    }
-}
-
-impl Display for Monomial {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}*x^{}", self.coefficient, self.exponent)
-    }
-}
-
-impl Neg for Monomial {
-    type Output = Self;
-
-    fn neg(self) -> Self::Output {
-        Self {
-            coefficient: -self.coefficient,
-            exponent: self.exponent,
-        }
-    }
-}
-
-impl Signed for Monomial {
-    fn sign(&self) -> Sign {
-        self.coefficient.sign()
-    }
+    pub coefficient: RationalNumber,
+    pub exponent: usize,
 }
 
 struct MonomialParser {
@@ -133,14 +102,16 @@ impl FromStr for Monomial {
             };
         }
 
+        while parser.can_advance() {
+            if parser.char() != ' ' {
+                break;
+            }
+            parser.advance();
+        }
+
         // Exponent.
         while parser.can_advance() {
             let char = parser.char();
-
-            if char == ' ' {
-                parser.advance();
-                continue;
-            }
 
             if !char.is_numeric() {
                 break;
@@ -178,16 +149,16 @@ impl FromStr for Monomial {
         };
 
         let exponent = if !parser.has_variable {
-            NaturalNumber::zero()
+            0
         } else if !parser.has_exponent {
-            NaturalNumber::one()
+            1
         } else {
-            match NaturalNumber::from_str(&exponent_chars) {
+            match usize::from_str(&exponent_chars) {
                 Ok(v) => v,
-                Err(e) => {
+                Err(..) => {
                     return Err(ParseError::new(format!(
-                        "cannot parse exponent: {}",
-                        e.message
+                        "cannot parse '{}' as exponent",
+                        exponent_chars
                     )));
                 }
             }
