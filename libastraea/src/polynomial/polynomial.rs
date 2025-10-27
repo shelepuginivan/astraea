@@ -12,10 +12,14 @@ pub struct Polynomial {
 }
 
 impl Polynomial {
-    pub fn new(mut coefficients: Vec<RationalNumber>) -> Self {
-        while coefficients.pop_if(|c| c.is_zero()).is_some() {}
+    /// Keeps the invariant of the polynomial - its leading coefficient must not be zero.
+    fn normalize(mut self) -> Self {
+        while self.coefficients.pop_if(|c| c.is_zero()).is_some() {}
+        self
+    }
 
-        Self { coefficients }
+    pub fn new(coefficients: Vec<RationalNumber>) -> Self {
+        Self { coefficients }.normalize()
     }
 
     pub fn from_canonical_form<S: Into<String>>(s: S) -> Result<Self, ParseError> {
@@ -59,7 +63,7 @@ impl Polynomial {
             coefficients[monomial.exponent] = monomial.coefficient;
         }
 
-        Ok(Self { coefficients })
+        Ok(Self::new(coefficients))
     }
 
     pub fn degree(&self) -> usize {
@@ -125,6 +129,7 @@ mod tests {
         let tests = vec![
             ("x^2 - 2x + 1", vec![q(1, 1), q(-2, 1), q(1, 1)]),
             ("5/6", vec![q(5, 6)]),
+            ("0x^100 + x^2 + 4x + 4", vec![q(4, 1), q(4, 1), q(1, 1)]),
         ];
 
         for (canonical_form, expected) in tests {
