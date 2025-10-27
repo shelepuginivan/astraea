@@ -12,6 +12,12 @@ pub struct Polynomial {
 }
 
 impl Polynomial {
+    pub fn new(mut coefficients: Vec<RationalNumber>) -> Self {
+        while coefficients.pop_if(|c| c.is_zero()).is_some() {}
+
+        Self { coefficients }
+    }
+
     pub fn from_canonical_form<S: Into<String>>(s: S) -> Result<Self, ParseError> {
         let chars: Vec<char> = s.into().trim().chars().collect();
 
