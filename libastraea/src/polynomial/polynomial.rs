@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
 use crate::integer::Integer;
-use crate::math::{Ring, Sign, Signed};
+use crate::math::{IntegralDomain, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 use crate::polynomial::Monomial;
 use crate::rational::RationalNumber;
@@ -112,7 +112,7 @@ impl Polynomial {
     }
 
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
-        let mut quotient = Self::new(vec![RationalNumber::zero()]);
+        let mut quotient = Self::zero();
         let mut remainder = self.clone();
 
         while remainder.degree() >= rhs.degree() {
@@ -141,6 +141,21 @@ impl Polynomial {
         }
 
         Self::new(coefficients)
+    }
+}
+
+impl IntegralDomain for Polynomial {}
+impl Ring for Polynomial {
+    fn zero() -> Self {
+        Self {
+            coefficients: vec![RationalNumber::zero()],
+        }
+    }
+
+    fn one() -> Self {
+        Self {
+            coefficients: vec![RationalNumber::one()],
+        }
     }
 }
 
