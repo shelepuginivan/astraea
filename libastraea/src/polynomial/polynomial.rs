@@ -4,7 +4,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::core::{ParseError, Pretty, ValueError};
 use crate::integer::Integer;
 use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};
 use crate::natural::NaturalNumber;
@@ -265,6 +265,43 @@ impl<T: Field> Display for Polynomial<T> {
         }
 
         Ok(())
+    }
+}
+
+impl<T: Field> Pretty for Polynomial<T> {
+    fn prettify(&self) -> String {
+        let mut is_first_coefficient = true;
+        let mut parts = Vec::<String>::with_capacity(self.degree() + 1);
+
+        for (exponent, coefficient) in self.coefficients.iter().enumerate().rev() {
+            if coefficient.is_zero() {
+                continue;
+            }
+
+            let sign = coefficient.sign().char();
+            let sep = if  !is_first_coefficient {
+                format!(" {} ", sign)
+            } else {
+                "".to_string()
+            };
+
+            let coefficient_str = if exponent == 0 || !coefficient.is_one() {
+                &coefficient.prettify()
+            } else {
+                ""
+            };
+
+            let variable_str = match exponent {
+                0 => "".to_string(),
+                1 => "x".to_string(),
+                e => format!("x^{}", e),
+            };
+
+            parts.push(format!("{}{}{}", sep, coefficient_str, variable_str));
+            is_first_coefficient = false;
+        }
+
+        parts.join("")
     }
 }
 
