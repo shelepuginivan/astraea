@@ -14,9 +14,10 @@ pub struct Polynomial {
 }
 
 impl Polynomial {
-    /// Keeps the invariant of the polynomial - its leading coefficient must not be zero.
+    /// Keeps the invariant of the polynomial - its leading coefficient must not be zero, unless
+    /// the degree of the polynomial is 0.
     fn normalize(mut self) -> Self {
-        while self.coefficients.pop_if(|c| c.is_zero()).is_some() {}
+        while self.coefficients.len() > 1 && self.coefficients.pop_if(|c| c.is_zero()).is_some() {}
         self
     }
 
@@ -242,7 +243,7 @@ mod tests {
             (
                 vec![q(1, 1), q(-2, 3), q(3, 4)],
                 vec![q(-1, 1), q(2, 3), q(-3, 4)],
-                vec![],
+                vec![q(0, 1)],
             ),
             (
                 vec![q(-3, 2), q(4, 5)],
