@@ -42,6 +42,14 @@ impl Sign {
             _ => Err(ParseError::new(format!("'{}' is not a sign", c))),
         }
     }
+
+    pub fn char(&self) -> char {
+        match self {
+            Self::Negative => '-',
+            Self::Zero => ' ',
+            Self::Positive => '+',
+        }
+    }
 }
 
 impl Display for Sign {
