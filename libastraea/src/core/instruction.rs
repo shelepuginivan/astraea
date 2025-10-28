@@ -388,6 +388,164 @@ pub enum Instruction {
         serialize = "RationalDivide"
     )]
     RationalDivide,
+
+    /// Adds two polynomials.
+    ///
+    /// - Index: P-1
+    /// - Opcode: ADD_PP_P
+    #[strum(
+        props(opcode = "ADD_PP_P", index = "P-1"),
+        serialize = "ADD_PP_P",
+        serialize = "P-1",
+        serialize = "PolynomialAdd"
+    )]
+    PolynomialAdd,
+
+    /// Subtracts second polynomial from first.
+    ///
+    /// - Index: P-2
+    /// - Opcode: SUB_PP_P
+    #[strum(
+        props(opcode = "SUB_PP_P", index = "P-2"),
+        serialize = "SUB_PP_P",
+        serialize = "P-2",
+        serialize = "PolynomialSubtract"
+    )]
+    PolynomialSubtract,
+
+    /// Multiplies polynomial by rational number.
+    ///
+    /// - Index: P-3
+    /// - Opcode: MUL_PQ_P
+    #[strum(
+        props(opcode = "MUL_PQ_P", index = "P-3"),
+        serialize = "MUL_PQ_P",
+        serialize = "P-3",
+        serialize = "PolynomialMultiplyByRational"
+    )]
+    PolynomialMultiplyByRational,
+
+    /// Multiplies polynomial by x<sup>k</sup>.
+    ///
+    /// - Index: P-4
+    /// - Opcode: MUL_Pxk_P
+    #[strum(
+        props(opcode = "MUL_Pxk_P", index = "P-4"),
+        serialize = "MUL_Pxk_P",
+        serialize = "P-4",
+        serialize = "PolynomialMultiplyByPowerOfX"
+    )]
+    PolynomialMultiplyByPowerOfX,
+
+    /// Returns leading coefficient of the polynomial.
+    ///
+    /// - Index: P-5
+    /// - Opcode: LED_P_Q
+    #[strum(
+        props(opcode = "LED_P_Q", index = "P-5"),
+        serialize = "LED_P_Q",
+        serialize = "P-5",
+        serialize = "PolynomialLeadingCoefficient"
+    )]
+    PolynomialLeadingCoefficient,
+
+    /// Returns degree of the polynomial.
+    ///
+    /// - Index: P-6
+    /// - Opcode: DEG_P_N
+    #[strum(
+        props(opcode = "DEG_P_N", index = "P-6"),
+        serialize = "DEG_P_N",
+        serialize = "P-6",
+        serialize = "PolynomialDegree"
+    )]
+    PolynomialDegree,
+
+    /// Returns content of the polynomial, which is defined as a rational number with numerator
+    /// equal to GCD of numerators of polynomial coefficients, and denumerator equal to LCM of
+    /// denumerators of polynomial coefficients.
+    ///
+    /// - Index: P-7
+    /// - Opcode: FAC_P_Q
+    #[strum(
+        props(opcode = "FAC_P_Q", index = "P-7"),
+        serialize = "FAC_P_Q",
+        serialize = "P-7",
+        serialize = "PolynomialContent"
+    )]
+    PolynomialContent,
+
+    /// Multiplies two polynomials.
+    ///
+    /// - Index: P-8
+    /// - Opcode: MUL_PP_P
+    #[strum(
+        props(opcode = "MUL_PP_P", index = "P-8"),
+        serialize = "MUL_PP_P",
+        serialize = "P-8",
+        serialize = "PolynomialMultiply"
+    )]
+    PolynomialMultiply,
+
+    /// Calculates the quotient of dividing the first polynomial by the second.
+    ///
+    /// - Index: P-9
+    /// - Opcode: DIV_PP_P
+    #[strum(
+        props(opcode = "DIV_PP_P", index = "P-9"),
+        serialize = "DIV_PP_P",
+        serialize = "P-9",
+        serialize = "PolynomialQuotient"
+    )]
+    PolynomialQuotient,
+
+    /// Calculates the remainder of dividing the first polynomial by the second.
+    ///
+    /// - Index: P-10
+    /// - Opcode: MOD_PP_P
+    #[strum(
+        props(opcode = "MOD_PP_P", index = "P-10"),
+        serialize = "MOD_PP_P",
+        serialize = "P-10",
+        serialize = "PolynomialRemainder"
+    )]
+    PolynomialRemainder,
+
+    /// Calculates GCD of two polynomials.
+    ///
+    /// - Index: P-11
+    /// - Opcode: GCF_PP_P
+    #[strum(
+        props(opcode = "GCF_PP_P", index = "P-11"),
+        serialize = "GCF_PP_P",
+        serialize = "P-11",
+        serialize = "PolynomialGCD"
+    )]
+    PolynomialGCD,
+
+    /// Returns derivative of polynomial.
+    ///
+    /// - Index: P-12
+    /// - Opcode: DER_P_P
+    #[strum(
+        props(opcode = "DER_P_P", index = "P-12"),
+        serialize = "DER_P_P",
+        serialize = "P-12",
+        serialize = "PolynomialDerivative"
+    )]
+    PolynomialDerivative,
+
+    /// Converts multiple roots of polynomial to simple roots.
+    ///
+    /// - Index: P-13
+    /// - Opcode: NMR_P_P
+    #[strum(
+        props(opcode = "NMR_P_P", index = "P-13"),
+        serialize = "NMR_P_P",
+        serialize = "P-13",
+        serialize = "PolynomialFlatten"
+    )]
+    PolynomialFlatten,
 }
 
 impl Instruction {
