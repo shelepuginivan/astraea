@@ -18,7 +18,10 @@ impl Polynomial {
     /// Keeps the invariant of the polynomial - its leading coefficient must not be zero, unless
     /// the degree of the polynomial is 0.
     fn normalize(mut self) -> Self {
-        while self.coefficients.len() > 1 && self.coefficients.pop_if(|c| c.is_zero()).is_some() {}
+        while self.coefficients.pop_if(|c| c.is_zero()).is_some() {}
+        if self.coefficients.len() == 0 {
+            self.coefficients.push(RationalNumber::zero());
+        }
         self
     }
 
@@ -86,6 +89,22 @@ impl Polynomial {
         Self {
             coefficients: [vec![RationalNumber::zero(); k], self.coefficients].concat(),
         }
+    }
+
+    pub fn derivative(self) -> Self {
+        let mut coefficients = vec![RationalNumber::zero(); self.degree()];
+
+        for (i, coefficient) in self.coefficients.into_iter().enumerate() {
+            if i == 0 {
+                continue;
+            }
+
+            let exponent = RationalNumber::from_str(&format!("{}", i)).unwrap();
+
+            coefficients[i - 1] = coefficient * exponent;
+        }
+
+        Self::new(coefficients)
     }
 }
 
@@ -347,6 +366,46 @@ mod tests {
             let expected = Polynomial::new(expected_coeffs);
 
             let actual = lhs * rhs;
+
+            assert_eq!(
+                expected.coefficients.len(),
+                actual.coefficients.len(),
+                "Coefficient length mismatch",
+            );
+
+            for (i, (expected, actual)) in expected
+                .coefficients
+                .iter()
+                .zip(actual.coefficients.iter())
+                .enumerate()
+            {
+                assert_eq!(
+                    expected.to_string(),
+                    actual.to_string(),
+                    "Mismatch at coefficient index {}",
+                    i,
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_polynomial_derivative() {
+        let tests = vec![
+            (vec![q(0, 1)], vec![q(0, 1)]),
+            (
+                vec![q(1, 1), q(2, 1), q(1, 1)], // 1 + 2x + x^2
+                vec![q(2, 1), q(2, 1)],          // 2 + 2x
+            ),
+            (
+                vec![q(1, 1), q(1, 1), q(1, 1), q(1, 1)], // 1 + x + x^2 + x^3
+                vec![q(1, 1), q(2, 1), q(3, 1)],          // 1 + 2x + 3x^2
+            ),
+        ];
+
+        for (coeffs, expected_coeffs) in tests {
+            let expected = Polynomial::new(expected_coeffs);
+            let actual = Polynomial::new(coeffs).derivative();
 
             assert_eq!(
                 expected.coefficients.len(),
