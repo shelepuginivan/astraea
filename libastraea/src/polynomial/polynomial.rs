@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
 use std::collections::LinkedList;
 use std::fmt::Display;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::ParseError;
+use crate::core::{ParseError, ValueError};
 use crate::integer::Integer;
 use crate::math::{Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
@@ -75,6 +75,10 @@ impl Polynomial {
         Ok(Self::new(coefficients))
     }
 
+    pub fn as_coefficients(self) -> Vec<RationalNumber> {
+        self.coefficients
+    }
+
     pub fn degree(&self) -> usize {
         self.coefficients.len().max(1) - 1
     }
@@ -105,6 +109,22 @@ impl Polynomial {
         }
 
         RationalNumber::new(numerator_gcd, denumerator_lcm).unwrap()
+    }
+
+    pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
+        let mut quotient = Self::new(vec![RationalNumber::zero()]);
+        let mut remainder = self.clone();
+
+        while remainder.degree() >= rhs.degree() {
+            let coeff = (remainder.leading_coefficient() / rhs.leading_coefficient())?;
+            let degree = remainder.degree() - rhs.degree();
+            let t = Polynomial::new(vec![coeff]).times_pow_x(degree);
+
+            quotient = quotient + t.clone();
+            remainder = remainder - t * rhs.clone();
+        }
+
+        Ok((quotient.normalize(), remainder.normalize()))
     }
 
     pub fn derivative(self) -> Self {
@@ -152,6 +172,14 @@ impl Add for Polynomial {
     }
 }
 
+impl Sub for Polynomial {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.add(-rhs)
+    }
+}
+
 impl Mul<RationalNumber> for Polynomial {
     type Output = Self;
 
@@ -185,11 +213,19 @@ impl Mul for Polynomial {
     }
 }
 
-impl Sub for Polynomial {
-    type Output = Self;
+impl Div for Polynomial {
+    type Output = Result<Self, ValueError>;
 
-    fn sub(self, rhs: Self) -> Self::Output {
-        self.add(-rhs)
+    fn div(self, rhs: Self) -> Self::Output {
+        Ok(self.divide(rhs)?.0)
+    }
+}
+
+impl Rem for Polynomial {
+    type Output = Result<Self, ValueError>;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        Ok(self.divide(rhs)?.1)
     }
 }
 
@@ -456,6 +492,58 @@ mod tests {
         for (coeffs, expected) in tests {
             let actual = Polynomial::new(coeffs).content();
             assert_eq!(expected.to_string(), actual.to_string());
+        }
+    }
+
+    #[test]
+    fn test_polynomial_divide() {
+        let tests = vec![(
+            vec![q(7, 1), q(-6, 1), q(9, 1), q(3, 1), q(5, 1)],
+            vec![q(1, 1), q(-2, 1), q(1, 1)],
+            vec![q(30, 1), q(13, 1), q(5, 1)],
+            vec![q(-23, 1), q(41, 1)],
+        )];
+
+        for (lhs, rhs, expected_quotient, expected_remainder) in tests {
+            let lhs = Polynomial::new(lhs);
+            let rhs = Polynomial::new(rhs);
+
+            let (actual_quotient, actual_remainder) = lhs.divide(rhs).expect("should divide");
+            let actual_quotient = actual_quotient.as_coefficients();
+            let actual_remainder = actual_remainder.as_coefficients();
+
+            assert_eq!(
+                expected_quotient.len(),
+                actual_quotient.len(),
+                "Quotient coefficient len mismatch",
+            );
+
+            for (i, (expected, actual)) in expected_quotient.iter().zip(actual_quotient).enumerate()
+            {
+                assert_eq!(
+                    expected.to_string(),
+                    actual.to_string(),
+                    "Quotient coefficient mismatch at index {}",
+                    i,
+                )
+            }
+
+            assert_eq!(
+                expected_remainder.len(),
+                actual_remainder.len(),
+                "Remainder coefficient len mismatch",
+            );
+
+            for (i, (expected, actual)) in
+                expected_remainder.iter().zip(actual_remainder).enumerate()
+            {
+                assert_eq!(
+                    expected.to_string(),
+                    actual.to_string(),
+                    "Quotient coefficient mismatch at index {}",
+                    i,
+                )
+            }
         }
     }
 }
