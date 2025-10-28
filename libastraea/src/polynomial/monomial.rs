@@ -2,13 +2,12 @@ use std::str::FromStr;
 use std::usize;
 
 use crate::core::ParseError;
-use crate::math::Ring;
-use crate::rational::RationalNumber;
+use crate::math::Field;
 
 /// Monomial represents a single term of a polynomial, written as k &middot; x<sup>a</sup>, where k
 /// is a rational coefficient and a is an exponent of type usize.
-pub struct Monomial {
-    pub coefficient: RationalNumber,
+pub struct Monomial<T: Field> {
+    pub coefficient: T,
     pub exponent: usize,
 }
 
@@ -50,7 +49,7 @@ impl MonomialParser {
     }
 }
 
-impl FromStr for Monomial {
+impl<T: Field> FromStr for Monomial<T> {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -135,15 +134,12 @@ impl FromStr for Monomial {
             && parser.has_variable
             && coefficient_chars.is_empty()
         {
-            RationalNumber::one()
+            T::one()
         } else {
-            match RationalNumber::from_str(&coefficient_chars) {
+            match T::from_str(&coefficient_chars) {
                 Ok(v) => v,
-                Err(e) => {
-                    return Err(ParseError::new(format!(
-                        "cannot parse coefficient: {}",
-                        e.message
-                    )));
+                Err(..) => {
+                    return Err(ParseError::new("cannot parse coefficient"));
                 }
             }
         };
@@ -173,6 +169,8 @@ impl FromStr for Monomial {
 
 #[cfg(test)]
 mod tests {
+    use crate::rational::RationalNumber;
+
     use super::*;
     use std::str::FromStr;
 
@@ -193,8 +191,8 @@ mod tests {
         ];
 
         for (input, expected_coeff, expected_exp) in cases {
-            let monomial =
-                Monomial::from_str(input).expect(&format!("Failed to parse '{}'", input));
+            let monomial = Monomial::<RationalNumber>::from_str(input)
+                .expect(&format!("Failed to parse '{}'", input));
             assert_eq!(
                 expected_coeff.to_string(),
                 monomial.coefficient.to_string(),
@@ -225,7 +223,7 @@ mod tests {
 
         for input in invalid_cases {
             assert!(
-                Monomial::from_str(input).is_err(),
+                Monomial::<RationalNumber>::from_str(input).is_err(),
                 "Expected error for '{}'",
                 input
             );

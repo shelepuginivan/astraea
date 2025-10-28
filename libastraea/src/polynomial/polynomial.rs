@@ -6,35 +6,35 @@ use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
 use crate::integer::Integer;
-use crate::math::{IntegralDomain, Ring, Sign, Signed};
+use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};
 use crate::natural::NaturalNumber;
 use crate::polynomial::Monomial;
 use crate::rational::RationalNumber;
 
 #[derive(Clone)]
-pub struct Polynomial {
-    coefficients: Vec<RationalNumber>,
+pub struct Polynomial<T: Field> {
+    coefficients: Vec<T>,
 }
 
-impl Polynomial {
+impl<T: Field> Polynomial<T> {
     /// Keeps the invariant of the polynomial - its leading coefficient must not be zero, unless
     /// the degree of the polynomial is 0.
     fn normalize(mut self) -> Self {
         while self.coefficients.pop_if(|c| c.is_zero()).is_some() {}
         if self.coefficients.len() == 0 {
-            self.coefficients.push(RationalNumber::zero());
+            self.coefficients.push(T::zero());
         }
         self
     }
 
-    pub fn new(coefficients: Vec<RationalNumber>) -> Self {
+    pub fn new(coefficients: Vec<T>) -> Self {
         Self { coefficients }.normalize()
     }
 
     pub fn from_canonical_form<S: Into<String>>(s: S) -> Result<Self, ParseError> {
         let chars: Vec<char> = s.into().trim().chars().collect();
 
-        let mut monomials: LinkedList<Monomial> = LinkedList::new();
+        let mut monomials: LinkedList<Monomial<T>> = LinkedList::new();
         let mut polynomial_degree = 0;
         let mut cursor = 0;
         let mut monomial_chars: Vec<char> = Vec::new();
@@ -44,7 +44,7 @@ impl Polynomial {
             match chars[cursor] {
                 '+' | '-' => {
                     let monomial_str: String = monomial_chars.iter().collect();
-                    let mut monomial = Monomial::from_str(monomial_str.as_str())?;
+                    let mut monomial = Monomial::<T>::from_str(monomial_str.as_str())?;
                     polynomial_degree = polynomial_degree.max(monomial.exponent);
                     monomial.coefficient = monomial.coefficient.with_sign(next_sign);
                     monomials.push_back(monomial);
@@ -61,12 +61,12 @@ impl Polynomial {
         }
 
         let monomial_str: String = monomial_chars.iter().collect();
-        let mut monomial = Monomial::from_str(monomial_str.as_str())?;
+        let mut monomial = Monomial::<T>::from_str(monomial_str.as_str())?;
         polynomial_degree = polynomial_degree.max(monomial.exponent);
         monomial.coefficient = monomial.coefficient.with_sign(next_sign);
         monomials.push_back(monomial);
 
-        let mut coefficients = vec![RationalNumber::zero(); polynomial_degree + 1];
+        let mut coefficients = vec![T::zero(); polynomial_degree + 1];
 
         for monomial in monomials {
             coefficients[monomial.exponent] = monomial.coefficient;
@@ -75,7 +75,7 @@ impl Polynomial {
         Ok(Self::new(coefficients))
     }
 
-    pub fn as_coefficients(self) -> Vec<RationalNumber> {
+    pub fn as_coefficients(self) -> Vec<T> {
         self.coefficients
     }
 
@@ -83,32 +83,18 @@ impl Polynomial {
         self.coefficients.len().max(1) - 1
     }
 
-    pub fn leading_coefficient(&self) -> RationalNumber {
+    pub fn leading_coefficient(&self) -> T {
         self.coefficients
             .last()
             .and_then(|v| Some(v.clone()))
-            .or_else(|| Some(RationalNumber::zero()))
+            .or_else(|| Some(T::zero()))
             .unwrap()
     }
 
     pub fn times_pow_x(self, k: usize) -> Self {
         Self {
-            coefficients: [vec![RationalNumber::zero(); k], self.coefficients].concat(),
+            coefficients: [vec![T::zero(); k], self.coefficients].concat(),
         }
-    }
-
-    pub fn content(self) -> RationalNumber {
-        let mut numerator_gcd = Integer::zero();
-        let mut denumerator_lcm = NaturalNumber::one();
-
-        for coefficient in self.coefficients {
-            let (numerator, denumerator) = coefficient.as_values();
-
-            numerator_gcd = numerator_gcd.gcd(numerator);
-            denumerator_lcm = denumerator_lcm.lcm(denumerator);
-        }
-
-        RationalNumber::new(numerator_gcd, denumerator_lcm).unwrap()
     }
 
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
@@ -128,14 +114,14 @@ impl Polynomial {
     }
 
     pub fn derivative(self) -> Self {
-        let mut coefficients = vec![RationalNumber::zero(); self.degree()];
+        let mut coefficients = vec![T::zero(); self.degree()];
 
         for (i, coefficient) in self.coefficients.into_iter().enumerate() {
             if i == 0 {
                 continue;
             }
 
-            let exponent = RationalNumber::from_str(&format!("{}", i)).unwrap();
+            let exponent = T::from_str(&format!("{}", i)).unwrap();
 
             coefficients[i - 1] = coefficient * exponent;
         }
@@ -144,17 +130,18 @@ impl Polynomial {
     }
 }
 
-impl IntegralDomain for Polynomial {}
-impl Ring for Polynomial {
+impl<T: Field> MathSet for Polynomial<T> {}
+impl<T: Field> IntegralDomain for Polynomial<T> {}
+impl<T: Field> Ring for Polynomial<T> {
     fn zero() -> Self {
         Self {
-            coefficients: vec![RationalNumber::zero()],
+            coefficients: vec![T::zero()],
         }
     }
 
     fn one() -> Self {
         Self {
-            coefficients: vec![RationalNumber::one()],
+            coefficients: vec![T::one()],
         }
     }
 
@@ -167,7 +154,7 @@ impl Ring for Polynomial {
     }
 }
 
-impl Neg for Polynomial {
+impl<T: Field> Neg for Polynomial<T> {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -177,7 +164,7 @@ impl Neg for Polynomial {
     }
 }
 
-impl Add for Polynomial {
+impl<T: Field> Add for Polynomial<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -195,7 +182,7 @@ impl Add for Polynomial {
     }
 }
 
-impl Sub for Polynomial {
+impl<T: Field> Sub for Polynomial<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -203,10 +190,10 @@ impl Sub for Polynomial {
     }
 }
 
-impl Mul<RationalNumber> for Polynomial {
+impl<T: Field> Mul<T> for Polynomial<T> {
     type Output = Self;
 
-    fn mul(self, rhs: RationalNumber) -> Self::Output {
+    fn mul(self, rhs: T) -> Self::Output {
         Self {
             coefficients: self
                 .coefficients
@@ -218,13 +205,13 @@ impl Mul<RationalNumber> for Polynomial {
     }
 }
 
-impl Mul for Polynomial {
+impl<T: Field> Mul for Polynomial<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
         let result_degree = self.degree() + rhs.degree();
         let mut result = Polynomial {
-            coefficients: vec![RationalNumber::zero(); result_degree + 1],
+            coefficients: vec![T::zero(); result_degree + 1],
         };
 
         for (k, rhs_coefficient) in rhs.coefficients.into_iter().enumerate() {
@@ -236,7 +223,7 @@ impl Mul for Polynomial {
     }
 }
 
-impl Div for Polynomial {
+impl<T: Field> Div for Polynomial<T> {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -244,7 +231,7 @@ impl Div for Polynomial {
     }
 }
 
-impl Rem for Polynomial {
+impl<T: Field> Rem for Polynomial<T> {
     type Output = Result<Self, ValueError>;
 
     fn rem(self, rhs: Self) -> Self::Output {
@@ -252,7 +239,7 @@ impl Rem for Polynomial {
     }
 }
 
-impl Display for Polynomial {
+impl<T: Field> Display for Polynomial<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut is_first_coefficient = true;
 
@@ -281,11 +268,27 @@ impl Display for Polynomial {
     }
 }
 
-impl FromStr for Polynomial {
+impl<T: Field> FromStr for Polynomial<T> {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Polynomial::from_canonical_form(s)
+    }
+}
+
+impl Polynomial<RationalNumber> {
+    pub fn content(self) -> RationalNumber {
+        let mut numerator_gcd = Integer::zero();
+        let mut denumerator_lcm = NaturalNumber::one();
+
+        for coefficient in self.coefficients {
+            let (numerator, denumerator) = coefficient.as_values();
+
+            numerator_gcd = numerator_gcd.gcd(numerator);
+            denumerator_lcm = denumerator_lcm.lcm(denumerator);
+        }
+
+        RationalNumber::new(numerator_gcd, denumerator_lcm).unwrap()
     }
 }
 
@@ -306,7 +309,7 @@ mod tests {
         ];
 
         for (canonical_form, expected) in tests {
-            let p = Polynomial::from_canonical_form(canonical_form)
+            let p = Polynomial::<RationalNumber>::from_canonical_form(canonical_form)
                 .expect(&format!("failed to parse '{}'", canonical_form));
 
             for (expected_exponent, actual_exponent) in expected.iter().zip(p.coefficients) {
