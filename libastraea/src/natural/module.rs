@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use crate::core::{Instruction, InstructionError, Module, Pretty};
 use crate::digit;
-use crate::math::Digit;
 use crate::math::sign::ToSign;
+use crate::math::{Digit, Ring};
 use crate::natural::NaturalNumber;
 use crate::validate::{self, ensure_args_count};
 

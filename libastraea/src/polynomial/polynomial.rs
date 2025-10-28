@@ -157,6 +157,14 @@ impl Ring for Polynomial {
             coefficients: vec![RationalNumber::one()],
         }
     }
+
+    fn is_zero(&self) -> bool {
+        self.degree() == 0 && self.coefficients[0].is_zero()
+    }
+
+    fn is_one(&self) -> bool {
+        self.degree() == 0 && self.coefficients[0].is_one()
+    }
 }
 
 impl Neg for Polynomial {

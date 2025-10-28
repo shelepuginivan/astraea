@@ -29,6 +29,17 @@ impl Ring for RationalNumber {
             denominator: NaturalNumber::one(),
         }
     }
+
+    fn is_zero(&self) -> bool {
+        self.numerator.is_zero()
+    }
+
+    fn is_one(&self) -> bool {
+        match self.clone().to_integer() {
+            Ok(i) => i.is_one(),
+            Err(..) => false,
+        }
+    }
 }
 
 impl RationalNumber {
@@ -48,10 +59,6 @@ impl RationalNumber {
             numerator: integer,
             denominator: NaturalNumber::one(),
         }
-    }
-
-    pub fn is_zero(&self) -> bool {
-        self.numerator.is_zero()
     }
 
     pub fn reduce(self) -> Self {

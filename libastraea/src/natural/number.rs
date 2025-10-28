@@ -28,6 +28,18 @@ impl Ring for NaturalNumber {
             digits: vec![digit!(1)],
         }
     }
+
+    fn is_zero(&self) -> bool {
+        if self.digits.len() > 1 {
+            return false;
+        }
+
+        self.digits.len() == 0 || self.digits[0] == digit!(0)
+    }
+
+    fn is_one(&self) -> bool {
+        self.digits.len() == 1 && self.digits[1] == digit!(1)
+    }
 }
 
 impl NaturalNumber {
@@ -89,15 +101,6 @@ impl NaturalNumber {
     /// Returns digits of the NaturalNumber, in reverse order.
     pub fn as_digits(self) -> Vec<Digit> {
         self.digits
-    }
-
-    /// Reports whether the number is zero.
-    pub fn is_zero(&self) -> bool {
-        if self.digits.len() > 1 {
-            return false;
-        }
-
-        self.digits.len() == 0 || self.digits[0] == digit!(0)
     }
 
     /// Increments number by 1.

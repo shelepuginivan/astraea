@@ -13,6 +13,12 @@ pub trait Ring: Add + Sub + Mul + Sized {
 
     /// Returns the multiplicative identity.
     fn one() -> Self;
+
+    /// Reports whether the element is an additive identity.
+    fn is_zero(&self) -> bool;
+
+    /// Reports whether the element is a multiplicative identity.
+    fn is_one(&self) -> bool;
 }
 
 /// IntegralDomain represents an integral domain.

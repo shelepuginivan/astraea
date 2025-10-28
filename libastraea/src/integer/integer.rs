@@ -29,6 +29,14 @@ impl Ring for Integer {
             sign: Sign::Positive,
         }
     }
+
+    fn is_zero(&self) -> bool {
+        self.value.is_zero() || self.sign == Sign::Zero
+    }
+
+    fn is_one(&self) -> bool {
+        self.value.is_one()
+    }
 }
 
 impl Integer {
@@ -50,10 +58,6 @@ impl Integer {
             )),
             _ => Ok(self.value),
         }
-    }
-
-    pub fn is_zero(&self) -> bool {
-        self.value.is_zero() || self.sign == Sign::Zero
     }
 
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
