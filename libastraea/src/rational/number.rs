@@ -88,6 +88,10 @@ impl RationalNumber {
 
         Ok(reduced.numerator)
     }
+
+    pub fn as_values(self) -> (Integer, NaturalNumber) {
+        (self.numerator, self.denominator)
+    }
 }
 
 impl FromStr for RationalNumber {

@@ -5,7 +5,9 @@ use std::ops::{Add, Mul, Neg, Sub};
 use std::str::FromStr;
 
 use crate::core::ParseError;
+use crate::integer::Integer;
 use crate::math::{Ring, Sign, Signed};
+use crate::natural::NaturalNumber;
 use crate::polynomial::Monomial;
 use crate::rational::RationalNumber;
 
@@ -89,6 +91,20 @@ impl Polynomial {
         Self {
             coefficients: [vec![RationalNumber::zero(); k], self.coefficients].concat(),
         }
+    }
+
+    pub fn content(self) -> RationalNumber {
+        let mut numerator_gcd = Integer::zero();
+        let mut denumerator_lcm = NaturalNumber::one();
+
+        for coefficient in self.coefficients {
+            let (numerator, denumerator) = coefficient.as_values();
+
+            numerator_gcd = numerator_gcd.gcd(numerator);
+            denumerator_lcm = denumerator_lcm.lcm(denumerator);
+        }
+
+        RationalNumber::new(numerator_gcd, denumerator_lcm).unwrap()
     }
 
     pub fn derivative(self) -> Self {
@@ -426,6 +442,20 @@ mod tests {
                     i,
                 );
             }
+        }
+    }
+
+    #[test]
+    fn test_polynomial_content() {
+        let tests = vec![
+            (vec![q(6, 1), q(5, 3), q(3, 2)], q(1, 6)),
+            (vec![q(0, 1)], q(0, 1)),
+            (vec![], q(0, 1)),
+        ];
+
+        for (coeffs, expected) in tests {
+            let actual = Polynomial::new(coeffs).content();
+            assert_eq!(expected.to_string(), actual.to_string());
         }
     }
 }
