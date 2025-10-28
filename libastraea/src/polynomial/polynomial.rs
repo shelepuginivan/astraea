@@ -9,6 +9,7 @@ use crate::math::{Ring, Sign, Signed};
 use crate::polynomial::Monomial;
 use crate::rational::RationalNumber;
 
+#[derive(Clone)]
 pub struct Polynomial {
     coefficients: Vec<RationalNumber>,
 }
@@ -131,6 +132,24 @@ impl Mul<RationalNumber> for Polynomial {
     }
 }
 
+impl Mul for Polynomial {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let result_degree = self.degree() + rhs.degree();
+        let mut result = Polynomial {
+            coefficients: vec![RationalNumber::zero(); result_degree + 1],
+        };
+
+        for (k, rhs_coefficient) in rhs.coefficients.into_iter().enumerate() {
+            let prod = self.clone() * rhs_coefficient;
+            result = result + prod.times_pow_x(k);
+        }
+
+        result.normalize()
+    }
+}
+
 impl Sub for Polynomial {
     type Output = Self;
 
@@ -222,7 +241,7 @@ mod tests {
     }
 
     #[test]
-    fn test_polynomial_addition() {
+    fn test_polynomial_add() {
         let tests = vec![
             (
                 vec![q(1, 1), q(2, 3), q(5, 4)],
@@ -259,6 +278,75 @@ mod tests {
             let expected = Polynomial::new(expected_coeffs);
 
             let actual = lhs + rhs;
+
+            assert_eq!(
+                expected.coefficients.len(),
+                actual.coefficients.len(),
+                "Coefficient length mismatch",
+            );
+
+            for (i, (expected, actual)) in expected
+                .coefficients
+                .iter()
+                .zip(actual.coefficients.iter())
+                .enumerate()
+            {
+                assert_eq!(
+                    expected.to_string(),
+                    actual.to_string(),
+                    "Mismatch at coefficient index {}",
+                    i,
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_polynomial_mul() {
+        let tests = vec![
+            (
+                vec![q(1, 1), q(2, 3), q(5, 4)],
+                vec![q(0, 1)],
+                vec![q(0, 1)],
+            ),
+            (
+                vec![q(1, 1), q(2, 3), q(5, 4)],
+                vec![q(1, 1)],
+                vec![q(1, 1), q(2, 3), q(5, 4)],
+            ),
+            (
+                vec![q(1, 1), q(1, 1)],          // 1 + x
+                vec![q(1, 1), q(1, 1)],          // 1 + x
+                vec![q(1, 1), q(2, 1), q(1, 1)], // 1 + 2x + x^2
+            ),
+            (
+                vec![q(2, 1), q(0, 1), q(3, 1)],           // 2 + 0x + 3x^2
+                vec![q(1, 1), q(4, 1)],                    // 1 + 4x
+                vec![q(2, 1), q(8, 1), q(3, 1), q(12, 1)], // 2 + 8x + 3x^2 + 12x^3
+            ),
+            (
+                vec![q(1, 1), q(-1, 1)],          // 1 - x
+                vec![q(1, 1), q(1, 1)],           // 1 + x
+                vec![q(1, 1), q(0, 1), q(-1, 1)], // 1 + 0x - x^2
+            ),
+            (
+                vec![q(3, 2), q(-1, 3)], // 3/2 - (1/3)x
+                vec![q(2, 1), q(1, 4)],  // 2 + (1/4)x
+                vec![
+                    q(6, 2),   // 3/2 * 2 = 3
+                    q(-7, 24), // 3/2 * 1/4 + (-1/3)*2 = 3/8 - 2/3 = 9/24 - 16/24 = -7/24
+                    q(-1, 12), // (-1/3) * (1/4) = -1/12
+                ],
+            ),
+            (vec![q(0, 1)], vec![q(1, 1), q(2, 1)], vec![q(0, 1)]),
+        ];
+
+        for (lhs_coeffs, rhs_coeffs, expected_coeffs) in tests {
+            let lhs = Polynomial::new(lhs_coeffs);
+            let rhs = Polynomial::new(rhs_coeffs);
+            let expected = Polynomial::new(expected_coeffs);
+
+            let actual = lhs * rhs;
 
             assert_eq!(
                 expected.coefficients.len(),
