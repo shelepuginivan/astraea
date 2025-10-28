@@ -1,13 +1,19 @@
-use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
+use std::{
+    fmt::{Debug, Display},
+    ops::{Add, Div, Mul, Neg, Rem, Sub},
+    str::FromStr,
+};
 
-use crate::math::Sign;
+use crate::{core::ValueError, math::Sign};
+
+pub trait MathSet: Sized + Clone + FromStr<Err: Debug> + Display {}
 
 /// Ring represents an algebraic ring structure.
 ///
 /// A ring is a set equipped with two binary operations: addition and multiplication,
 /// satisfying properties such as associativity, distributivity, and the existence of
 /// additive and multiplicative identities.
-pub trait Ring: Add + Sub + Mul + Sized {
+pub trait Ring: MathSet + Add<Output = Self> + Mul<Output = Self> {
     /// Returns the additive identity.
     fn zero() -> Self;
 
@@ -24,13 +30,12 @@ pub trait Ring: Add + Sub + Mul + Sized {
 /// IntegralDomain represents an integral domain.
 ///
 /// Supports integer division and remainder operations.
-pub trait IntegralDomain: Ring + Div + Rem {}
+pub trait IntegralDomain:
+    Ring + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
+{
+}
 
-/// Field represents an algebraic field structure.
-///
-/// A field is a set with addition, subtraction, multiplication, and division.
-pub trait Field: Ring + Div {}
-
+/// Signed represents a math set with positive and negative values.
 pub trait Signed: Neg<Output = Self> + Ring {
     fn sign(&self) -> Sign;
 
@@ -58,3 +63,8 @@ pub trait Signed: Neg<Output = Self> + Ring {
         }
     }
 }
+
+/// Field represents an algebraic field structure.
+///
+/// A field is a set with addition, subtraction, multiplication, and division.
+pub trait Field: Ring + Sub + Div<Output = Result<Self, ValueError>> + Signed {}
