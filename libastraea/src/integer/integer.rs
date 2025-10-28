@@ -4,7 +4,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, Pretty, ValueError};
-use crate::math::{IntegralDomain, Ring, Sign, Signed};
+use crate::math::{IntegralDomain, MathSet, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
@@ -14,6 +14,7 @@ pub struct Integer {
     sign: Sign,
 }
 
+impl MathSet for Integer {}
 impl IntegralDomain for Integer {}
 impl Ring for Integer {
     fn zero() -> Self {
