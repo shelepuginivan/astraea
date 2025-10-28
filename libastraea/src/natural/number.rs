@@ -39,7 +39,7 @@ impl Ring for NaturalNumber {
     }
 
     fn is_one(&self) -> bool {
-        self.digits.len() == 1 && self.digits[1] == digit!(1)
+        self.digits.len() == 1 && self.digits[0] == digit!(1)
     }
 }
 
