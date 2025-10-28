@@ -4,9 +4,12 @@ use std::{
     str::FromStr,
 };
 
-use crate::{core::ValueError, math::Sign};
+use crate::{
+    core::{Pretty, ValueError},
+    math::Sign,
+};
 
-pub trait MathSet: Sized + Clone + FromStr<Err: Debug> + Display {}
+pub trait MathSet: Sized + Clone + FromStr<Err: Debug> + Display + Pretty {}
 
 /// Ring represents an algebraic ring structure.
 ///
