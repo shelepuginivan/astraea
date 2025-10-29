@@ -151,6 +151,22 @@ impl<T: Field> Polynomial<T> {
 
         Self::new(coefficients)
     }
+
+    pub fn flatten(self) -> Self {
+        let mut p = self;
+        let mut result = Self::one();
+
+        while p.degree() > 0 && !p.is_zero() {
+            let derivative = p.clone().derivative();
+            let r = p.clone().gcd(derivative.clone());
+            let s = (p / r.clone()).unwrap();
+            let m = s.clone().gcd(derivative);
+            result = result * (s / m).unwrap();
+            p = r;
+        }
+
+        result
+    }
 }
 
 impl<T: Field> MathSet for Polynomial<T> {}
