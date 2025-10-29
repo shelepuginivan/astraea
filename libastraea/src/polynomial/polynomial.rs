@@ -154,6 +154,10 @@ impl<T: Field> Polynomial<T> {
     }
 
     pub fn flatten(self) -> Self {
+        if self.is_zero() {
+            return Self::zero();
+        }
+
         let mut p = self;
         let mut result = Self::one();
 
