@@ -140,6 +140,17 @@ impl<T: Field> Polynomial<T> {
 
         other.gcd(r)
     }
+
+    pub fn monic(self) -> Self {
+        let mut coefficients = vec![T::zero(); self.degree() + 1];
+        let leading = self.leading_coefficient();
+
+        for (exponent, coefficient) in self.coefficients.into_iter().enumerate() {
+            coefficients[exponent] = (coefficient / leading.clone()).unwrap();
+        }
+
+        Self::new(coefficients)
+    }
 }
 
 impl<T: Field> MathSet for Polynomial<T> {}
