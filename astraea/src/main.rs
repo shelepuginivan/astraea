@@ -5,6 +5,7 @@ use libastraea::{
     core::{Instruction, InstructionErrorReason, Module, ModuleGroup},
     integer::IntegerModule,
     natural::NaturalModule,
+    polynomial::PolynomialModule,
     rational::RationalModule,
 };
 use std::str::FromStr;
@@ -17,6 +18,7 @@ fn main() {
         Box::new(NaturalModule::new()),
         Box::new(IntegerModule::new()),
         Box::new(RationalModule::new()),
+        Box::new(PolynomialModule::new()),
     ]);
 
     let instruction = match Instruction::from_str(&args.instruction) {

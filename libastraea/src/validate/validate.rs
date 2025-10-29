@@ -1,8 +1,10 @@
 use std::{fmt::Display, str::FromStr};
 
 use crate::core::InstructionError;
-use crate::math::Digit;
+use crate::math::{Digit, Field};
 use crate::natural::NaturalNumber;
+use crate::polynomial::Polynomial;
+use crate::rational::RationalNumber;
 
 pub fn ensure_args_count(args: &Vec<String>, expected: usize) -> Result<(), InstructionError> {
     if args.len() != expected {
@@ -10,6 +12,16 @@ pub fn ensure_args_count(args: &Vec<String>, expected: usize) -> Result<(), Inst
     }
 
     Ok(())
+}
+
+pub fn get_usize(args: &Vec<String>, arg_index: usize) -> Result<usize, InstructionError> {
+    let v = &args[arg_index];
+    usize::from_str(v).or_else(|_| {
+        Err(InstructionError::invalid_arg(
+            format!("cannot convert \"{}\" to usize", v),
+            arg_index,
+        ))
+    })
 }
 
 pub fn get_digit(args: &Vec<String>, arg_index: usize) -> Result<Digit, InstructionError> {
@@ -25,14 +37,20 @@ pub fn get_natural(
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
-pub fn get_usize(args: &Vec<String>, arg_index: usize) -> Result<usize, InstructionError> {
-    let v = &args[arg_index];
-    usize::from_str(v).or_else(|_| {
-        Err(InstructionError::invalid_arg(
-            format!("cannot convert \"{}\" to usize", v),
-            arg_index,
-        ))
-    })
+pub fn get_rational(
+    args: &Vec<String>,
+    arg_index: usize,
+) -> Result<RationalNumber, InstructionError> {
+    RationalNumber::from_str(&args[arg_index])
+        .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
+}
+
+pub fn get_polynomial<T: Field>(
+    args: &Vec<String>,
+    arg_index: usize,
+) -> Result<Polynomial<T>, InstructionError> {
+    Polynomial::from_str(&args[arg_index])
+        .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
 /// Parses arguments provided to the particular instruction and ensures their validity.
