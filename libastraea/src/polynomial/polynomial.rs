@@ -325,7 +325,7 @@ impl<T: Field> Pretty for Polynomial<T> {
             };
 
             let coefficient_str = if exponent == 0 || !coefficient.is_one() {
-                &coefficient.prettify()
+                &coefficient.clone().abs().prettify()
             } else {
                 ""
             };
