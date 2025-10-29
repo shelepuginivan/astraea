@@ -101,7 +101,7 @@ impl<T: Field> Polynomial<T> {
         let mut quotient = Self::zero();
         let mut remainder = self.clone();
 
-        while remainder.degree() >= rhs.degree() {
+        while remainder.degree() >= rhs.degree() && !remainder.is_zero() {
             let coeff = (remainder.leading_coefficient() / rhs.leading_coefficient())?;
             let degree = remainder.degree() - rhs.degree();
             let t = Polynomial::new(vec![coeff]).times_pow_x(degree);
