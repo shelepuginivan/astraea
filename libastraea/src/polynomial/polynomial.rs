@@ -5,7 +5,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::core::{ParseError, ValueError};
-use crate::formatting::Pretty;
+use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
 use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};
 use crate::natural::NaturalNumber;
@@ -310,6 +310,10 @@ impl<T: Field> Display for Polynomial<T> {
 
 impl<T: Field + Pretty> Pretty for Polynomial<T> {
     fn prettify(&self) -> String {
+        if self.is_zero() {
+            return "0".to_string();
+        }
+
         let mut is_first_coefficient = true;
         let mut parts = Vec::<String>::with_capacity(self.degree() + 1);
 
@@ -334,7 +338,7 @@ impl<T: Field + Pretty> Pretty for Polynomial<T> {
             let variable_str = match exponent {
                 0 => "".to_string(),
                 1 => "x".to_string(),
-                e => format!("x^{}", e),
+                e => format!("x{}", formatting::superscript(e)),
             };
 
             parts.push(format!("{}{}{}", sep, coefficient_str, variable_str));
