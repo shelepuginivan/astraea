@@ -52,7 +52,8 @@ impl RationalNumber {
         Ok(Self {
             numerator,
             denominator,
-        })
+        }
+        .reduce())
     }
 
     pub fn from_integer(integer: Integer) -> Self {
@@ -179,6 +180,7 @@ impl Add for RationalNumber {
             numerator,
             denominator,
         }
+        .reduce()
     }
 }
 
@@ -198,6 +200,7 @@ impl Mul for RationalNumber {
             numerator: self.numerator * rhs.numerator,
             denominator: self.denominator * rhs.denominator,
         }
+        .reduce()
     }
 }
 
@@ -229,7 +232,8 @@ impl Div for RationalNumber {
         Ok(Self {
             numerator: Integer::new(numerator, sign),
             denominator,
-        })
+        }
+        .reduce())
     }
 }
 
