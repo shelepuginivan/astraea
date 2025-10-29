@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module, Pretty};
+use crate::core::{Instruction, InstructionError, Module};
+use crate::formatting::Pretty;
 use crate::integer::Integer;
 use crate::math::Signed;
 use crate::natural::NaturalNumber;

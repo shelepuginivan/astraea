@@ -4,7 +4,8 @@ use std::{
     ops::{Mul, Neg},
 };
 
-use crate::core::{ParseError, Pretty};
+use crate::core::ParseError;
+use crate::formatting::Pretty;
 
 /// Sign represents sign of the number.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

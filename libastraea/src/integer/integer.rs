@@ -3,7 +3,8 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, Pretty, ValueError};
+use crate::core::{ParseError, ValueError};
+use crate::formatting::Pretty;
 use crate::math::{IntegralDomain, MathSet, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 

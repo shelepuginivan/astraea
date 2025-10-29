@@ -1,7 +1,8 @@
 use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module, Pretty};
+use crate::core::{Instruction, InstructionError, Module};
 use crate::digit;
+use crate::formatting::Pretty;
 use crate::math::sign::ToSign;
 use crate::math::{Digit, Ring};
 use crate::natural::NaturalNumber;

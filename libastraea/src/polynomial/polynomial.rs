@@ -4,7 +4,8 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, Pretty, ValueError};
+use crate::core::{ParseError, ValueError};
+use crate::formatting::Pretty;
 use crate::integer::Integer;
 use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};
 use crate::natural::NaturalNumber;
@@ -307,7 +308,7 @@ impl<T: Field> Display for Polynomial<T> {
     }
 }
 
-impl<T: Field> Pretty for Polynomial<T> {
+impl<T: Field + Pretty> Pretty for Polynomial<T> {
     fn prettify(&self) -> String {
         let mut is_first_coefficient = true;
         let mut parts = Vec::<String>::with_capacity(self.degree() + 1);
