@@ -138,7 +138,7 @@ impl<T: Field> Polynomial<T> {
 
         let r = (self % other.clone()).unwrap();
 
-        other.gcd(r)
+        other.gcd(r).monic()
     }
 
     pub fn monic(self) -> Self {
