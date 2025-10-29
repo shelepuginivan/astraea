@@ -128,6 +128,18 @@ impl<T: Field> Polynomial<T> {
 
         Self::new(coefficients)
     }
+
+    pub fn gcd(self, other: Self) -> Self {
+        if other.is_zero() {
+            return self;
+        } else if self.is_zero() {
+            return other;
+        }
+
+        let r = (self % other.clone()).unwrap();
+
+        other.gcd(r)
+    }
 }
 
 impl<T: Field> MathSet for Polynomial<T> {}
@@ -279,7 +291,7 @@ impl<T: Field> Pretty for Polynomial<T> {
             }
 
             let sign = coefficient.sign().char();
-            let sep = if  !is_first_coefficient {
+            let sep = if !is_first_coefficient {
                 format!(" {} ", sign)
             } else {
                 "".to_string()
