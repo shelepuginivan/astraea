@@ -46,6 +46,7 @@ impl Ring for RationalNumber {
 }
 
 impl RationalNumber {
+    /// Creates a new RationalNumber with specified numerator and denominator.
     pub fn new(numerator: Integer, denominator: NaturalNumber) -> Result<Self, ValueError> {
         if denominator.is_zero() {
             return Err(ValueError::new("denominator cannot be 0"));
@@ -58,6 +59,7 @@ impl RationalNumber {
         .reduce())
     }
 
+    /// Converts integer to rational number with denominator set to 1.
     pub fn from_integer(integer: Integer) -> Self {
         Self {
             numerator: integer,
@@ -93,12 +95,15 @@ impl RationalNumber {
         }
     }
 
+    /// Reports whether the rational number is an integer, i.e. its numerator is divisible by its
+    /// denominator.
     pub fn is_integer(&self) -> bool {
         let rem = self.numerator.clone() % Integer::from_natural(self.denominator.clone());
 
         rem.unwrap().is_zero()
     }
 
+    /// Converts rational number to integer, if possible.
     pub fn to_integer(self) -> Result<Integer, ValueError> {
         let reduced = self.reduce();
 
@@ -109,6 +114,7 @@ impl RationalNumber {
         Ok(reduced.numerator)
     }
 
+    /// Destructs rational number into its numerator and denominator.
     pub fn as_values(self) -> (Integer, NaturalNumber) {
         (self.numerator, self.denominator)
     }
