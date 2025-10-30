@@ -614,6 +614,12 @@ mod tests {
         let actual = (lhs - rhs).unwrap().to_string();
 
         assert_eq!(expected, actual);
+
+        let rhs_gt_lhs = NaturalNumber::from(123u8) - NaturalNumber::from(3234672789346usize);
+        assert!(rhs_gt_lhs.is_err());
+
+        let rhs_gt_lhs = NaturalNumber::from(123u8) - NaturalNumber::from(124u16);
+        assert!(rhs_gt_lhs.is_err());
     }
 
     #[test]
@@ -665,6 +671,9 @@ mod tests {
 
             assert_eq!(expected.to_string(), actual.unwrap().to_string());
         }
+
+        let zero_division = NaturalNumber::from(9u8) / NaturalNumber::from(0u8);
+        assert!(zero_division.is_err());
     }
 
     #[test]
