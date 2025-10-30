@@ -45,7 +45,7 @@ impl Ring for NaturalNumber {
 }
 
 impl NaturalNumber {
-    /// Creates a new instance of NaturalNumber. Digits are
+    /// Creates a NaturalNumber from digits in direct order.
     ///
     /// ```
     /// use libastraea::digit;
@@ -62,6 +62,7 @@ impl NaturalNumber {
         Self::from_reversed(digits)
     }
 
+    /// Creates a NaturalNumber from digits in reverse order.
     pub fn from_reversed(mut digits: Vec<Digit>) -> Self {
         loop {
             match digits.pop_if(|d| *d == digit!(0)) {
@@ -77,7 +78,7 @@ impl NaturalNumber {
         NaturalNumber { digits }
     }
 
-    /// Returns length of the NaturalNumber.
+    /// Number of digits in a number.
     pub fn len(&self) -> usize {
         self.digits.len()
     }
@@ -100,7 +101,7 @@ impl NaturalNumber {
         Self::from_reversed(digits)
     }
 
-    /// Returns digits of the NaturalNumber, in reverse order.
+    /// Returns digits of the number, in reverse order.
     pub fn as_digits(self) -> Vec<Digit> {
         self.digits
     }
@@ -166,6 +167,17 @@ impl NaturalNumber {
         Ok((quotient, remainder))
     }
 
+    /// Calculates GCD (greatest common divisor) of two natural numbers.
+    ///
+    /// ```
+    /// use libastraea::natural::NaturalNumber;
+    ///
+    /// let a = NaturalNumber::from(12u8);
+    /// let b = NaturalNumber::from(18u8);
+    /// let gcd = a.gcd(b);
+    ///
+    /// assert_eq!(gcd.to_string(), "6")
+    /// ```
     pub fn gcd(self, other: Self) -> Self {
         if other.is_zero() {
             return self;
@@ -188,6 +200,17 @@ impl NaturalNumber {
         low.gcd(r)
     }
 
+    /// Calculates LCM (least common multiple) of two natural numbers.
+    ///
+    /// ```
+    /// use libastraea::natural::NaturalNumber;
+    ///
+    /// let a = NaturalNumber::from(12u8);
+    /// let b = NaturalNumber::from(18u8);
+    /// let lcm = a.lcm(b);
+    ///
+    /// assert_eq!(lcm.to_string(), "36")
+    /// ```
     pub fn lcm(self, other: Self) -> Self {
         if self.is_zero() || other.is_zero() {
             return Self::zero();
