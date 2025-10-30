@@ -96,7 +96,7 @@ impl Error {
 
         let needle = self.needle(&args);
         let start_index = cli.find(&needle).unwrap();
-        let end_index = start_index + needle.len();
+        let end_index = start_index + needle.chars().count();
 
         start_index..end_index
     }
