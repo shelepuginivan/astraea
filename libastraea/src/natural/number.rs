@@ -10,7 +10,7 @@ use crate::formatting::Pretty;
 use crate::math::{Digit, IntegralDomain, MathSet, Ring};
 
 /// Represents a natural number.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct NaturalNumber {
     /// Digits of the natural number, stored in reverse order.
     digits: Vec<Digit>,
