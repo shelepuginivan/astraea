@@ -39,7 +39,7 @@ impl Digit {
     /// use libastraea::math::Digit;
     ///
     /// let d = Digit::new(9).unwrap();
-    /// assert_eq!(d.value, 9)
+    /// assert_eq!(d, Digit::Nine);
     /// ```
     pub fn new(value: u8) -> Result<Self, ValueError> {
         match value {
@@ -82,7 +82,7 @@ impl Digit {
     /// use libastraea::math::Digit;
     ///
     /// let d = Digit::from_char('7').unwrap();
-    /// assert_eq!(d.value, 7);
+    /// assert_eq!(d, Digit::Seven);
     /// ```
     pub fn from_char(char: char) -> Result<Self, ParseError> {
         match char {
