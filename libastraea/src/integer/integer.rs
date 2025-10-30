@@ -42,10 +42,12 @@ impl Ring for Integer {
 }
 
 impl Integer {
+    /// Creates a new Integer from natural value and sign.
     pub fn new(value: NaturalNumber, sign: Sign) -> Self {
         Self { value, sign }
     }
 
+    /// Creates a positive Integer from natural number.
     pub fn from_natural(n: NaturalNumber) -> Self {
         Self {
             value: n,
@@ -53,6 +55,7 @@ impl Integer {
         }
     }
 
+    /// Converts integer to natural. Returns error for negative integers.
     pub fn to_natural(self) -> Result<NaturalNumber, ValueError> {
         match self.sign {
             Sign::Negative => Err(ValueError::new(
@@ -62,6 +65,8 @@ impl Integer {
         }
     }
 
+    /// Divides number by rhs, returning the quotient and the remainder. Error is returned if and
+    /// only if rhs is zero.
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
         if rhs.is_zero() {
             return Err(ValueError::new("division by 0 is not allowed"));
@@ -91,6 +96,8 @@ impl Integer {
         Ok((quotient, remainder))
     }
 
+    /// Calculates GCD (greatest common divisor) of two integers. The returned value is always
+    /// positive.
     pub fn gcd(self, other: Self) -> Self {
         Self {
             value: self.value.gcd(other.value),
@@ -98,6 +105,8 @@ impl Integer {
         }
     }
 
+    /// Calculates LCM (least common multiple) of two natural numbers. The returned value is always
+    /// positive.
     pub fn lcm(self, other: Self) -> Self {
         Self {
             value: self.value.lcm(other.value),
