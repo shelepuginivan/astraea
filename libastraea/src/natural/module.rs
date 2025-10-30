@@ -142,23 +142,23 @@ impl Module for NaturalModule {
     }
 
     fn methods(&self) -> HashSet<Instruction> {
-        let mut method_set: HashSet<Instruction> = HashSet::new();
-
-        method_set.insert(Instruction::NaturalCompare);
-        method_set.insert(Instruction::NaturalIsZero);
-        method_set.insert(Instruction::NaturalIncrement);
-        method_set.insert(Instruction::NaturalAdd);
-        method_set.insert(Instruction::NaturalSubtract);
-        method_set.insert(Instruction::NaturalMultiplyByDigit);
-        method_set.insert(Instruction::NaturalMultiplyByPowerOfTen);
-        method_set.insert(Instruction::NaturalMultiply);
-        method_set.insert(Instruction::NaturalSubtractMultipliedByDigit);
-        method_set.insert(Instruction::NaturalCalculateDivisionDigit);
-        method_set.insert(Instruction::NaturalQuotient);
-        method_set.insert(Instruction::NaturalRemainder);
-        method_set.insert(Instruction::NaturalGCD);
-        method_set.insert(Instruction::NaturalLCM);
-
-        method_set
+        [
+            Instruction::NaturalCompare,
+            Instruction::NaturalIsZero,
+            Instruction::NaturalIncrement,
+            Instruction::NaturalAdd,
+            Instruction::NaturalSubtract,
+            Instruction::NaturalMultiplyByDigit,
+            Instruction::NaturalMultiplyByPowerOfTen,
+            Instruction::NaturalMultiply,
+            Instruction::NaturalSubtractMultipliedByDigit,
+            Instruction::NaturalCalculateDivisionDigit,
+            Instruction::NaturalQuotient,
+            Instruction::NaturalRemainder,
+            Instruction::NaturalGCD,
+            Instruction::NaturalLCM,
+        ]
+        .into_iter()
+        .collect()
     }
 }

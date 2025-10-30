@@ -100,19 +100,19 @@ impl Module for IntegerModule {
     }
 
     fn methods(&self) -> HashSet<Instruction> {
-        let mut method_set: HashSet<Instruction> = HashSet::new();
-
-        method_set.insert(Instruction::IntegerAbs);
-        method_set.insert(Instruction::IntegerSgn);
-        method_set.insert(Instruction::IntegerNeg);
-        method_set.insert(Instruction::IntegerFromNatural);
-        method_set.insert(Instruction::IntegerToNatural);
-        method_set.insert(Instruction::IntegerAdd);
-        method_set.insert(Instruction::IntegerSubtract);
-        method_set.insert(Instruction::IntegerMultiply);
-        method_set.insert(Instruction::IntegerQuotient);
-        method_set.insert(Instruction::IntegerRemainder);
-
-        method_set
+        [
+            Instruction::IntegerAbs,
+            Instruction::IntegerSgn,
+            Instruction::IntegerNeg,
+            Instruction::IntegerFromNatural,
+            Instruction::IntegerToNatural,
+            Instruction::IntegerAdd,
+            Instruction::IntegerSubtract,
+            Instruction::IntegerMultiply,
+            Instruction::IntegerQuotient,
+            Instruction::IntegerRemainder,
+        ]
+        .into_iter()
+        .collect()
     }
 }

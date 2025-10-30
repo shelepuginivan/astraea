@@ -84,17 +84,17 @@ impl Module for RationalModule {
     }
 
     fn methods(&self) -> HashSet<Instruction> {
-        let mut method_set: HashSet<Instruction> = HashSet::new();
-
-        method_set.insert(Instruction::RationalReduce);
-        method_set.insert(Instruction::RationalIsInteger);
-        method_set.insert(Instruction::RationalFromInteger);
-        method_set.insert(Instruction::RationalToInteger);
-        method_set.insert(Instruction::RationalAdd);
-        method_set.insert(Instruction::RationalSubtract);
-        method_set.insert(Instruction::RationalMultiply);
-        method_set.insert(Instruction::RationalDivide);
-
-        method_set
+        [
+            Instruction::RationalReduce,
+            Instruction::RationalIsInteger,
+            Instruction::RationalFromInteger,
+            Instruction::RationalToInteger,
+            Instruction::RationalAdd,
+            Instruction::RationalSubtract,
+            Instruction::RationalMultiply,
+            Instruction::RationalDivide,
+        ]
+        .into_iter()
+        .collect()
     }
 }
