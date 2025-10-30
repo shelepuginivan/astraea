@@ -21,13 +21,13 @@ impl IntegralDomain for NaturalNumber {}
 impl Ring for NaturalNumber {
     fn zero() -> Self {
         Self {
-            digits: vec![digit!(0)],
+            digits: vec![Digit::Zero],
         }
     }
 
     fn one() -> Self {
         Self {
-            digits: vec![digit!(1)],
+            digits: vec![Digit::One],
         }
     }
 
@@ -36,11 +36,11 @@ impl Ring for NaturalNumber {
             return false;
         }
 
-        self.digits.len() == 0 || self.digits[0] == digit!(0)
+        self.digits.len() == 0 || self.digits[0] == Digit::Zero
     }
 
     fn is_one(&self) -> bool {
-        self.digits.len() == 1 && self.digits[0] == digit!(1)
+        self.digits.len() == 1 && self.digits[0] == Digit::One
     }
 }
 
@@ -65,14 +65,14 @@ impl NaturalNumber {
     /// Creates a NaturalNumber from digits in reverse order.
     pub fn from_reversed(mut digits: Vec<Digit>) -> Self {
         loop {
-            match digits.pop_if(|d| *d == digit!(0)) {
+            match digits.pop_if(|d| *d == Digit::Zero) {
                 Some(..) => {}
                 None => break,
             };
         }
 
         if digits.len() == 0 {
-            digits.push(digit!(0));
+            digits.push(Digit::Zero);
         }
 
         NaturalNumber { digits }
@@ -109,13 +109,11 @@ impl NaturalNumber {
     /// Increments number by 1.
     pub fn inc(self) -> Self {
         if self.is_zero() {
-            return Self {
-                digits: vec![digit!(1)],
-            };
+            return Self::one();
         }
 
         let mut digits = self.as_digits();
-        let mut next_carry = digit!(1);
+        let mut next_carry = Digit::One;
 
         for idx in 0..digits.len() {
             let (digit, carry) = digits[idx] + next_carry;
@@ -123,7 +121,7 @@ impl NaturalNumber {
             digits[idx] = digit;
             next_carry = carry;
 
-            if next_carry == digit!(0) {
+            if next_carry == Digit::Zero {
                 break;
             }
         }
@@ -137,7 +135,7 @@ impl NaturalNumber {
             return self;
         }
 
-        let digits = [vec![digit!(0); k], self.as_digits()].concat();
+        let digits = [vec![Digit::Zero; k], self.as_digits()].concat();
 
         Self::from_reversed(digits)
     }
@@ -235,13 +233,11 @@ impl Add for NaturalNumber {
 
         let result_digit_cap = lhs_len.max(rhs_len) + 1;
         if result_digit_cap == 1 {
-            return NaturalNumber {
-                digits: vec![digit!(0)],
-            };
+            return NaturalNumber::zero();
         }
 
         let mut digits: Vec<Digit> = Vec::with_capacity(result_digit_cap);
-        let mut next_carry = digit!(0);
+        let mut next_carry = Digit::Zero;
 
         let lhs_digits = self.digits.into_iter();
         let rhs_digits = rhs.digits.into_iter();
@@ -252,7 +248,7 @@ impl Add for NaturalNumber {
             (lhs_digits, rhs_digits)
         };
 
-        let radix = longer.zip(shorter.chain(iter::repeat(digit!(0))));
+        let radix = longer.zip(shorter.chain(iter::repeat(Digit::Zero)));
 
         for (lhs_digit, rhs_digit) in radix {
             let (sum, carry) = lhs_digit + rhs_digit;
@@ -264,7 +260,7 @@ impl Add for NaturalNumber {
             next_carry = carry;
         }
 
-        if next_carry != digit!(0) {
+        if next_carry != Digit::Zero {
             digits.push(next_carry);
         }
 
@@ -284,18 +280,16 @@ impl Sub for NaturalNumber {
 
         let result_digit_cap = self.digits.len();
         if result_digit_cap == 0 {
-            return Ok(NaturalNumber {
-                digits: vec![digit!(0)],
-            });
+            return Ok(Self::zero());
         }
 
         let mut digits: Vec<Digit> = Vec::with_capacity(result_digit_cap);
-        let mut next_carry = digit!(0);
+        let mut next_carry = Digit::Zero;
 
         let lhs_digits = self.digits.into_iter();
         let rhs_digits = rhs.digits.into_iter();
 
-        let radix = lhs_digits.zip(rhs_digits.chain(iter::repeat(digit!(0))));
+        let radix = lhs_digits.zip(rhs_digits.chain(iter::repeat(Digit::Zero)));
 
         for (lhs_digit, rhs_digit) in radix {
             let (diff, carry) = lhs_digit - rhs_digit;
@@ -307,13 +301,13 @@ impl Sub for NaturalNumber {
             next_carry = carry;
         }
 
-        if next_carry != digit!(0) {
+        if next_carry != Digit::Zero {
             return Err(ValueError::new(
                 "the right-hand side operand must not be greater than the left-hand side operand",
             ));
         }
 
-        while digits.len() > 1 && *digits.last().unwrap() == digit!(0) {
+        while digits.len() > 1 && *digits.last().unwrap() == Digit::Zero {
             digits.pop();
         }
 
@@ -325,24 +319,20 @@ impl Mul<Digit> for NaturalNumber {
     type Output = Self;
 
     fn mul(self, rhs: Digit) -> Self::Output {
-        if rhs == digit!(0) {
-            return NaturalNumber {
-                digits: vec![digit!(0)],
-            };
+        if rhs == Digit::Zero {
+            return Self::zero();
         }
 
-        if rhs == digit!(1) {
+        if rhs == Digit::One {
             return self;
         }
 
         if self.digits.len() == 0 {
-            return NaturalNumber {
-                digits: vec![digit!(0)],
-            };
+            return Self::zero();
         }
 
         let mut digits = Vec::with_capacity(self.digits.len() + 1);
-        let mut next_carry = digit!(0);
+        let mut next_carry = Digit::Zero;
 
         for digit in self.digits {
             let (prod, carry) = digit * rhs;
@@ -354,7 +344,7 @@ impl Mul<Digit> for NaturalNumber {
             next_carry = carry;
         }
 
-        if next_carry != digit!(0) {
+        if next_carry != Digit::Zero {
             digits.push(next_carry);
         }
 
