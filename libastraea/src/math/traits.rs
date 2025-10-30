@@ -68,3 +68,27 @@ pub trait Signed: Neg<Output = Self> + Ring {
 ///
 /// A field is a set with addition, subtraction, multiplication, and division.
 pub trait Field: Ring + Sub + Div<Output = Result<Self, ValueError>> + Signed {}
+
+/// Pow provides the exponentiation operation.
+pub trait Pow {
+    fn pow(self, power: usize) -> Self;
+}
+
+impl<T: Ring> Pow for T {
+    fn pow(self, power: usize) -> Self {
+        let mut a = self;
+        let mut res = Self::one();
+        let mut power = power;
+
+        while power > 0 {
+            if power & 1 == 1 {
+                res = res * a.clone();
+            }
+
+            a = a.clone() * a;
+            power >>= 1;
+        }
+
+        res
+    }
+}
