@@ -76,6 +76,28 @@ impl Mul for Sign {
     }
 }
 
+impl PartialOrd for Sign {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (Sign::Negative, Sign::Negative) => Some(Ordering::Equal),
+            (Sign::Negative, Sign::Zero) => Some(Ordering::Less),
+            (Sign::Negative, Sign::Positive) => Some(Ordering::Less),
+            (Sign::Zero, Sign::Negative) => Some(Ordering::Greater),
+            (Sign::Zero, Sign::Zero) => Some(Ordering::Equal),
+            (Sign::Zero, Sign::Positive) => Some(Ordering::Less),
+            (Sign::Positive, Sign::Negative) => Some(Ordering::Greater),
+            (Sign::Positive, Sign::Zero) => Some(Ordering::Greater),
+            (Sign::Positive, Sign::Positive) => Some(Ordering::Equal),
+        }
+    }
+}
+
+impl Ord for Sign {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other).unwrap()
+    }
+}
+
 /// Implements Into<T> for Sign for every signed integer type.
 macro_rules! impl_sign_into {
     ($($t:ty),*) => {
@@ -180,5 +202,20 @@ mod tests {
         assert_eq!(Into::<i32>::into(Sign::Positive), 1);
         assert_eq!(Into::<i32>::into(Sign::Zero), 0);
         assert_eq!(Into::<i32>::into(Sign::Negative), -1);
+    }
+
+    #[test]
+    fn test_sign_ord() {
+        assert!(Sign::Positive == Sign::Positive);
+        assert!(Sign::Positive > Sign::Zero);
+        assert!(Sign::Positive > Sign::Negative);
+
+        assert!(Sign::Zero < Sign::Positive);
+        assert!(Sign::Zero == Sign::Zero);
+        assert!(Sign::Zero > Sign::Negative);
+
+        assert!(Sign::Negative < Sign::Positive);
+        assert!(Sign::Negative < Sign::Zero);
+        assert!(Sign::Negative == Sign::Negative);
     }
 }
