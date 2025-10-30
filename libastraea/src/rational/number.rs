@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::str::FromStr;
@@ -9,7 +10,7 @@ use crate::math::{Field, MathSet, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RationalNumber {
     numerator: Integer,
     denominator: NaturalNumber,
@@ -235,6 +236,29 @@ impl Div for RationalNumber {
             denominator,
         }
         .reduce())
+    }
+}
+
+impl PartialEq for RationalNumber {
+    fn eq(&self, other: &Self) -> bool {
+        self.numerator == other.numerator && self.denominator == other.denominator
+    }
+}
+
+impl Eq for RationalNumber {}
+
+impl PartialOrd for RationalNumber {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let lhs = self.numerator.clone() * Integer::from_natural(other.denominator.clone());
+        let rhs = other.numerator.clone() * Integer::from_natural(self.denominator.clone());
+
+        Some(lhs.cmp(&rhs))
+    }
+}
+
+impl Ord for RationalNumber {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(&other).unwrap()
     }
 }
 
