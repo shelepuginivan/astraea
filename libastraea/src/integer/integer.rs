@@ -9,7 +9,7 @@ use crate::math::{IntegralDomain, MathSet, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Integer {
     value: NaturalNumber,
     sign: Sign,
@@ -299,6 +299,26 @@ mod tests {
     }
 
     #[test]
+    fn test_integer_to_natural() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let i: i64 = rng.random();
+            let v: Integer = i.into();
+
+            if i < 0 {
+                assert!(v.to_natural().is_err());
+                continue;
+            }
+
+            let actual = v.to_natural().unwrap();
+            let expected: NaturalNumber = i.try_into().unwrap();
+
+            assert_eq!(actual, expected);
+        }
+    }
+
+    #[test]
     fn test_integer_add() {
         let mut rng = rand::rng();
 
@@ -310,11 +330,20 @@ mod tests {
             let rhs = rng.random_range(min_value..max_value);
             let expected = (lhs + rhs).to_string();
 
-            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
-            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let lhs = Integer::from(lhs);
+            let rhs = Integer::from(rhs);
             let actual = (lhs + rhs).to_string();
 
             assert_eq!(expected, actual);
+        }
+
+        assert_eq!(Integer::zero() + Integer::zero(), Integer::zero());
+
+        for _ in 0..1000 {
+            let v: i32 = rng.random();
+
+            assert_eq!(Integer::from(v) + Integer::zero(), Integer::from(v));
+            assert_eq!(Integer::zero() + Integer::from(v), Integer::from(v));
         }
     }
 
@@ -380,6 +409,9 @@ mod tests {
 
             assert_eq!(expected, actual);
         }
+
+        let zero_division = Integer::from(234234i32) / Integer::from(0i8);
+        assert!(zero_division.is_err());
     }
 
     #[test]
@@ -403,6 +435,24 @@ mod tests {
             let actual = (lhs % rhs).unwrap().to_string();
 
             assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_integer_fmt() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let i: i32 = rng.random();
+            let v = Integer::from(i);
+
+            let actual_prettify = v.prettify();
+            let actual_to_string = v.to_string();
+
+            let expected = i.to_string();
+
+            assert_eq!(actual_prettify, expected);
+            assert_eq!(actual_to_string, expected);
         }
     }
 }
