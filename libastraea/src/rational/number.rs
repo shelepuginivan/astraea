@@ -65,8 +65,13 @@ impl RationalNumber {
         }
     }
 
+    /// Reduces the rational number. This is done automatically after most operations.
     pub fn reduce(self) -> Self {
-        if self.numerator.is_zero() || self.numerator.is_one() || self.denominator.is_one() {
+        if self.numerator.is_zero() {
+            return Self::zero();
+        }
+
+        if self.numerator.is_one() || self.denominator.is_one() {
             return self;
         }
 
