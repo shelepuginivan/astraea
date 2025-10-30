@@ -387,55 +387,9 @@ impl Rem for NaturalNumber {
     }
 }
 
-impl<T> From<T> for NaturalNumber
-where
-    T: Into<usize>,
-{
-    fn from(value: T) -> Self {
-        let mut value = value.into();
-        let mut digits: Vec<Digit> = Vec::new();
-
-        while value > 0 {
-            let digit = value % 10;
-            let digit = Digit::new(digit as u8).unwrap();
-            digits.push(digit);
-            value /= 10;
-        }
-
-        Self::from_reversed(digits)
-    }
-}
-
-impl FromStr for NaturalNumber {
-    type Err = ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let length = s.len();
-        if length == 0 {
-            return Err(ParseError::new(
-                "cannot create natural number from empty string",
-            ));
-        }
-
-        let mut digits: Vec<Digit> = vec![Digit::default(); length];
-
-        for (index, char) in s.chars().enumerate() {
-            let digit = Digit::from_char(char)?;
-            digits[length - index - 1] = digit;
-        }
-
-        Ok(NaturalNumber::from_reversed(digits))
-    }
-}
-
 impl Display for NaturalNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s: String = self
-            .digits
-            .iter()
-            .rev()
-            .map(|digit| digit.to_char())
-            .collect();
+        let s: String = self.digits.iter().rev().map(|digit| digit.char()).collect();
 
         write!(f, "{}", s)
     }
@@ -498,6 +452,82 @@ impl IndexMut<usize> for NaturalNumber {
         &mut self.digits[index]
     }
 }
+
+impl FromStr for NaturalNumber {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let length = s.len();
+        if length == 0 {
+            return Err(ParseError::new(
+                "cannot create natural number from empty string",
+            ));
+        }
+
+        let mut digits: Vec<Digit> = vec![Digit::Zero; length];
+
+        for (index, char) in s.chars().enumerate() {
+            let digit = Digit::from_char(char)?;
+            digits[length - index - 1] = digit;
+        }
+
+        Ok(NaturalNumber::from_reversed(digits))
+    }
+}
+
+/// Implements From<T> for NaturalNumber for every unsigned integer type.
+macro_rules! impl_natural_from {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for NaturalNumber {
+                fn from(value: $t) -> Self {
+                    let mut value = value;
+                    let mut digits: Vec<Digit> = Vec::new();
+
+                    while value > 0 {
+                        let digit = Digit::try_from(value % 10).unwrap();
+                        digits.push(digit);
+                        value /= 10;
+                    }
+
+                    Self::from_reversed(digits)
+                }
+            }
+        )*
+    };
+}
+
+impl_natural_from!(u8, u16, u32, u64, u128, usize);
+
+/// Implements TryFrom<T> for NaturalNumber for every signed integer type.
+macro_rules! impl_natural_try_from {
+    ($($t:ty),*) => {
+        $(
+            impl TryFrom<$t> for NaturalNumber {
+                type Error = ValueError;
+
+                fn try_from(value: $t) -> Result<Self, Self::Error> {
+                    if value.is_negative() {
+                        return Err(ValueError::new("natural number must not be negative"));
+                    }
+
+                    let mut value = value;
+                    let mut digits: Vec<Digit> = Vec::new();
+
+                    while value > 0 {
+                        let digit = Digit::try_from(value % 10).unwrap();
+                        digits.push(digit);
+                        value /= 10;
+                    }
+
+                    Ok(Self::from_reversed(digits))
+                }
+            }
+        )*
+    };
+}
+
+impl_natural_try_from!(i8, i16, i32, i64, i128, isize);
 
 #[cfg(test)]
 mod tests {
