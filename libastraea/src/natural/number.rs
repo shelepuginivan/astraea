@@ -374,6 +374,25 @@ impl Rem for NaturalNumber {
     }
 }
 
+impl<T> From<T> for NaturalNumber
+where
+    T: Into<usize>,
+{
+    fn from(value: T) -> Self {
+        let mut value = value.into();
+        let mut digits: Vec<Digit> = Vec::new();
+
+        while value > 0 {
+            let digit = value % 10;
+            let digit = Digit::new(digit as u8).unwrap();
+            digits.push(digit);
+            value /= 10;
+        }
+
+        Self::from_reversed(digits)
+    }
+}
+
 impl FromStr for NaturalNumber {
     type Err = ParseError;
 
