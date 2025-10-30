@@ -113,7 +113,7 @@ impl FromStr for RationalNumber {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut tokens = s.split('/').map(|token| token.trim());
+        let mut tokens = s.split('/');
 
         let numerator = match tokens.next() {
             Some(token) => Integer::from_str(token),

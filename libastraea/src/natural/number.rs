@@ -457,6 +457,7 @@ impl FromStr for NaturalNumber {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let s = s.trim();
         let length = s.len();
         if length == 0 {
             return Err(ParseError::new(

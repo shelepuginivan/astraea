@@ -247,12 +247,13 @@ impl FromStr for Integer {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut s = s.trim();
+
         if s.is_empty() {
             return Err(ParseError::new("cannot create integer from empty string"));
         }
 
         let mut minus_count = 0;
-        let mut s = s;
 
         while s.starts_with("-") {
             s = s.strip_prefix('-').unwrap();
