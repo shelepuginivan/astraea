@@ -2,6 +2,7 @@ use std::str::FromStr;
 use std::usize;
 
 use crate::core::ParseError;
+use crate::formatting;
 use crate::math::Field;
 
 /// Monomial represents a single term of a polynomial, written as k &middot; x<sup>a</sup>, where k
@@ -18,6 +19,7 @@ struct MonomialParser {
     has_multiplication_sign: bool,
     has_variable: bool,
     has_exponent: bool,
+    exponent_as_superscript: bool,
 
     coefficient_chars: Vec<char>,
     exponent_chars: Vec<char>,
@@ -31,6 +33,7 @@ impl MonomialParser {
             has_multiplication_sign: false,
             has_variable: false,
             has_exponent: false,
+            exponent_as_superscript: false,
             coefficient_chars: Vec::new(),
             exponent_chars: Vec::new(),
         }
@@ -97,6 +100,12 @@ impl<T: Field> FromStr for Monomial<T> {
                     parser.has_exponent = true;
                     break;
                 }
+                '⁰' | '¹' | '²' | '³' | '⁴' | '⁵' | '⁶' | '⁷' | '⁸' | '⁹' => {
+                    parser.has_exponent = true;
+                    parser.exponent_as_superscript = true;
+                    break;
+                }
+
                 char => return Err(ParseError::new(format!("unexpected char: \"{}\"", char))),
             };
         }
@@ -111,6 +120,17 @@ impl<T: Field> FromStr for Monomial<T> {
         // Exponent.
         while parser.can_advance() {
             let char = parser.char();
+
+            if parser.exponent_as_superscript {
+                match formatting::from_superscript(char) {
+                    Some(c) => {
+                        parser.exponent_chars.push(c);
+                        parser.advance();
+                        continue;
+                    }
+                    None => break,
+                }
+            }
 
             if !char.is_numeric() {
                 break;
