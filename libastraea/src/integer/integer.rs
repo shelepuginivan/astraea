@@ -9,7 +9,7 @@ use crate::math::{IntegralDomain, MathSet, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug)]
 pub struct Integer {
     value: NaturalNumber,
     sign: Sign,
@@ -197,6 +197,36 @@ impl Neg for Integer {
 impl Signed for Integer {
     fn sign(&self) -> Sign {
         self.sign
+    }
+}
+
+impl PartialEq for Integer {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value && self.sign == other.sign
+    }
+}
+
+impl Eq for Integer {}
+
+impl PartialOrd for Integer {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match self.sign().cmp(&other.sign()) {
+            Ordering::Greater => return Some(Ordering::Greater),
+            Ordering::Equal => {}
+            Ordering::Less => return Some(Ordering::Less),
+        };
+
+        match self.sign {
+            Sign::Negative => Some(other.value.cmp(&self.value)),
+            Sign::Zero => Some(Ordering::Equal),
+            Sign::Positive => Some(self.value.cmp(&other.value)),
+        }
+    }
+}
+
+impl Ord for Integer {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other).unwrap()
     }
 }
 
@@ -454,5 +484,24 @@ mod tests {
             assert_eq!(actual_prettify, expected);
             assert_eq!(actual_to_string, expected);
         }
+    }
+
+    #[test]
+    fn test_integer_ord() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs: i32 = rng.random();
+            let rhs: i32 = rng.random();
+            let expected = lhs.cmp(&rhs);
+
+            let lhs: Integer = lhs.into();
+            let rhs: Integer = rhs.into();
+            let actual = lhs.cmp(&rhs);
+
+            assert_eq!(actual, expected, "{} ? {}", lhs, rhs);
+        }
+
+        assert!(Integer::zero() == Integer::zero());
     }
 }
