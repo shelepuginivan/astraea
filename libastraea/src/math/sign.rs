@@ -16,24 +16,6 @@ pub enum Sign {
 }
 
 impl Sign {
-    /// Returns integer representation of Sign (-1 for Negative, 1 for Positive, 0 otherwise).
-    pub fn value(&self) -> i32 {
-        match self {
-            Self::Negative => -1,
-            Self::Zero => 0,
-            Self::Positive => 1,
-        }
-    }
-
-    /// Converts std::cmp::Ordering to Sign.
-    pub fn from_ordering(o: &Ordering) -> Self {
-        match o {
-            Ordering::Less => Self::Negative,
-            Ordering::Equal => Self::Zero,
-            Ordering::Greater => Self::Positive,
-        }
-    }
-
     /// Converts char ("+", "-") to Sign.
     pub fn from_char(c: char) -> Result<Self, ParseError> {
         match c {
@@ -44,6 +26,7 @@ impl Sign {
         }
     }
 
+    /// Char representation of sign.
     pub fn char(&self) -> char {
         match self {
             Self::Negative => '-',
@@ -55,7 +38,7 @@ impl Sign {
 
 impl Display for Sign {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value())
+        write!(f, "{}", self.char())
     }
 }
 
