@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::core::{Instruction, InstructionError, Module};
 use crate::digit;
 use crate::formatting::Pretty;
-use crate::math::{Digit, Ring, Sign};
+use crate::math::{Digit, Ring};
 use crate::natural::NaturalNumber;
 use crate::validate::{self, ensure_args_count};
 
@@ -24,7 +24,7 @@ impl Module for NaturalModule {
         match instruction {
             Instruction::NaturalCompare => {
                 let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
-                Ok(Box::new(Into::<Sign>::into(lhs.cmp(&rhs))))
+                Ok(Box::new(lhs.cmp(&rhs)))
             }
 
             Instruction::NaturalIsZero => {
