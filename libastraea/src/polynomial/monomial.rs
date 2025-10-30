@@ -50,59 +50,56 @@ impl MonomialParser {
     fn char(&self) -> char {
         self.source[self.cursor]
     }
-}
 
-impl<T: Field> FromStr for Monomial<T> {
-    type Err = ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut parser = MonomialParser::new(s.trim().to_string());
-
-        // Coefficient.
-        while parser.can_advance() {
-            let char = parser.char();
+    fn collect_coefficient(&mut self) {
+        while self.can_advance() {
+            let char = self.char();
 
             if !char.is_numeric() && char != '/' {
                 break;
             }
 
-            parser.coefficient_chars.push(char);
-            parser.advance();
+            self.coefficient_chars.push(char);
+            self.advance();
         }
+    }
 
-        // Variable ("x").
-        while parser.can_advance() {
-            match parser.char() {
-                ' ' => parser.advance(),
+    fn collect_variable(&mut self) -> Result<(), ParseError> {
+        while self.can_advance() {
+            match self.char() {
+                ' ' => self.advance(),
                 '*' | '·' | '×' => {
-                    if parser.has_multiplication_sign {
+                    if self.has_multiplication_sign {
                         return Err(ParseError::new("unexpected multiplication sign"));
                     }
 
-                    parser.has_multiplication_sign = true;
-                    parser.advance();
+                    self.has_multiplication_sign = true;
+                    self.advance();
                 }
                 'x' => {
-                    parser.has_variable = true;
-                    parser.advance();
+                    self.has_variable = true;
+                    self.advance();
                     break;
                 }
                 char => return Err(ParseError::new(format!("unexpected char: \"{}\"", char))),
             };
         }
 
-        // Exponent sign ("^").
-        while parser.can_advance() {
-            match parser.char() {
-                ' ' => parser.advance(),
+        Ok(())
+    }
+
+    fn collect_exponent_sign(&mut self) -> Result<(), ParseError> {
+        while self.can_advance() {
+            match self.char() {
+                ' ' => self.advance(),
                 '^' => {
-                    parser.advance();
-                    parser.has_exponent = true;
+                    self.advance();
+                    self.has_exponent = true;
                     break;
                 }
                 '⁰' | '¹' | '²' | '³' | '⁴' | '⁵' | '⁶' | '⁷' | '⁸' | '⁹' => {
-                    parser.has_exponent = true;
-                    parser.exponent_as_superscript = true;
+                    self.has_exponent = true;
+                    self.exponent_as_superscript = true;
                     break;
                 }
 
@@ -110,22 +107,27 @@ impl<T: Field> FromStr for Monomial<T> {
             };
         }
 
-        while parser.can_advance() {
-            if parser.char() != ' ' {
+        Ok(())
+    }
+
+    fn skip_spaces(&mut self) {
+        while self.can_advance() {
+            if self.char() != ' ' {
                 break;
             }
-            parser.advance();
+            self.advance();
         }
+    }
 
-        // Exponent.
-        while parser.can_advance() {
-            let char = parser.char();
+    fn collect_exponent(&mut self) -> Result<(), ParseError> {
+        while self.can_advance() {
+            let char = self.char();
 
-            if parser.exponent_as_superscript {
+            if self.exponent_as_superscript {
                 match formatting::from_superscript(char) {
                     Some(c) => {
-                        parser.exponent_chars.push(c);
-                        parser.advance();
+                        self.exponent_chars.push(c);
+                        self.advance();
                         continue;
                     }
                     None => break,
@@ -136,16 +138,34 @@ impl<T: Field> FromStr for Monomial<T> {
                 break;
             }
 
-            parser.exponent_chars.push(char);
-            parser.advance();
+            self.exponent_chars.push(char);
+            self.advance();
         }
 
-        if parser.can_advance() {
-            return Err(ParseError::new(format!(
-                "unexpected junk at the end: \"{}\"",
-                &s[parser.cursor..],
-            )));
+        Ok(())
+    }
+
+    fn finalize(&mut self) -> Result<(), ParseError> {
+        if self.can_advance() {
+            return Err(ParseError::new("unexpected junk at the end"));
         }
+
+        Ok(())
+    }
+}
+
+impl<T: Field> FromStr for Monomial<T> {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parser = MonomialParser::new(s.trim().to_string());
+
+        parser.collect_coefficient();
+        parser.collect_variable()?;
+        parser.collect_exponent_sign()?;
+        parser.skip_spaces();
+        parser.collect_exponent()?;
+        parser.finalize()?;
 
         let coefficient_chars: String = parser.coefficient_chars.into_iter().collect();
         let exponent_chars: String = parser.exponent_chars.into_iter().collect();
