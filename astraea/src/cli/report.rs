@@ -91,7 +91,7 @@ impl Error {
         if let Self::InvalidNumberOfArguments(expected, actual) = self
             && actual < expected
         {
-            return cli.len()..cli.len();
+            return cli.chars().count()..cli.chars().count();
         }
 
         let needle = self.needle(&args);
