@@ -76,12 +76,109 @@ impl Mul for Sign {
     }
 }
 
-pub trait ToSign {
-    fn to_sign(&self) -> Sign;
+/// Implements Into<T> for Sign for every signed integer type.
+macro_rules! impl_sign_into {
+    ($($t:ty),*) => {
+        $(
+            impl Into<$t> for Sign {
+                fn into(self) -> $t {
+                    match self {
+                        Sign::Positive => 1,
+                        Sign::Zero => 0,
+                        Sign::Negative => -1,
+                    }
+                }
+            }
+        )*
+    };
 }
 
-impl ToSign for Ordering {
-    fn to_sign(&self) -> Sign {
-        Sign::from_ordering(self)
+impl_sign_into!(i8, i16, i32, i64, i128, isize);
+
+/// Implements From<T> for Sign for every integer type.
+macro_rules! impl_sign_from {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for Sign {
+                fn from(value: $t) -> Self {
+                    value.cmp(&0).into()
+                }
+            }
+        )*
+    };
+}
+
+impl_sign_from!(
+    u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize
+);
+
+impl Into<Sign> for Ordering {
+    fn into(self) -> Sign {
+        match self {
+            Self::Less => Sign::Negative,
+            Self::Equal => Sign::Zero,
+            Self::Greater => Sign::Positive,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rand::Rng;
+
+    use super::*;
+
+    #[test]
+    fn test_sign_from_char() {
+        assert_eq!(Sign::from_char('+').unwrap(), Sign::Positive);
+        assert_eq!(Sign::from_char('-').unwrap(), Sign::Negative);
+
+        assert!(Sign::from_char('9').is_err())
+    }
+
+    #[test]
+    fn test_sign_char() {
+        assert_eq!(Sign::Positive.char(), '+');
+        assert_eq!(Sign::Zero.char(), ' ');
+        assert_eq!(Sign::Negative.char(), '-');
+    }
+
+    #[test]
+    fn test_sign_fmt() {
+        assert_eq!(Sign::Positive.to_string(), "+");
+        assert_eq!(Sign::Zero.to_string(), " ");
+        assert_eq!(Sign::Negative.to_string(), "-");
+
+        assert_eq!(Sign::Positive.prettify(), "+");
+        assert_eq!(Sign::Zero.prettify(), " ");
+        assert_eq!(Sign::Negative.prettify(), "-");
+    }
+
+    #[test]
+    fn test_sign_from_ordering() {
+        assert_eq!(Into::<Sign>::into(Ordering::Greater), Sign::Positive);
+        assert_eq!(Into::<Sign>::into(Ordering::Equal), Sign::Zero);
+        assert_eq!(Into::<Sign>::into(Ordering::Less), Sign::Negative);
+    }
+
+    #[test]
+    fn test_sign_from_integer() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let v: i32 = rng.random();
+
+            let expected: Sign = v.cmp(&0).into();
+            let actual = Sign::from(v);
+
+            assert_eq!(actual, expected);
+        }
+    }
+
+    #[test]
+    fn test_sign_into() {
+        assert_eq!(Into::<i32>::into(Sign::Positive), 1);
+        assert_eq!(Into::<i32>::into(Sign::Zero), 0);
+        assert_eq!(Into::<i32>::into(Sign::Negative), -1);
     }
 }
