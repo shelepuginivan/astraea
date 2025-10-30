@@ -138,10 +138,10 @@ impl Module for NaturalModule {
     }
 
     fn implements(&self, instruction: Instruction) -> bool {
-        self.methods().contains(&instruction)
+        self.instructions().contains(&instruction)
     }
 
-    fn methods(&self) -> HashSet<Instruction> {
+    fn instructions(&self) -> HashSet<Instruction> {
         [
             Instruction::NaturalCompare,
             Instruction::NaturalIsZero,

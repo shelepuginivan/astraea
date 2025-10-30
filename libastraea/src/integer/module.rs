@@ -96,10 +96,10 @@ impl Module for IntegerModule {
     }
 
     fn implements(&self, instruction: Instruction) -> bool {
-        self.methods().contains(&instruction)
+        self.instructions().contains(&instruction)
     }
 
-    fn methods(&self) -> HashSet<Instruction> {
+    fn instructions(&self) -> HashSet<Instruction> {
         [
             Instruction::IntegerAbs,
             Instruction::IntegerSgn,

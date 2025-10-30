@@ -16,7 +16,7 @@ pub trait Module {
     fn implements(&self, instruction: Instruction) -> bool;
 
     /// Returns all instructions implemented by the module.
-    fn methods(&self) -> HashSet<Instruction>;
+    fn instructions(&self) -> HashSet<Instruction>;
 }
 
 pub struct ModuleGroup {
@@ -59,11 +59,11 @@ impl Module for ModuleGroup {
         false
     }
 
-    fn methods(&self) -> HashSet<Instruction> {
+    fn instructions(&self) -> HashSet<Instruction> {
         let mut method_set: HashSet<Instruction> = HashSet::new();
 
         for module in &self.modules {
-            method_set.extend(&module.methods());
+            method_set.extend(&module.instructions());
         }
 
         method_set
