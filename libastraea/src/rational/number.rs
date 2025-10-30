@@ -128,7 +128,7 @@ impl FromStr for RationalNumber {
 
         let numerator = match tokens.next() {
             Some(token) => Integer::from_str(token),
-            None => return Err(ParseError::new("numerator was not provied")),
+            None => return Err(ParseError::new("numerator was not provided")),
         };
         let numerator = match numerator {
             Ok(v) => v,
@@ -296,6 +296,8 @@ impl Pretty for RationalNumber {
 
 #[cfg(test)]
 mod tests {
+    use std::i64;
+
     use rand::Rng;
 
     use super::*;
@@ -330,6 +332,7 @@ mod tests {
         assert!(RationalNumber::from_str("/23435").is_err());
         assert!(RationalNumber::from_str("   / ").is_err());
         assert!(RationalNumber::from_str("1/0").is_err());
+        assert!(RationalNumber::from_str("").is_err());
     }
 
     #[test]
@@ -406,6 +409,44 @@ mod tests {
 
         let is_integer = RationalNumber::from_str("1").unwrap().is_integer();
         assert!(is_integer);
+    }
+
+    #[test]
+    fn test_rational_number_to_integer() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let numerator: i32 = rng.random();
+            let denominator: i32 = rng.random_range(1..10);
+
+            let v = RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap();
+
+            if numerator % denominator == 0 {
+                assert_eq!(
+                    v.to_integer().unwrap(),
+                    Integer::from(numerator / denominator)
+                );
+            } else {
+                assert!(v.to_integer().is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn test_rational_number_from_integer() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let v: i32 = rng.random();
+            let expected_numerator = Integer::from(v);
+            let expected_denominator = NaturalNumber::one();
+
+            let (actual_numerator, actual_denominator) =
+                RationalNumber::from_integer(Integer::from(v)).as_values();
+
+            assert_eq!(actual_numerator, expected_numerator);
+            assert_eq!(actual_denominator, expected_denominator);
+        }
     }
 
     #[test]
@@ -654,5 +695,68 @@ mod tests {
         let lhs = rat(0, 1);
         let rhs = rat(0, 1);
         assert!((lhs / rhs).is_err());
+    }
+
+    #[test]
+    fn test_rational_number_ord() {
+        let mut rng = rand::rng();
+
+        for _ in 0..1000 {
+            let lhs_numerator: i32 = rng.random();
+            let lhs_denominator = rng.random::<u16>().max(1);
+
+            let rhs_numerator: i32 = rng.random();
+            let rhs_denominator = rng.random::<u16>().max(1);
+
+            let lhs = RationalNumber::new(
+                Integer::from(lhs_numerator),
+                NaturalNumber::from(lhs_denominator),
+            )
+            .unwrap();
+            let rhs = RationalNumber::new(
+                Integer::from(rhs_numerator),
+                NaturalNumber::from(rhs_denominator),
+            )
+            .unwrap();
+
+            assert_eq!(
+                lhs.cmp(&rhs),
+                (lhs_numerator as i64 * rhs_denominator as i64)
+                    .cmp(&(lhs_denominator as i64 * rhs_numerator as i64))
+            );
+        }
+
+        assert!(rat(1, 2) == rat(2, 4));
+        assert!(rat(-3, 5) == rat(-6, 10));
+        assert!(rat(1, 3) < rat(1, 2));
+        assert!(rat(-2, 3) < rat(-1, 3));
+        assert!(rat(3, 4) <= rat(3, 4));
+        assert!(rat(2, 5) <= rat(3, 5));
+        assert!(rat(5, 6) > rat(4, 6));
+        assert!(rat(1, 1) > rat(999, 1000));
+        assert!(rat(7, 8) >= rat(7, 8));
+        assert!(rat(9, 10) >= rat(8, 10));
+        assert!(rat(-1, 2) == rat(-2, 4));
+        assert!(rat(-3, 5) == rat(-6, 10));
+        assert!(rat(-3, 4) < rat(-1, 2));
+        assert!(rat(-5, 6) < rat(-2, 3));
+        assert!(rat(-7, 8) <= rat(-7, 8));
+        assert!(rat(-4, 5) <= rat(-3, 5));
+        assert!(rat(-1, 2) > rat(-3, 4));
+        assert!(rat(-2, 3) > rat(-5, 6));
+        assert!(rat(-9, 10) >= rat(-9, 10));
+        assert!(rat(-3, 5) >= rat(-4, 5));
+        assert!(rat(-1, 2) < rat(1, 2));
+        assert!(rat(1, 3) > rat(-1, 3));
+    }
+
+    #[test]
+    fn test_rational_number_fmt() {
+        assert_eq!(rat(1, 1).prettify(), "1");
+        assert_eq!(rat(222, 2).prettify(), "111");
+        assert_eq!(rat(-24, 12).prettify(), "-2");
+        assert_eq!(rat(0, 1).prettify(), "0");
+        assert_eq!(rat(1, 3).prettify(), "1/3");
+        assert_eq!(rat(-2, 5).prettify(), "-2/5");
     }
 }
