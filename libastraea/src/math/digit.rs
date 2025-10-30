@@ -10,21 +10,30 @@ use crate::formatting::Pretty;
 #[macro_export]
 macro_rules! digit {
     ($v:literal) => {
-        Digit::new($v).unwrap()
+        Digit::try_from($v).unwrap()
     };
     ($v:expr) => {
-        Digit::new($v).unwrap()
+        Digit::try_from($v).unwrap()
     };
 }
 
-/// Represents a single digit of a natural number.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, PartialOrd, Ord)]
-pub struct Digit {
-    pub value: u8,
+/// Represents a single decimal digit of a natural number.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
+pub enum Digit {
+    Zero,
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
 }
 
 impl Digit {
-    /// Creates a new instance of Digit. Value must be a valid digit, i.e. in range [0, 9].
+    /// Creates a new instance of Digit. Value must be a valid decimal digit, i.e. in range [0, 9].
     ///
     /// ```
     /// use libastraea::math::Digit;
@@ -33,14 +42,38 @@ impl Digit {
     /// assert_eq!(d.value, 9)
     /// ```
     pub fn new(value: u8) -> Result<Self, ValueError> {
-        if value >= 10 {
-            return Err(ValueError::new(format!(
-                "expected value to be in range [0, 9], got {}",
-                value
-            )));
+        match value {
+            0 => Ok(Digit::Zero),
+            1 => Ok(Digit::One),
+            2 => Ok(Digit::Two),
+            3 => Ok(Digit::Three),
+            4 => Ok(Digit::Four),
+            5 => Ok(Digit::Five),
+            6 => Ok(Digit::Six),
+            7 => Ok(Digit::Seven),
+            8 => Ok(Digit::Eight),
+            9 => Ok(Digit::Nine),
+            v => Err(ValueError::new(format!(
+                "expected value to be in range [0, 9], got '{}'",
+                v
+            ))),
         }
+    }
 
-        Ok(Digit { value })
+    /// Value of the digit.
+    pub fn value(&self) -> u8 {
+        match self {
+            Self::Zero => 0,
+            Digit::One => 1,
+            Digit::Two => 2,
+            Digit::Three => 3,
+            Digit::Four => 4,
+            Digit::Five => 5,
+            Digit::Six => 6,
+            Digit::Seven => 7,
+            Digit::Eight => 8,
+            Digit::Nine => 9,
+        }
     }
 
     /// Parses Digit from char.
@@ -52,24 +85,22 @@ impl Digit {
     /// assert_eq!(d.value, 7);
     /// ```
     pub fn from_char(char: char) -> Result<Self, ParseError> {
-        let digit: u8 = match char {
-            '0' => 0,
-            '1' => 1,
-            '2' => 2,
-            '3' => 3,
-            '4' => 4,
-            '5' => 5,
-            '6' => 6,
-            '7' => 7,
-            '8' => 8,
-            '9' => 9,
-            _ => return Err(ParseError::new(format!("{} is not a digit", char))),
-        };
-
-        Ok(Digit { value: digit })
+        match char {
+            '0' => Ok(Digit::Zero),
+            '1' => Ok(Digit::One),
+            '2' => Ok(Digit::Two),
+            '3' => Ok(Digit::Three),
+            '4' => Ok(Digit::Four),
+            '5' => Ok(Digit::Five),
+            '6' => Ok(Digit::Six),
+            '7' => Ok(Digit::Seven),
+            '8' => Ok(Digit::Eight),
+            '9' => Ok(Digit::Nine),
+            chr => Err(ParseError::new(format!("'{}' is not a digit", chr))),
+        }
     }
 
-    /// Converts Digit to char.
+    /// Char representation of the digit.
     ///
     /// ```
     /// use libastraea::math::Digit;
@@ -77,19 +108,18 @@ impl Digit {
     /// let d = Digit::new(4).unwrap();
     /// assert_eq!(d.to_char(), '4');
     /// ```
-    pub fn to_char(&self) -> char {
-        match self.value {
-            0 => '0',
-            1 => '1',
-            2 => '2',
-            3 => '3',
-            4 => '4',
-            5 => '5',
-            6 => '6',
-            7 => '7',
-            8 => '8',
-            9 => '9',
-            _ => unreachable!(),
+    pub fn char(&self) -> char {
+        match self {
+            Digit::Zero => '0',
+            Digit::One => '1',
+            Digit::Two => '2',
+            Digit::Three => '3',
+            Digit::Four => '4',
+            Digit::Five => '5',
+            Digit::Six => '6',
+            Digit::Seven => '7',
+            Digit::Eight => '8',
+            Digit::Nine => '9',
         }
     }
 }
@@ -112,7 +142,7 @@ impl Add for Digit {
     /// assert_eq!(carry, digit!(1));
     /// ```
     fn add(self, rhs: Self) -> Self::Output {
-        let sum = self.value + rhs.value;
+        let sum = self.value() + rhs.value();
         let result = sum % 10;
         let carry = sum / 10;
 
@@ -138,7 +168,7 @@ impl Sub for Digit {
     /// assert_eq!(carry, digit!(1));
     /// ```
     fn sub(self, rhs: Self) -> Self::Output {
-        let diff = (self.value as i16) - (rhs.value as i16);
+        let diff = (self.value() as i16) - (rhs.value() as i16);
         let res = (diff + 10) % 10;
         let result = digit!(res as u8);
         let carry = if diff >= 0 { digit!(0) } else { digit!(1) };
@@ -165,7 +195,7 @@ impl Mul for Digit {
     /// assert_eq!(carry, digit!(4));
     /// ```
     fn mul(self, rhs: Self) -> Self::Output {
-        let product = self.value * rhs.value;
+        let product = self.value() * rhs.value();
         let result = product % 10;
         let carry = product / 10;
 
@@ -177,14 +207,14 @@ impl Div for Digit {
     type Output = Self;
 
     fn div(self, rhs: Self) -> Self::Output {
-        let value = self.value / rhs.value;
-        Self { value }
+        let value = self.value() / rhs.value();
+        Self::new(value).unwrap()
     }
 }
 
 impl Display for Digit {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value)
+        write!(f, "{}", self.char())
     }
 }
 
@@ -205,6 +235,68 @@ impl FromStr for Digit {
         Self::from_char(s.chars().next().unwrap())
     }
 }
+
+/// Implements Into<T> for Digit for every integer type.
+macro_rules! impl_digit_into {
+    ($($t:ty),*) => {
+        $(
+            impl Into<$t> for Digit {
+                fn into(self) -> $t {
+                    match self {
+                        Digit::Zero => 0,
+                        Digit::One => 1,
+                        Digit::Two => 2,
+                        Digit::Three => 3,
+                        Digit::Four => 4,
+                        Digit::Five => 5,
+                        Digit::Six => 6,
+                        Digit::Seven => 7,
+                        Digit::Eight => 8,
+                        Digit::Nine => 9,
+                    }
+                }
+            }
+        )*
+    };
+}
+
+impl_digit_into!(
+    u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize
+);
+
+/// Implements TryFrom<T> for Digit for every integer type.
+macro_rules! impl_digit_try_from {
+    ($($t:ty),*) => {
+        $(
+            impl TryFrom<$t> for Digit {
+                type Error = ValueError;
+
+                fn try_from(value: $t) -> Result<Self, Self::Error> {
+                    match value {
+                        0 => Ok(Digit::Zero),
+                        1 => Ok(Digit::One),
+                        2 => Ok(Digit::Two),
+                        3 => Ok(Digit::Three),
+                        4 => Ok(Digit::Four),
+                        5 => Ok(Digit::Five),
+                        6 => Ok(Digit::Six),
+                        7 => Ok(Digit::Seven),
+                        8 => Ok(Digit::Eight),
+                        9 => Ok(Digit::Nine),
+                        v => Err(Self::Error::new(format!(
+                            "expected value to be in range [0, 9], got '{}'",
+                            v
+                        ))),
+                    }
+                }
+            }
+        )*
+    };
+}
+
+impl_digit_try_from!(
+    u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize
+);
 
 #[cfg(test)]
 mod tests {
