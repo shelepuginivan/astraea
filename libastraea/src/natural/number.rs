@@ -140,10 +140,10 @@ impl NaturalNumber {
         Self::from_reversed(digits)
     }
 
-    /// Divides number by denominator, returning the quotient and the remainder.
-    /// Value error is returned if and only if the denominator is zero.
-    pub fn divide(self, denominator: Self) -> Result<(Self, Self), ValueError> {
-        if denominator.is_zero() {
+    /// Divides number by rhs, returning the quotient and the remainder. Error is returned if and
+    /// only if rhs is zero.
+    pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
+        if rhs.is_zero() {
             return Err(ValueError::new("division by 0 is not allowed"));
         }
 
@@ -154,8 +154,8 @@ impl NaturalNumber {
             remainder = remainder.append(self[i]);
 
             let mut q_digit = 0;
-            while remainder >= denominator {
-                remainder = (remainder - denominator.clone())?;
+            while remainder >= rhs {
+                remainder = (remainder - rhs.clone())?;
                 q_digit += 1;
             }
 
