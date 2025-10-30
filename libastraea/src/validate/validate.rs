@@ -112,3 +112,87 @@ where
 
     Ok((first, second))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{formatting::Pretty, integer::Integer};
+
+    use super::*;
+
+    #[test]
+    fn test_ensure_args_count() {
+        assert!(ensure_args_count(&vec!["".to_string(); 1], 1).is_ok());
+        assert!(ensure_args_count(&vec!["".to_string(); 2], 2).is_ok());
+        assert!(ensure_args_count(&vec!["".to_string(); 1], 2).is_err());
+    }
+
+    #[test]
+    fn test_ensure_args() {
+        let args = ensure_args::<Integer>(vec!["234".to_string(), "-5653".to_string()], 2).unwrap();
+        assert_eq!(args[0], Integer::from(234));
+        assert_eq!(args[1], Integer::from(-5653));
+
+        assert!(ensure_args::<Integer>(vec!["234".to_string(), "aaaa".to_string()], 2).is_err());
+        assert!(ensure_args::<Integer>(vec!["234".to_string(), "-5653".to_string()], 3).is_err());
+    }
+
+    #[test]
+    fn test_get_usize() {
+        let actual = get_usize(&vec!["34".to_string()], 0).unwrap();
+        assert_eq!(actual, 34usize);
+        assert!(get_usize(&vec!["34".to_string(), "a".to_string()], 1).is_err());
+    }
+
+    #[test]
+    fn test_get_digit() {
+        let actual = get_digit(&vec!["9".to_string()], 0).unwrap();
+        assert_eq!(actual, Digit::Nine);
+        assert!(get_digit(&vec!["99".to_string()], 0).is_err());
+    }
+
+    #[test]
+    fn test_get_natural() {
+        let actual = get_natural(&vec!["51".to_string()], 0).unwrap();
+        assert_eq!(actual, NaturalNumber::from(51u8));
+        assert!(get_natural(&vec!["-11".to_string()], 0).is_err());
+        assert!(get_natural(&vec!["a".to_string()], 0).is_err());
+    }
+
+    #[test]
+    fn test_get_rational() {
+        let actual = get_rational(&vec!["7/5".to_string()], 0).unwrap();
+        assert_eq!(
+            actual,
+            RationalNumber::new(Integer::from(7), NaturalNumber::from(5u8)).unwrap()
+        );
+        assert!(get_rational(&vec!["8/0".to_string()], 0).is_err());
+        assert!(get_rational(&vec!["sadkfsjafokdjh".to_string()], 0).is_err());
+    }
+
+    #[test]
+    fn test_get_polynomial() {
+        let actual: Polynomial<RationalNumber> =
+            get_polynomial(&vec!["7x+1".to_string()], 0).unwrap();
+        assert_eq!(actual.prettify(), "7x + 1");
+        assert!(get_rational(&vec!["x^hfjwhf".to_string()], 0).is_err());
+    }
+
+    #[test]
+    fn test_one_arg() {
+        let actual: NaturalNumber = one_arg(vec!["12321".into()]).unwrap();
+        assert_eq!(actual, NaturalNumber::from(12321u16));
+        assert!(one_arg::<RationalNumber>(vec![]).is_err());
+        assert!(one_arg::<RationalNumber>(vec!["24".into(), "11".into()]).is_err());
+    }
+
+    #[test]
+    fn test_two_args() {
+        let (actual_first, actual_second) =
+            two_args::<Integer>(vec!["-1234".into(), "5678".into()]).unwrap();
+        assert_eq!(actual_first, Integer::from(-1234));
+        assert_eq!(actual_second, Integer::from(5678));
+        assert!(two_args::<Integer>(vec![]).is_err());
+        assert!(two_args::<Integer>(vec!["24".into()]).is_err());
+        assert!(two_args::<Integer>(vec!["24".into(), "17".into(), "-324234".into()]).is_err());
+    }
+}
