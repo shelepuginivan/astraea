@@ -235,6 +235,42 @@ impl FromStr for Integer {
     }
 }
 
+/// Implements From<T> for Integer for every signed integer type.
+macro_rules! impl_integer_from_signed {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for Integer {
+                fn from(value: $t) -> Self {
+                    let (sign, value) = match value.cmp(&0) {
+                        Ordering::Less => (Sign::Negative, -value),
+                        Ordering::Equal => return Self::zero(),
+                        Ordering::Greater => (Sign::Positive, value),
+                    };
+
+                    Self::new(value.try_into().unwrap(), sign)
+                }
+            }
+        )*
+    };
+}
+
+impl_integer_from_signed!(i8, i16, i32, i64, i128, isize);
+
+/// Implements From<T> for Integer for every unsigned integer type.
+macro_rules! impl_integer_from_unsigned {
+    ($($t:ty),*) => {
+        $(
+            impl From<$t> for Integer {
+                fn from(value: $t) -> Self {
+                    Self::new(value.into(), Sign::Positive)
+                }
+            }
+        )*
+    };
+}
+
+impl_integer_from_unsigned!(u8, u16, u32, u64, u128, usize);
+
 #[cfg(test)]
 mod tests {
     use super::*;
