@@ -218,6 +218,7 @@ mod tests {
     fn test_monomial_from_str() {
         let cases = vec![
             ("5*x^6", "5/1", 6),
+            ("x^123", "1/1", 123),
             ("123x^0", "123/1", 0),
             ("0*x^1", "0/1", 1),
             ("42 * x ^ 3", "42/1", 3),
@@ -228,6 +229,8 @@ mod tests {
             ("34*x", "34/1", 1),
             ("x^2", "1/1", 2),
             ("x", "1/1", 1),
+            ("2x⁵", "2/1", 5),
+            ("123 * x⁴²", "123/1", 42),
         ];
 
         for (input, expected_coeff, expected_exp) in cases {
@@ -259,6 +262,7 @@ mod tests {
             "2342*x234^324",
             "*x^3",
             "x^",
+            "234x^3⁸",
         ];
 
         for input in invalid_cases {
