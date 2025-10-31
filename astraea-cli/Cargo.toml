@@ -10,5 +10,6 @@ doc = false
 
 [dependencies]
 ariadne = "0.5.1"
-clap = { version = "4.5.50", features = ["derive"] }
 astraea = { path = "../astraea" }
+astraea-modules = { path = "../astraea-modules" }
+clap = { version = "4.5.50", features = ["derive"] }

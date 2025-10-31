@@ -1,10 +1,11 @@
+use astraea::formatting::Pretty;
+use astraea::polynomial::Polynomial;
+use astraea::rational::RationalNumber;
 use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module};
-use crate::formatting::Pretty;
-use crate::polynomial::Polynomial;
-use crate::rational::RationalNumber;
-use crate::validate;
+use crate::instruction::Instruction;
+use crate::module::Module;
+use crate::validate::{self, InstructionError};
 
 pub struct PolynomialModule {}
 

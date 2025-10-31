@@ -1,11 +1,12 @@
+use astraea::digit;
+use astraea::formatting::Pretty;
+use astraea::math::{Digit, Ring};
+use astraea::natural::NaturalNumber;
 use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module};
-use crate::digit;
-use crate::formatting::Pretty;
-use crate::math::{Digit, Ring};
-use crate::natural::NaturalNumber;
-use crate::validate::{self, ensure_args_count};
+use crate::instruction::Instruction;
+use crate::module::Module;
+use crate::validate::{self, InstructionError};
 
 pub struct NaturalModule {}
 
@@ -52,7 +53,7 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalMultiplyByDigit => {
-                ensure_args_count(&args, 2)?;
+                validate::ensure_args_count(&args, 2)?;
 
                 let lhs = validate::get_natural(&args, 0)?;
                 let rhs = validate::get_digit(&args, 1)?;
@@ -61,7 +62,7 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalMultiplyByPowerOfTen => {
-                ensure_args_count(&args, 2)?;
+                validate::ensure_args_count(&args, 2)?;
 
                 let lhs = validate::get_natural(&args, 0)?;
                 let rhs = validate::get_usize(&args, 1)?;

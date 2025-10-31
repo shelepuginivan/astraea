@@ -1,11 +1,12 @@
+use astraea::formatting::Pretty;
+use astraea::integer::Integer;
+use astraea::math::Signed;
+use astraea::natural::NaturalNumber;
 use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError, Module};
-use crate::formatting::Pretty;
-use crate::integer::Integer;
-use crate::math::Signed;
-use crate::natural::NaturalNumber;
-use crate::validate::{one_arg, two_args};
+use crate::instruction::Instruction;
+use crate::module::Module;
+use crate::validate::{self, InstructionError};
 
 pub struct IntegerModule {}
 
@@ -23,31 +24,31 @@ impl Module for IntegerModule {
     ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::IntegerAbs => {
-                let v: Integer = one_arg(args)?;
+                let v: Integer = validate::one_arg(args)?;
 
                 Ok(Box::new(v.abs()))
             }
 
             Instruction::IntegerSgn => {
-                let v: Integer = one_arg(args)?;
+                let v: Integer = validate::one_arg(args)?;
 
                 Ok(Box::new(v.abs()))
             }
 
             Instruction::IntegerNeg => {
-                let v: Integer = one_arg(args)?;
+                let v: Integer = validate::one_arg(args)?;
 
                 Ok(Box::new(-v))
             }
 
             Instruction::IntegerFromNatural => {
-                let v: NaturalNumber = one_arg(args)?;
+                let v: NaturalNumber = validate::one_arg(args)?;
 
                 Ok(Box::new(Integer::from_natural(v)))
             }
 
             Instruction::IntegerToNatural => {
-                let v: Integer = one_arg(args)?;
+                let v: Integer = validate::one_arg(args)?;
 
                 match v.to_natural() {
                     Ok(v) => Ok(Box::new(v)),
@@ -56,25 +57,25 @@ impl Module for IntegerModule {
             }
 
             Instruction::IntegerAdd => {
-                let (lhs, rhs) = two_args::<Integer>(args)?;
+                let (lhs, rhs) = validate::two_args::<Integer>(args)?;
 
                 Ok(Box::new(lhs + rhs))
             }
 
             Instruction::IntegerSubtract => {
-                let (lhs, rhs) = two_args::<Integer>(args)?;
+                let (lhs, rhs) = validate::two_args::<Integer>(args)?;
 
                 Ok(Box::new(lhs - rhs))
             }
 
             Instruction::IntegerMultiply => {
-                let (lhs, rhs) = two_args::<Integer>(args)?;
+                let (lhs, rhs) = validate::two_args::<Integer>(args)?;
 
                 Ok(Box::new(lhs * rhs))
             }
 
             Instruction::IntegerQuotient => {
-                let (lhs, rhs) = two_args::<Integer>(args)?;
+                let (lhs, rhs) = validate::two_args::<Integer>(args)?;
 
                 match lhs / rhs {
                     Ok(v) => Ok(Box::new(v)),
@@ -83,7 +84,7 @@ impl Module for IntegerModule {
             }
 
             Instruction::IntegerRemainder => {
-                let (lhs, rhs) = two_args::<Integer>(args)?;
+                let (lhs, rhs) = validate::two_args::<Integer>(args)?;
 
                 match lhs % rhs {
                     Ok(v) => Ok(Box::new(v)),

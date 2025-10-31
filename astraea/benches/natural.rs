@@ -3,13 +3,12 @@ use criterion::Criterion;
 use criterion::Throughput;
 use criterion::{criterion_group, criterion_main};
 
-use astraea::core::Instruction;
 use astraea::digit;
 use astraea::math::Digit;
 use astraea::natural::NaturalNumber;
 
 pub fn natural_add(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalAdd.opcode());
+    let mut group = c.benchmark_group("Natural Add");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));
@@ -27,7 +26,7 @@ pub fn natural_add(c: &mut Criterion) {
 }
 
 pub fn natural_subtract(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalSubtract.opcode());
+    let mut group = c.benchmark_group("Natural Sub");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));
@@ -45,7 +44,7 @@ pub fn natural_subtract(c: &mut Criterion) {
 }
 
 pub fn natural_mul(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalMultiply.opcode());
+    let mut group = c.benchmark_group("Natural Mul");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));
@@ -63,7 +62,7 @@ pub fn natural_mul(c: &mut Criterion) {
 }
 
 pub fn natural_div(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalQuotient.opcode());
+    let mut group = c.benchmark_group("Natural Div");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));
@@ -81,7 +80,7 @@ pub fn natural_div(c: &mut Criterion) {
 }
 
 pub fn natural_rem(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalRemainder.opcode());
+    let mut group = c.benchmark_group("Natural Rem");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));
@@ -99,7 +98,7 @@ pub fn natural_rem(c: &mut Criterion) {
 }
 
 pub fn natural_gcd(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalGCD.opcode());
+    let mut group = c.benchmark_group("Natural GCD");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));
@@ -117,7 +116,7 @@ pub fn natural_gcd(c: &mut Criterion) {
 }
 
 pub fn natural_lcm(c: &mut Criterion) {
-    let mut group = c.benchmark_group(Instruction::NaturalLCM.opcode());
+    let mut group = c.benchmark_group("Natural LCM");
 
     for size in [2usize.pow(4), 2usize.pow(8), 2usize.pow(12), 2usize.pow(16)].iter() {
         group.throughput(Throughput::Elements(*size as u64));

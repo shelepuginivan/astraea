@@ -1,11 +1,8 @@
 mod cli;
 
-use astraea::{
-    core::{Instruction, InstructionErrorReason, Module, ModuleGroup},
-    integer::IntegerModule,
-    natural::NaturalModule,
-    polynomial::PolynomialModule,
-    rational::RationalModule,
+use astraea_modules::{
+    Instruction, InstructionErrorReason, IntegerModule, Module, ModuleGroup, NaturalModule,
+    PolynomialModule, RationalModule,
 };
 use clap::Parser;
 use std::str::FromStr;

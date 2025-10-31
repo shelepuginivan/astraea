@@ -1,0 +1,8 @@
+[package]
+name = "astraea-modules"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+astraea = { path = "../astraea" }
+strum = { version = "0.27", features = ["derive"] }

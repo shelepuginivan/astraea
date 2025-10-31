@@ -1,7 +1,8 @@
+use astraea::formatting::Pretty;
 use std::collections::HashSet;
 
-use crate::core::{Instruction, InstructionError};
-use crate::formatting::Pretty;
+use crate::instruction::Instruction;
+use crate::validate::InstructionError;
 
 /// Module is a part of computer algebra system responsible for a set of instructions.
 pub trait Module {
