@@ -1,7 +1,7 @@
 pub mod module;
-pub mod monomial;
 pub mod polynomial;
 
+mod monomial;
+
 pub use module::*;
-pub use monomial::*;
 pub use polynomial::*;

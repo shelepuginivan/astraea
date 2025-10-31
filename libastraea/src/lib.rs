@@ -5,6 +5,6 @@ pub mod math;
 pub mod natural;
 pub mod polynomial;
 pub mod rational;
+pub mod formatting;
 
-mod formatting;
 mod validate;
