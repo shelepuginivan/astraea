@@ -48,6 +48,16 @@ impl Integer {
     }
 
     /// Creates a positive Integer from natural number.
+    ///
+    /// ```
+    /// use astraea::natural::NaturalNumber;
+    /// use astraea::integer::Integer;
+    ///
+    /// let n = NaturalNumber::from(123u8);
+    /// let i = Integer::from_natural(n);
+    ///
+    /// assert_eq!(i, Integer::from(123));
+    /// ```
     pub fn from_natural(n: NaturalNumber) -> Self {
         Self {
             value: n,
@@ -56,6 +66,18 @@ impl Integer {
     }
 
     /// Converts integer to natural. Returns error for negative integers.
+    ///
+    /// ```
+    /// use astraea::natural::NaturalNumber;
+    /// use astraea::integer::Integer;
+    ///
+    /// let i = Integer::from(1000);
+    /// let n = i.to_natural().unwrap();
+    /// assert_eq!(n, NaturalNumber::from(1000u16));
+    ///
+    /// let i = Integer::from(-1000);
+    /// assert!(i.to_natural().is_err());
+    /// ```
     pub fn to_natural(self) -> Result<NaturalNumber, ValueError> {
         match self.sign {
             Sign::Negative => Err(ValueError::new(
@@ -67,6 +89,32 @@ impl Integer {
 
     /// Divides number by rhs, returning the quotient and the remainder. Error is returned if and
     /// only if rhs is zero.
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    ///
+    /// let lhs = Integer::from(100);
+    /// let rhs = Integer::from(3);
+    ///
+    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
+    ///
+    /// assert_eq!(quotient, Integer::from(33));
+    /// assert_eq!(remainder, Integer::from(1));
+    /// ```
+    ///
+    /// The sign of the remainder is the same as the sign of the original number:
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    ///
+    /// let lhs = Integer::from(-100);
+    /// let rhs = Integer::from(3);
+    ///
+    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
+    ///
+    /// assert_eq!(quotient, Integer::from(-33));
+    /// assert_eq!(remainder, Integer::from(-1));
+    /// ```
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
         if rhs.is_zero() {
             return Err(ValueError::new("division by 0 is not allowed"));
@@ -96,8 +144,19 @@ impl Integer {
         Ok((quotient, remainder))
     }
 
-    /// Calculates GCD (greatest common divisor) of two integers. The returned value is always
-    /// positive.
+    /// Calculates GCD (greatest common divisor) of two integers. The returned value is a
+    /// non-negative integer.
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    ///
+    /// let a = Integer::from(8);
+    /// let b = Integer::from(-12);
+    ///
+    /// let gcd = a.gcd(b);
+    ///
+    /// assert_eq!(gcd, Integer::from(4));
+    /// ```
     pub fn gcd(self, other: Self) -> Self {
         Self {
             value: self.value.gcd(other.value),
@@ -105,8 +164,19 @@ impl Integer {
         }
     }
 
-    /// Calculates LCM (least common multiple) of two natural numbers. The returned value is always
-    /// positive.
+    /// Calculates LCM (least common multiple) of two natural numbers. The returned value is a
+    /// non-negative integer.
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    ///
+    /// let a = Integer::from(-6);
+    /// let b = Integer::from(9);
+    ///
+    /// let lcm = a.lcm(b);
+    ///
+    /// assert_eq!(lcm, Integer::from(18));
+    /// ```
     pub fn lcm(self, other: Self) -> Self {
         Self {
             value: self.value.lcm(other.value),
