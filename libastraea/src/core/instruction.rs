@@ -462,8 +462,8 @@ pub enum Instruction {
     PolynomialDegree,
 
     /// Returns content of the polynomial, which is defined as a rational number with numerator
-    /// equal to GCD of numerators of polynomial coefficients, and denumerator equal to LCM of
-    /// denumerators of polynomial coefficients.
+    /// equal to GCD of numerators of polynomial coefficients, and denominator equal to LCM of
+    /// denominators of polynomial coefficients.
     ///
     /// - Index: P-7
     /// - Opcode: FAC_P_Q
