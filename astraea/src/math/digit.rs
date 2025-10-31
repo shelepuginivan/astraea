@@ -3,7 +3,7 @@ use std::i16;
 use std::ops::{Add, Div, Mul, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 
 /// Creates a Digit from the argument.

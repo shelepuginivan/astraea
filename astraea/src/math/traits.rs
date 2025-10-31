@@ -4,7 +4,7 @@ use std::{
     str::FromStr,
 };
 
-use crate::{core::ValueError, math::Sign};
+use crate::{error::ValueError, math::Sign};
 
 pub trait MathSet: Sized + Clone + FromStr<Err: Debug> + Display {}
 

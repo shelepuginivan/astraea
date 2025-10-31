@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use std::usize;
 
-use crate::core::ParseError;
+use crate::error::ParseError;
 use crate::formatting;
 use crate::math::Field;
 

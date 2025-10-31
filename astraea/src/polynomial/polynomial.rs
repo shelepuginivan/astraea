@@ -4,7 +4,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::core::{ParseError, ValueError};
+use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
 use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};

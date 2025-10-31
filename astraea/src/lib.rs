@@ -1,5 +1,5 @@
 //! # astraea
-pub mod core;
+pub mod error;
 pub mod formatting;
 pub mod integer;
 pub mod math;

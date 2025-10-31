@@ -4,7 +4,7 @@ use std::{
     ops::{Mul, Neg},
 };
 
-use crate::core::ParseError;
+use crate::error::ParseError;
 use crate::formatting::Pretty;
 
 /// Sign represents sign of the number.
