@@ -60,6 +60,20 @@ impl RationalNumber {
     }
 
     /// Converts integer to rational number with denominator set to 1.
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    /// use astraea::math::Ring;
+    /// use astraea::rational::RationalNumber;
+    ///
+    /// let i = Integer::from(1_000_000);
+    /// let r = RationalNumber::from_integer(i);
+    ///
+    /// let (numerator, denominator) = r.as_values();
+    ///
+    /// assert_eq!(numerator, Integer::from(1_000_000));
+    /// assert!(denominator.is_one());
+    /// ```
     pub fn from_integer(integer: Integer) -> Self {
         Self {
             numerator: integer,
@@ -67,7 +81,19 @@ impl RationalNumber {
         }
     }
 
-    /// Reduces the rational number. This is done automatically after most operations.
+    /// Reduces the rational number. This is done automatically after operations with rational
+    /// numbers.
+    ///
+    /// ```
+    /// use astraea::formatting::Pretty;
+    /// use astraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// // This automatically reduces the rational number.
+    /// let r = RationalNumber::from_str("6/9").unwrap();
+    ///
+    /// assert_eq!(r.prettify(), "2/3");
+    /// ```
     pub fn reduce(self) -> Self {
         if self.numerator.is_zero() {
             return Self::zero();
@@ -97,6 +123,17 @@ impl RationalNumber {
 
     /// Reports whether the rational number is an integer, i.e. its numerator is divisible by its
     /// denominator.
+    ///
+    /// ```
+    /// use astraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let r = RationalNumber::from_str("22/11").unwrap();
+    /// assert!(r.is_integer());
+    ///
+    /// let r = RationalNumber::from_str("23/11").unwrap();
+    /// assert!(!r.is_integer());
+    /// ```
     pub fn is_integer(&self) -> bool {
         let rem = self.numerator.clone() % Integer::from_natural(self.denominator.clone());
 
@@ -104,6 +141,19 @@ impl RationalNumber {
     }
 
     /// Converts rational number to integer, if possible.
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    /// use astraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let r = RationalNumber::from_str("22/11").unwrap();
+    /// let i = r.to_integer().unwrap();
+    /// assert_eq!(i, Integer::from(2));
+    ///
+    /// let r = RationalNumber::from_str("23/11").unwrap();
+    /// assert!(r.to_integer().is_err());
+    /// ```
     pub fn to_integer(self) -> Result<Integer, ValueError> {
         let reduced = self.reduce();
 
@@ -115,6 +165,20 @@ impl RationalNumber {
     }
 
     /// Destructs rational number into its numerator and denominator.
+    ///
+    /// ```
+    /// use astraea::integer::Integer;
+    /// use astraea::natural::NaturalNumber;
+    /// use astraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let r = RationalNumber::from_str("-34 / 23").unwrap();
+    ///
+    /// let (numerator, denominator) = r.as_values();
+    ///
+    /// assert_eq!(numerator, Integer::from(-34));
+    /// assert_eq!(denominator, NaturalNumber::from(23u8));
+    /// ```
     pub fn as_values(self) -> (Integer, NaturalNumber) {
         (self.numerator, self.denominator)
     }
