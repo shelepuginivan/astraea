@@ -9,7 +9,7 @@ use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
 use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};
 use crate::natural::NaturalNumber;
-use crate::polynomial::Monomial;
+use crate::polynomial::monomial::Monomial;
 use crate::rational::RationalNumber;
 
 #[derive(Clone)]
@@ -28,10 +28,51 @@ impl<T: Field> Polynomial<T> {
         self
     }
 
+    /// Creates a new polynomial from coefficients, ordered in exponent ascending order.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let k0 = RationalNumber::from_str("1/2").unwrap();
+    /// let k1 = RationalNumber::from_str("-3").unwrap();
+    /// let k2 = RationalNumber::from_str("6").unwrap();
+    ///
+    /// let p = Polynomial::new(vec![k0, k1, k2]);
+    ///
+    /// assert_eq!(p.prettify(), "6x² - 3x + 1/2");
+    /// ```
     pub fn new(coefficients: Vec<T>) -> Self {
         Self { coefficients }.normalize()
     }
 
+    /// Parses polynomial from its canonical form.
+    ///
+    /// Canonical form is a sum of monomials: coefficients multiplied by variable raised to a
+    /// power, e.g.
+    ///
+    /// > x⁶ - 3x⁵ + 2x⁴ + 2x³ - 3x² + x
+    ///
+    /// Monomials may contain a coefficients, a variable "x", and an exponent. The following must
+    /// be met for the original string:
+    ///
+    /// 1. At least one of coefficient or variable must be present.
+    /// 2. If coefficient is not present, multiplicative identity is inferred.
+    /// 3. If variable is not present, exponent must not be present and is inferred to 0.
+    /// 4. Exponent may be specified with a caret (x^2), or with superscript digits (x²). Mixing of
+    ///    those notations is not allowed.
+    /// 5. One multiplication symbol (*, ·, ×) may be used as a separator between coefficient and
+    ///    variable.
+    ///
+    /// ```
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    ///
+    /// let s = "1/2 * x^2 - 16x³⁹ + 123/2";
+    /// let p = Polynomial::<RationalNumber>::from_canonical_form(s).unwrap();
+    /// ```
     pub fn from_canonical_form<S: Into<String>>(s: S) -> Result<Self, ParseError> {
         let chars: Vec<char> = s.into().trim().chars().collect();
 
@@ -76,14 +117,37 @@ impl<T: Field> Polynomial<T> {
         Ok(Self::new(coefficients))
     }
 
+    /// Coefficients of the polynomial, ordered in exponent ascending order.
     pub fn as_coefficients(self) -> Vec<T> {
         self.coefficients
     }
 
+    /// Degree of the polynomial.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    /// let p = Polynomial::<RationalNumber>::from_str("x³ - 7x² - 4x + 13").unwrap();
+    ///
+    /// assert_eq!(p.degree(), 3);
+    /// ```
     pub fn degree(&self) -> usize {
         self.coefficients.len().max(1) - 1
     }
 
+    /// Leading coefficient of the polynomial.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let p = Polynomial::<RationalNumber>::from_str("21/4 * x³ - 7x² - 4x + 13").unwrap();
+    /// assert_eq!(p.leading_coefficient().prettify(), "21/4");
+    /// ```
     pub fn leading_coefficient(&self) -> T {
         self.coefficients
             .last()
@@ -92,12 +156,44 @@ impl<T: Field> Polynomial<T> {
             .unwrap()
     }
 
+    /// Multiplies polynomial by x<sup>k</sup>.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let p = Polynomial::<RationalNumber>::from_str("x + 1").unwrap();
+    /// let p = p.times_pow_x(2);
+    ///
+    /// assert_eq!(p.prettify(), "x³ + x²");
+    /// ```
     pub fn times_pow_x(self, k: usize) -> Self {
         Self {
             coefficients: [vec![T::zero(); k], self.coefficients].concat(),
         }
     }
 
+    /// Divides polynomial by rhs, returning the quotient and the remainder. Error is returned if
+    /// and only if rhs is zero.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let lhs = Polynomial::<RationalNumber>::from_str("x³ - 6x² + 11x - 6").unwrap();
+    /// let rhs = Polynomial::<RationalNumber>::from_str("x² - 2x + 1").unwrap();
+    ///
+    /// // lhs is (x - 1)(x - 2)(x - 3)
+    /// // rhs is (x - 1)²
+    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
+    ///
+    /// assert_eq!(quotient.prettify(), "x - 4");
+    /// assert_eq!(remainder.prettify(), "2x - 2");
+    /// ```
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
         let mut quotient = Self::zero();
         let mut remainder = self.clone();
@@ -114,6 +210,19 @@ impl<T: Field> Polynomial<T> {
         Ok((quotient.normalize(), remainder.normalize()))
     }
 
+    /// Derivative of the polynomial.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let p = Polynomial::<RationalNumber>::from_str("4x³ + 2x² - 5x + 7").unwrap();
+    /// let d = p.derivative();
+    ///
+    /// assert_eq!(d.prettify(), "12x² + 4x - 5")
+    /// ```
     pub fn derivative(self) -> Self {
         let mut coefficients = vec![T::zero(); self.degree()];
 
@@ -130,7 +239,29 @@ impl<T: Field> Polynomial<T> {
         Self::new(coefficients)
     }
 
+    /// Calculates GCD (greatest common divisor) of two polynomials. The returned value is a monic
+    /// polynomial.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let lhs = Polynomial::<RationalNumber>::from_str("x³ - 6x² + 11x - 6").unwrap();
+    /// let rhs = Polynomial::<RationalNumber>::from_str("x² - 2x + 1").unwrap();
+    ///
+    /// // lhs is (x - 1)(x - 2)(x - 3)
+    /// // rhs is (x - 1)²
+    /// let gcd = lhs.gcd(rhs);
+    ///
+    /// assert_eq!(gcd.prettify(), "x - 1");
+    /// ```
     pub fn gcd(self, other: Self) -> Self {
+        self.gcd_raw(other).monic()
+    }
+
+    fn gcd_raw(self, other: Self) -> Self {
         if other.is_zero() {
             return self;
         } else if self.is_zero() {
@@ -139,9 +270,22 @@ impl<T: Field> Polynomial<T> {
 
         let r = (self % other.clone()).unwrap();
 
-        other.gcd(r).monic()
+        other.gcd(r)
     }
 
+    /// Converts polynomial into monic polynomial.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let p = Polynomial::<RationalNumber>::from_str("2x² - 4x + 5").unwrap();
+    /// let monic = p.monic();
+    ///
+    /// assert_eq!(monic.prettify(), "x² - 2x + 5/2");
+    /// ```
     pub fn monic(self) -> Self {
         let mut coefficients = vec![T::zero(); self.degree() + 1];
         let leading = self.leading_coefficient();
@@ -153,6 +297,19 @@ impl<T: Field> Polynomial<T> {
         Self::new(coefficients)
     }
 
+    /// Transforms polynomial by converting multiple roots into simple roots.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let p = Polynomial::<RationalNumber>::from_str("x³ - x² - x + 1").unwrap();    // (x - 1)²(x + 1)
+    /// let f = p.flatten();
+    ///
+    /// assert_eq!(f.prettify(), "x² - 1");    // (x - 1)(x + 1)
+    /// ```
     pub fn flatten(self) -> Self {
         if self.is_zero() {
             return Self::zero();
@@ -362,18 +519,38 @@ impl<T: Field> FromStr for Polynomial<T> {
 }
 
 impl Polynomial<RationalNumber> {
+    /// Content of the rational polynomial, defined as a rational number
+    ///
+    /// > a / b
+    ///
+    /// where:
+    /// - a is the greatest common divisor (GCD) of coefficients' numerators.
+    /// - b is the least common multiple (LCM) of coefficients' denominators.
+    ///
+    /// ```
+    /// use libastraea::formatting::Pretty;
+    /// use libastraea::polynomial::Polynomial;
+    /// use libastraea::rational::RationalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let p = Polynomial::<RationalNumber>::from_str("36 * x² - 48/5 * x + 24/7").unwrap();
+    ///
+    /// // GCD(36, 48, 24) = 12
+    /// // LCD(1, 5, 7) = 35
+    /// assert_eq!(p.content().prettify(), "12/35");
+    /// ```
     pub fn content(self) -> RationalNumber {
         let mut numerator_gcd = Integer::zero();
-        let mut denumerator_lcm = NaturalNumber::one();
+        let mut denominator_lcm = NaturalNumber::one();
 
         for coefficient in self.coefficients {
-            let (numerator, denumerator) = coefficient.as_values();
+            let (numerator, denominator) = coefficient.as_values();
 
             numerator_gcd = numerator_gcd.gcd(numerator);
-            denumerator_lcm = denumerator_lcm.lcm(denumerator);
+            denominator_lcm = denominator_lcm.lcm(denominator);
         }
 
-        RationalNumber::new(numerator_gcd, denumerator_lcm).unwrap()
+        RationalNumber::new(numerator_gcd, denominator_lcm).unwrap()
     }
 }
 
