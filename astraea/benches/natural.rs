@@ -3,10 +3,10 @@ use criterion::Criterion;
 use criterion::Throughput;
 use criterion::{criterion_group, criterion_main};
 
-use libastraea::core::Instruction;
-use libastraea::digit;
-use libastraea::math::Digit;
-use libastraea::natural::NaturalNumber;
+use astraea::core::Instruction;
+use astraea::digit;
+use astraea::math::Digit;
+use astraea::natural::NaturalNumber;
 
 pub fn natural_add(c: &mut Criterion) {
     let mut group = c.benchmark_group(Instruction::NaturalAdd.opcode());

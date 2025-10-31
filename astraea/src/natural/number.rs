@@ -48,9 +48,9 @@ impl NaturalNumber {
     /// Creates a NaturalNumber from digits in direct order.
     ///
     /// ```
-    /// use libastraea::digit;
-    /// use libastraea::math::Digit;
-    /// use libastraea::natural::NaturalNumber;
+    /// use astraea::digit;
+    /// use astraea::math::Digit;
+    /// use astraea::natural::NaturalNumber;
     ///
     /// let digits = vec![digit!(9); 999];
     /// let n = NaturalNumber::new(digits);
@@ -168,7 +168,7 @@ impl NaturalNumber {
     /// Calculates GCD (greatest common divisor) of two natural numbers.
     ///
     /// ```
-    /// use libastraea::natural::NaturalNumber;
+    /// use astraea::natural::NaturalNumber;
     ///
     /// let a = NaturalNumber::from(12u8);
     /// let b = NaturalNumber::from(18u8);
@@ -201,7 +201,7 @@ impl NaturalNumber {
     /// Calculates LCM (least common multiple) of two natural numbers.
     ///
     /// ```
-    /// use libastraea::natural::NaturalNumber;
+    /// use astraea::natural::NaturalNumber;
     ///
     /// let a = NaturalNumber::from(12u8);
     /// let b = NaturalNumber::from(18u8);

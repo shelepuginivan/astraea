@@ -1,13 +1,13 @@
 mod cli;
 
-use clap::Parser;
-use libastraea::{
+use astraea::{
     core::{Instruction, InstructionErrorReason, Module, ModuleGroup},
     integer::IntegerModule,
     natural::NaturalModule,
     polynomial::PolynomialModule,
     rational::RationalModule,
 };
+use clap::Parser;
 use std::str::FromStr;
 
 use crate::cli::{Args, Error};

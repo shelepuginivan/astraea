@@ -31,9 +31,9 @@ impl<T: Field> Polynomial<T> {
     /// Creates a new polynomial from coefficients, ordered in exponent ascending order.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let k0 = RationalNumber::from_str("1/2").unwrap();
@@ -67,8 +67,8 @@ impl<T: Field> Polynomial<T> {
     ///    variable.
     ///
     /// ```
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     ///
     /// let s = "1/2 * x^2 - 16x³⁹ + 123/2";
     /// let p = Polynomial::<RationalNumber>::from_canonical_form(s).unwrap();
@@ -125,9 +125,9 @@ impl<T: Field> Polynomial<T> {
     /// Degree of the polynomial.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     /// let p = Polynomial::<RationalNumber>::from_str("x³ - 7x² - 4x + 13").unwrap();
     ///
@@ -140,9 +140,9 @@ impl<T: Field> Polynomial<T> {
     /// Leading coefficient of the polynomial.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let p = Polynomial::<RationalNumber>::from_str("21/4 * x³ - 7x² - 4x + 13").unwrap();
@@ -159,9 +159,9 @@ impl<T: Field> Polynomial<T> {
     /// Multiplies polynomial by x<sup>k</sup>.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let p = Polynomial::<RationalNumber>::from_str("x + 1").unwrap();
@@ -179,9 +179,9 @@ impl<T: Field> Polynomial<T> {
     /// and only if rhs is zero.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let lhs = Polynomial::<RationalNumber>::from_str("x³ - 6x² + 11x - 6").unwrap();
@@ -213,9 +213,9 @@ impl<T: Field> Polynomial<T> {
     /// Derivative of the polynomial.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let p = Polynomial::<RationalNumber>::from_str("4x³ + 2x² - 5x + 7").unwrap();
@@ -243,9 +243,9 @@ impl<T: Field> Polynomial<T> {
     /// polynomial.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let lhs = Polynomial::<RationalNumber>::from_str("x³ - 6x² + 11x - 6").unwrap();
@@ -276,9 +276,9 @@ impl<T: Field> Polynomial<T> {
     /// Converts polynomial into monic polynomial.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let p = Polynomial::<RationalNumber>::from_str("2x² - 4x + 5").unwrap();
@@ -300,9 +300,9 @@ impl<T: Field> Polynomial<T> {
     /// Transforms polynomial by converting multiple roots into simple roots.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let p = Polynomial::<RationalNumber>::from_str("x³ - x² - x + 1").unwrap();    // (x - 1)²(x + 1)
@@ -528,9 +528,9 @@ impl Polynomial<RationalNumber> {
     /// - b is the least common multiple (LCM) of coefficients' denominators.
     ///
     /// ```
-    /// use libastraea::formatting::Pretty;
-    /// use libastraea::polynomial::Polynomial;
-    /// use libastraea::rational::RationalNumber;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::polynomial::Polynomial;
+    /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
     /// let p = Polynomial::<RationalNumber>::from_str("36 * x² - 48/5 * x + 24/7").unwrap();

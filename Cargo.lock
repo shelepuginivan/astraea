@@ -81,9 +81,18 @@ dependencies = [
 name = "astraea"
 version = "0.1.0"
 dependencies = [
+ "criterion",
+ "rand",
+ "strum",
+]
+
+[[package]]
+name = "astraea-cli"
+version = "0.1.0"
+dependencies = [
  "ariadne",
+ "astraea",
  "clap",
- "libastraea",
 ]
 
 [[package]]
@@ -311,15 +320,6 @@ checksum = "ec48937a97411dcb524a265206ccd4c90bb711fca92b2792c407f268825b9305"
 dependencies = [
  "once_cell",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "libastraea"
-version = "0.1.0"
-dependencies = [
- "criterion",
- "rand",
- "strum",
 ]
 
 [[package]]
