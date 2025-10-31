@@ -5,7 +5,6 @@ use std::ops::{Add, Div, Index, IndexMut, Mul, Rem, Sub};
 use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
-use crate::digit;
 use crate::formatting::Pretty;
 use crate::math::{Digit, IntegralDomain, MathSet, Ring};
 
@@ -48,11 +47,10 @@ impl NaturalNumber {
     /// Creates a NaturalNumber from digits in direct order.
     ///
     /// ```
-    /// use astraea::digit;
     /// use astraea::math::Digit;
     /// use astraea::natural::NaturalNumber;
     ///
-    /// let digits = vec![digit!(9); 999];
+    /// let digits = vec![Digit::Nine; 999];
     /// let n = NaturalNumber::new(digits);
     ///
     /// assert_eq!(n.to_string(), "9".repeat(999));
@@ -79,21 +77,59 @@ impl NaturalNumber {
     }
 
     /// Number of digits in a number.
+    ///
+    /// ```
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let n = NaturalNumber::from(12345678u32);
+    ///
+    /// assert_eq!(n.len(), 8);
+    /// ```
     pub fn len(&self) -> usize {
         self.digits.len()
     }
 
     /// Returns digit by index, starting from 0 for the least significant digit of the number.
+    ///
+    /// ```
+    /// use astraea::math::Digit;
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let n = NaturalNumber::from(1234u16);
+    ///
+    /// assert_eq!(n.lsd_at(1), Digit::Three);
+    /// ```
     pub fn lsd_at(&self, idx: usize) -> Digit {
         self.digits[idx]
     }
 
     /// Returns digit by index, starting from 0 for the most significant digit of the number.
+    ///
+    /// ```
+    /// use astraea::math::Digit;
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let n = NaturalNumber::from(1234u16);
+    ///
+    /// assert_eq!(n.msd_at(1), Digit::Two);
+    /// ```
     pub fn msd_at(&self, idx: usize) -> Digit {
         self.digits[self.digits.len() - idx - 1]
     }
 
     /// Appends digit to the number as least significant digit.
+    ///
+    /// ```
+    /// use astraea::math::Digit;
+    /// use astraea::formatting::Pretty;
+    /// use astraea::natural::NaturalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let n = NaturalNumber::from_str("12345689").unwrap();
+    /// let n = n.append(Digit::Zero);
+    ///
+    /// assert_eq!(n.prettify(), "123456890");
+    /// ```
     pub fn append(self, lsd: Digit) -> Self {
         let mut digits = self.times_pow10(1).as_digits();
         digits[0] = lsd;
@@ -102,11 +138,29 @@ impl NaturalNumber {
     }
 
     /// Returns digits of the number, in reverse order.
+    ///
+    /// ```
+    /// use astraea::math::Digit;
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let n = NaturalNumber::from(123u8);
+    ///
+    /// assert_eq!(n.as_digits(), vec![Digit::Three, Digit::Two, Digit::One]);
+    /// ```
     pub fn as_digits(self) -> Vec<Digit> {
         self.digits
     }
 
     /// Increments number by 1.
+    ///
+    /// ```
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let n = NaturalNumber::from(999999u32);
+    /// let n = n.inc();
+    ///
+    /// assert_eq!(n, NaturalNumber::from(1000000u32));
+    /// ```
     pub fn inc(self) -> Self {
         if self.is_zero() {
             return Self::one();
@@ -126,10 +180,23 @@ impl NaturalNumber {
             }
         }
 
+        if next_carry != Digit::Zero {
+            digits.push(next_carry);
+        }
+
         Self::from_reversed(digits)
     }
 
     /// Multiplies number by 10<sup>k</sup>.
+    ///
+    /// ```
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let n = NaturalNumber::from(1u8);
+    /// let n = n.times_pow10(9);
+    ///
+    /// assert_eq!(n, NaturalNumber::from(1_000_000_000u32));
+    /// ```
     pub fn times_pow10(self, k: usize) -> Self {
         if self.is_zero() {
             return self;
@@ -142,6 +209,19 @@ impl NaturalNumber {
 
     /// Divides number by rhs, returning the quotient and the remainder. Error is returned if and
     /// only if rhs is zero.
+    ///
+    /// ```
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let lhs = NaturalNumber::from(21u8);
+    /// let rhs = NaturalNumber::from(8u8);
+    ///
+    /// // 21 = 8 * 2 + 5
+    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
+    ///
+    /// assert_eq!(quotient, NaturalNumber::from(2u8));
+    /// assert_eq!(remainder, NaturalNumber::from(5u8));
+    /// ```
     pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
         if rhs.is_zero() {
             return Err(ValueError::new("division by 0 is not allowed"));
@@ -159,7 +239,7 @@ impl NaturalNumber {
                 q_digit += 1;
             }
 
-            quotient = quotient.append(digit!(q_digit));
+            quotient = quotient.append(Digit::try_from(q_digit).unwrap());
         }
 
         Ok((quotient, remainder))
@@ -175,6 +255,20 @@ impl NaturalNumber {
     /// let gcd = a.gcd(b);
     ///
     /// assert_eq!(gcd.to_string(), "6")
+    /// ```
+    ///
+    /// If either of two numbers is zero, the other is returned:
+    ///
+    /// ```
+    /// use astraea::math::Ring;
+    /// use astraea::natural::NaturalNumber;
+    /// use std::str::FromStr;
+    ///
+    /// let a = NaturalNumber::zero();
+    /// let b = NaturalNumber::from_str("1234123412341234").unwrap();
+    /// let gcd = a.gcd(b);
+    ///
+    /// assert_eq!(gcd.to_string(), "1234123412341234")
     /// ```
     pub fn gcd(self, other: Self) -> Self {
         if other.is_zero() {
@@ -208,6 +302,19 @@ impl NaturalNumber {
     /// let lcm = a.lcm(b);
     ///
     /// assert_eq!(lcm.to_string(), "36")
+    /// ```
+    ///
+    /// If either of two numbers is zero, zero is returned:
+    ///
+    /// ```
+    /// use astraea::math::Ring;
+    /// use astraea::natural::NaturalNumber;
+    ///
+    /// let a = NaturalNumber::from(12u8);
+    /// let b = NaturalNumber::zero();
+    /// let lcm = a.lcm(b);
+    ///
+    /// assert!(lcm.is_zero())
     /// ```
     pub fn lcm(self, other: Self) -> Self {
         if self.is_zero() || other.is_zero() {
