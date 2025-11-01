@@ -1,19 +1,15 @@
-use std::{
-    fmt::Debug,
-    ops::{Add, Div, Mul, Neg, Rem, Sub},
-    str::FromStr,
-};
+use std::fmt::Debug;
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
+use std::str::FromStr;
 
-use crate::{error::ValueError, math::Sign};
+use crate::error::ValueError;
+use crate::math::Sign;
 
 pub trait MathObject: Sized + Clone + FromStr<Err: Debug> {}
 
-/// Ring represents an algebraic ring structure.
-///
-/// A ring is a set equipped with two binary operations: addition and multiplication,
-/// satisfying properties such as associativity, distributivity, and the existence of
-/// additive and multiplicative identities.
-pub trait Ring: MathObject + Add<Output = Self> + Mul<Output = Self> {
+/// SemiRing is a generalization of algebraic rings, dropping the requirement that each element
+/// must have an additive inverse.
+pub trait SemiRing: MathObject + Add<Output = Self> + Mul<Output = Self> {
     /// Returns the additive identity.
     fn zero() -> Self;
 
@@ -27,16 +23,16 @@ pub trait Ring: MathObject + Add<Output = Self> + Mul<Output = Self> {
     fn is_one(&self) -> bool;
 }
 
-/// EuclideanRing is an algebraic ring that can be endowed with a Euclidean function.
+/// EuclideanRing is a semiring ring that can be endowed with a Euclidean function.
 ///
 /// Supports integer division and remainder operations.
 pub trait EuclideanRing:
-    Ring + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
+    SemiRing + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
 {
 }
 
 /// Signed represents a math set with positive and negative values.
-pub trait Signed: Neg<Output = Self> + Ring {
+pub trait Signed: Neg<Output = Self> + SemiRing {
     fn sign(&self) -> Sign;
 
     fn is_positive(&self) -> bool {
@@ -63,6 +59,13 @@ pub trait Signed: Neg<Output = Self> + Ring {
         }
     }
 }
+
+/// Ring represents an algebraic ring structure.
+///
+/// A ring is a set equipped with two binary operations: addition and multiplication,
+/// satisfying properties such as associativity, distributivity, and the existence of
+/// additive and multiplicative identities.
+pub trait Ring: SemiRing + Signed {}
 
 /// Field represents an algebraic field structure.
 ///

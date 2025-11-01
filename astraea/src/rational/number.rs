@@ -6,7 +6,7 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
-use crate::math::{Field, MathObject, Ring, Sign, Signed};
+use crate::math::{Field, MathObject, Ring, SemiRing, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -17,8 +17,7 @@ pub struct RationalNumber {
 }
 
 impl MathObject for RationalNumber {}
-impl Field for RationalNumber {}
-impl Ring for RationalNumber {
+impl SemiRing for RationalNumber {
     fn zero() -> Self {
         Self {
             numerator: Integer::zero(),
@@ -44,6 +43,8 @@ impl Ring for RationalNumber {
         }
     }
 }
+impl Ring for RationalNumber {}
+impl Field for RationalNumber {}
 
 impl RationalNumber {
     /// Creates a new RationalNumber with specified numerator and denominator.
@@ -63,7 +64,7 @@ impl RationalNumber {
     ///
     /// ```
     /// use astraea::integer::Integer;
-    /// use astraea::math::Ring;
+    /// use astraea::math::{Ring, SemiRing};
     /// use astraea::rational::RationalNumber;
     ///
     /// let i = Integer::from(1_000_000);

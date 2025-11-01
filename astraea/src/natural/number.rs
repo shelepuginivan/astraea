@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::math::{Digit, EuclideanRing, MathObject, Ring};
+use crate::math::{Digit, EuclideanRing, MathObject, SemiRing};
 
 /// Represents a natural number.
 #[derive(Clone, Debug)]
@@ -16,8 +16,7 @@ pub struct NaturalNumber {
 }
 
 impl MathObject for NaturalNumber {}
-impl EuclideanRing for NaturalNumber {}
-impl Ring for NaturalNumber {
+impl SemiRing for NaturalNumber {
     fn zero() -> Self {
         Self {
             digits: vec![Digit::Zero],
@@ -42,6 +41,7 @@ impl Ring for NaturalNumber {
         self.digits.len() == 1 && self.digits[0] == Digit::One
     }
 }
+impl EuclideanRing for NaturalNumber {}
 
 impl NaturalNumber {
     /// Creates a NaturalNumber from digits in direct order.
@@ -260,7 +260,7 @@ impl NaturalNumber {
     /// If either of two numbers is zero, the other is returned:
     ///
     /// ```
-    /// use astraea::math::Ring;
+    /// use astraea::math::SemiRing;
     /// use astraea::natural::NaturalNumber;
     /// use std::str::FromStr;
     ///
@@ -307,7 +307,7 @@ impl NaturalNumber {
     /// If either of two numbers is zero, zero is returned:
     ///
     /// ```
-    /// use astraea::math::Ring;
+    /// use astraea::math::SemiRing;
     /// use astraea::natural::NaturalNumber;
     ///
     /// let a = NaturalNumber::from(12u8);

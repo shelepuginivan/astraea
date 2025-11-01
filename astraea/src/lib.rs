@@ -7,7 +7,7 @@
 //! ```
 //! use std::str::FromStr;
 //!
-//! use astraea::math::Ring;
+//! use astraea::math::SemiRing;
 //! use astraea::natural::NaturalNumber;
 //!
 //! let a = NaturalNumber::from_str(&"9".repeat(1_000_000)).unwrap();
