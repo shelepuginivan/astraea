@@ -5,11 +5,17 @@ use std::str::FromStr;
 use crate::error::ValueError;
 use crate::math::Sign;
 
-// MathObject is a base trait for every mathematical object
+/// The base trait for all mathematical objects in the system.
+///
+/// This trait serves as a marker for types that represent mathematical entities, requiring cloning
+/// and parsing capabilities.
 pub trait MathObject: Sized + Clone + FromStr<Err: Debug> {}
 
-/// SemiRing is a generalization of algebraic rings, dropping the requirement that each element
-/// must have an additive inverse.
+/// A Semiring is an algebraic structure consisting of a set equipped with two binary operations:
+/// addition and multiplication, where addition is associative and commutative with an identity element,
+/// multiplication is associative with an identity element, and multiplication distributes over addition.
+///
+/// Unlike rings, semirings do not require additive inverses.
 pub trait SemiRing: MathObject + Add<Output = Self> + Mul<Output = Self> {
     /// Returns the additive identity.
     fn zero() -> Self;
@@ -27,6 +33,10 @@ pub trait SemiRing: MathObject + Add<Output = Self> + Mul<Output = Self> {
 /// EuclideanRing is a semiring ring that can be endowed with a Euclidean function.
 ///
 /// Supports integer division and remainder operations.
+///
+/// This trait generalizes the classical notion of Euclidean rings (which are integral domains) to
+/// include structures such as semirings (e.g., the natural numbers with 0) that may lack additive
+/// inverses but still support a division-with-remainder property.
 pub trait EuclideanRing:
     SemiRing + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
 {
@@ -65,9 +75,8 @@ pub trait Ring: Neg<Output = Self> + SemiRing + Sub {
     }
 }
 
-/// Field represents an algebraic field structure.
-///
-/// A field is a set with addition, subtraction, multiplication, and division.
+/// A Field is an algebraic structure in which addition, subtraction, multiplication,
+/// and division (except by zero) are defined and satisfy the usual properties.
 pub trait Field: Ring + Div<Output = Result<Self, ValueError>> {}
 
 /// Pow provides the exponentiation operation.
