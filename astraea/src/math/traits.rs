@@ -5,6 +5,7 @@ use std::str::FromStr;
 use crate::error::ValueError;
 use crate::math::Sign;
 
+// MathObject is a base trait for every mathematical object
 pub trait MathObject: Sized + Clone + FromStr<Err: Debug> {}
 
 /// SemiRing is a generalization of algebraic rings, dropping the requirement that each element
