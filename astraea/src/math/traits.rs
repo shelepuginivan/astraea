@@ -33,7 +33,7 @@ pub trait EuclideanRing:
 }
 
 /// Signed represents a math set with positive and negative values.
-pub trait Signed: Neg<Output = Self> + SemiRing {
+pub trait Signed: Neg<Output = Self> + SemiRing + Sub {
     fn sign(&self) -> Sign;
 
     fn is_positive(&self) -> bool {
@@ -71,7 +71,7 @@ pub trait Ring: SemiRing + Signed {}
 /// Field represents an algebraic field structure.
 ///
 /// A field is a set with addition, subtraction, multiplication, and division.
-pub trait Field: Ring + Sub + Div<Output = Result<Self, ValueError>> + Signed {}
+pub trait Field: Ring + Div<Output = Result<Self, ValueError>> + Signed {}
 
 /// Pow provides the exponentiation operation.
 pub trait Pow {
