@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::math::{IntegralDomain, MathSet, Ring, Sign, Signed};
+use crate::math::{EuclideanRing, MathSet, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
@@ -16,7 +16,7 @@ pub struct Integer {
 }
 
 impl MathSet for Integer {}
-impl IntegralDomain for Integer {}
+impl EuclideanRing for Integer {}
 impl Ring for Integer {
     fn zero() -> Self {
         Self {

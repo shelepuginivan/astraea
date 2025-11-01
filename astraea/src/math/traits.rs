@@ -27,10 +27,10 @@ pub trait Ring: MathSet + Add<Output = Self> + Mul<Output = Self> {
     fn is_one(&self) -> bool;
 }
 
-/// IntegralDomain represents an integral domain.
+/// EuclideanRing is an algebraic ring that can be endowed with a Euclidean function.
 ///
 /// Supports integer division and remainder operations.
-pub trait IntegralDomain:
+pub trait EuclideanRing:
     Ring + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
 {
 }

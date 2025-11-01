@@ -7,7 +7,7 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
-use crate::math::{Field, IntegralDomain, MathSet, Ring, Sign};
+use crate::math::{EuclideanRing, Field, MathSet, Ring, Sign};
 use crate::natural::NaturalNumber;
 use crate::polynomial::monomial::Monomial;
 use crate::rational::RationalNumber;
@@ -332,7 +332,7 @@ impl<T: Field> Polynomial<T> {
 }
 
 impl<T: Field> MathSet for Polynomial<T> {}
-impl<T: Field> IntegralDomain for Polynomial<T> {}
+impl<T: Field> EuclideanRing for Polynomial<T> {}
 impl<T: Field> Ring for Polynomial<T> {
     fn zero() -> Self {
         Self {
