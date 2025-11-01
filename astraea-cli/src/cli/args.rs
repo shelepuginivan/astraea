@@ -8,6 +8,13 @@ pub struct Args {
     pub instruction: String,
 
     /// Parameters of the instruction.
-    #[arg(short, long, num_args = 1.., allow_hyphen_values = true)]
+    #[arg(
+        short,
+        long,
+        num_args = 1..,
+        allow_hyphen_values = true,
+        required = true,
+        trailing_var_arg = true,
+    )]
     pub args: Vec<String>,
 }
