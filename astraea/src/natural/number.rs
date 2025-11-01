@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::math::{Digit, EuclideanRing, MathSet, Ring};
+use crate::math::{Digit, EuclideanRing, MathObject, Ring};
 
 /// Represents a natural number.
 #[derive(Clone, Debug)]
@@ -15,7 +15,7 @@ pub struct NaturalNumber {
     digits: Vec<Digit>,
 }
 
-impl MathSet for NaturalNumber {}
+impl MathObject for NaturalNumber {}
 impl EuclideanRing for NaturalNumber {}
 impl Ring for NaturalNumber {
     fn zero() -> Self {

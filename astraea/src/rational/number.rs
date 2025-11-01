@@ -6,7 +6,7 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
-use crate::math::{Field, MathSet, Ring, Sign, Signed};
+use crate::math::{Field, MathObject, Ring, Sign, Signed};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -16,7 +16,7 @@ pub struct RationalNumber {
     denominator: NaturalNumber,
 }
 
-impl MathSet for RationalNumber {}
+impl MathObject for RationalNumber {}
 impl Field for RationalNumber {}
 impl Ring for RationalNumber {
     fn zero() -> Self {

@@ -6,14 +6,14 @@ use std::{
 
 use crate::{error::ValueError, math::Sign};
 
-pub trait MathSet: Sized + Clone + FromStr<Err: Debug> {}
+pub trait MathObject: Sized + Clone + FromStr<Err: Debug> {}
 
 /// Ring represents an algebraic ring structure.
 ///
 /// A ring is a set equipped with two binary operations: addition and multiplication,
 /// satisfying properties such as associativity, distributivity, and the existence of
 /// additive and multiplicative identities.
-pub trait Ring: MathSet + Add<Output = Self> + Mul<Output = Self> {
+pub trait Ring: MathObject + Add<Output = Self> + Mul<Output = Self> {
     /// Returns the additive identity.
     fn zero() -> Self;
 
