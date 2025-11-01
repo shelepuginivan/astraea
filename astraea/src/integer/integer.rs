@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::math::{EuclideanRing, MathObject, Ring, SemiRing, Sign, Signed};
+use crate::math::{EuclideanRing, MathObject, Ring, SemiRing, Sign};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
@@ -17,7 +17,7 @@ pub struct Integer {
 
 impl MathObject for Integer {}
 impl EuclideanRing for Integer {}
-impl Ring for Integer {}
+
 impl SemiRing for Integer {
     fn zero() -> Self {
         Self {
@@ -41,6 +41,13 @@ impl SemiRing for Integer {
         self.value.is_one()
     }
 }
+
+impl Ring for Integer {
+    fn sign(&self) -> Sign {
+        self.sign
+    }
+}
+
 
 impl Integer {
     /// Creates a new Integer from natural value and sign.
@@ -262,12 +269,6 @@ impl Neg for Integer {
             value: self.value,
             sign: -self.sign,
         }
-    }
-}
-
-impl Signed for Integer {
-    fn sign(&self) -> Sign {
-        self.sign
     }
 }
 

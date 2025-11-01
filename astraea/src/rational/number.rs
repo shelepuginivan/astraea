@@ -6,7 +6,7 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
-use crate::math::{Field, MathObject, Ring, SemiRing, Sign, Signed};
+use crate::math::{Field, MathObject, Ring, SemiRing, Sign};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -43,7 +43,13 @@ impl SemiRing for RationalNumber {
         }
     }
 }
-impl Ring for RationalNumber {}
+
+impl Ring for RationalNumber {
+    fn sign(&self) -> Sign {
+        self.numerator.sign()
+    }
+}
+
 impl Field for RationalNumber {}
 
 impl RationalNumber {
@@ -283,12 +289,6 @@ impl Mul for RationalNumber {
             denominator: self.denominator * rhs.denominator,
         }
         .reduce()
-    }
-}
-
-impl Signed for RationalNumber {
-    fn sign(&self) -> Sign {
-        self.numerator.sign()
     }
 }
 

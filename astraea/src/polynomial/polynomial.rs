@@ -7,7 +7,7 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
-use crate::math::{EuclideanRing, Field, MathObject, Ring, SemiRing, Sign, Signed};
+use crate::math::{EuclideanRing, Field, MathObject, Ring, SemiRing, Sign};
 use crate::natural::NaturalNumber;
 use crate::polynomial::monomial::Monomial;
 use crate::rational::RationalNumber;
@@ -333,7 +333,6 @@ impl<T: Field> Polynomial<T> {
 
 impl<T: Field> MathObject for Polynomial<T> {}
 impl<T: Field> EuclideanRing for Polynomial<T> {}
-impl<T: Field> Ring for Polynomial<T> {}
 impl<T: Field> SemiRing for Polynomial<T> {
     fn zero() -> Self {
         Self {
@@ -356,7 +355,7 @@ impl<T: Field> SemiRing for Polynomial<T> {
     }
 }
 
-impl<T: Field> Signed for Polynomial<T> {
+impl<T: Field> Ring for Polynomial<T> {
     fn sign(&self) -> Sign {
         self.leading_coefficient().sign()
     }
