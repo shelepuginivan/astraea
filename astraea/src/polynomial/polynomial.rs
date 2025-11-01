@@ -440,7 +440,7 @@ impl<T: Field> Rem for Polynomial<T> {
     }
 }
 
-impl<T: Field> Display for Polynomial<T> {
+impl<T: Field + Display> Display for Polynomial<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut is_first_coefficient = true;
 

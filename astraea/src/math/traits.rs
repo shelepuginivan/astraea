@@ -1,12 +1,12 @@
 use std::{
-    fmt::{Debug, Display},
+    fmt::Debug,
     ops::{Add, Div, Mul, Neg, Rem, Sub},
     str::FromStr,
 };
 
 use crate::{error::ValueError, math::Sign};
 
-pub trait MathSet: Sized + Clone + FromStr<Err: Debug> + Display {}
+pub trait MathSet: Sized + Clone + FromStr<Err: Debug> {}
 
 /// Ring represents an algebraic ring structure.
 ///
