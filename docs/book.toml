@@ -7,3 +7,10 @@ title = "astraea"
 [output.html]
 default-theme = "ayu"
 mathjax-support = true
+smart-punctuation = true
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+
+[preprocessor]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
