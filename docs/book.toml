@@ -1,0 +1,9 @@
+[book]
+authors = ["Ivan Shelepugin <shelepuginivanm@gmail.com>"]
+language = "en"
+src = "src"
+title = "astraea"
+
+[output.html]
+default-theme = "ayu"
+mathjax-support = true
