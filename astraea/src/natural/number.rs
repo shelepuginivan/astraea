@@ -6,7 +6,10 @@ use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::math::{Digit, EuclideanRing, MathObject, SemiRing};
+use crate::math::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, Digit, Distributive, IntegerDivision,
+    MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, Semiring,
+};
 
 /// Represents a natural number.
 #[derive(Clone, Debug)]
@@ -16,16 +19,14 @@ pub struct NaturalNumber {
 }
 
 impl MathObject for NaturalNumber {}
-impl SemiRing for NaturalNumber {
+
+impl AddClosed for NaturalNumber {}
+impl AddAssociative<Self> for NaturalNumber {}
+
+impl AddIdentity<Self> for NaturalNumber {
     fn zero() -> Self {
         Self {
             digits: vec![Digit::Zero],
-        }
-    }
-
-    fn one() -> Self {
-        Self {
-            digits: vec![Digit::One],
         }
     }
 
@@ -36,12 +37,56 @@ impl SemiRing for NaturalNumber {
 
         self.digits.len() == 0 || self.digits[0] == Digit::Zero
     }
+}
+
+impl AddCommutative<Self> for NaturalNumber {}
+
+impl MulClosed for NaturalNumber {}
+
+impl MulAssociative<Self> for NaturalNumber {}
+
+impl MulIdentity<Self> for NaturalNumber {
+    fn one() -> Self {
+        Self {
+            digits: vec![Digit::One],
+        }
+    }
 
     fn is_one(&self) -> bool {
         self.digits.len() == 1 && self.digits[0] == Digit::One
     }
 }
-impl EuclideanRing for NaturalNumber {}
+
+impl MulCommutative<Self> for NaturalNumber {}
+
+impl Distributive for NaturalNumber {}
+
+impl Semiring for NaturalNumber {}
+
+impl IntegerDivision for NaturalNumber {
+    fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {
+        if rhs.is_zero() {
+            return Err(ValueError::new("division by 0 is not allowed"));
+        }
+
+        let mut quotient = Self::zero();
+        let mut remainder = Self::zero();
+
+        for i in 0..self.len() {
+            remainder = remainder.append(self[i]);
+
+            let mut q_digit = 0;
+            while remainder >= rhs {
+                remainder = (remainder - rhs.clone())?;
+                q_digit += 1;
+            }
+
+            quotient = quotient.append(Digit::try_from(q_digit).unwrap());
+        }
+
+        Ok((quotient, remainder))
+    }
+}
 
 impl NaturalNumber {
     /// Creates a NaturalNumber from digits in direct order.
@@ -207,48 +252,10 @@ impl NaturalNumber {
         Self::from_reversed(digits)
     }
 
-    /// Divides number by rhs, returning the quotient and the remainder. Error is returned if and
-    /// only if rhs is zero.
-    ///
-    /// ```
-    /// use astraea::natural::NaturalNumber;
-    ///
-    /// let lhs = NaturalNumber::from(21u8);
-    /// let rhs = NaturalNumber::from(8u8);
-    ///
-    /// // 21 = 8 * 2 + 5
-    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
-    ///
-    /// assert_eq!(quotient, NaturalNumber::from(2u8));
-    /// assert_eq!(remainder, NaturalNumber::from(5u8));
-    /// ```
-    pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
-        if rhs.is_zero() {
-            return Err(ValueError::new("division by 0 is not allowed"));
-        }
-
-        let mut quotient = Self::zero();
-        let mut remainder = Self::zero();
-
-        for i in 0..self.len() {
-            remainder = remainder.append(self[i]);
-
-            let mut q_digit = 0;
-            while remainder >= rhs {
-                remainder = (remainder - rhs.clone())?;
-                q_digit += 1;
-            }
-
-            quotient = quotient.append(Digit::try_from(q_digit).unwrap());
-        }
-
-        Ok((quotient, remainder))
-    }
-
     /// Calculates GCD (greatest common divisor) of two natural numbers.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::prelude::*;
     ///
     /// let a = NaturalNumber::from(12u8);
     /// let b = NaturalNumber::from(18u8);
@@ -260,8 +267,7 @@ impl NaturalNumber {
     /// If either of two numbers is zero, the other is returned:
     ///
     /// ```
-    /// use astraea::math::SemiRing;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::prelude::*;
     /// use std::str::FromStr;
     ///
     /// let a = NaturalNumber::zero();
@@ -295,7 +301,8 @@ impl NaturalNumber {
     /// Calculates LCM (least common multiple) of two natural numbers.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::prelude::*;
+    /// use std::str::FromStr;
     ///
     /// let a = NaturalNumber::from(12u8);
     /// let b = NaturalNumber::from(18u8);
@@ -307,8 +314,7 @@ impl NaturalNumber {
     /// If either of two numbers is zero, zero is returned:
     ///
     /// ```
-    /// use astraea::math::SemiRing;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::prelude::*;
     ///
     /// let a = NaturalNumber::from(12u8);
     /// let b = NaturalNumber::zero();
@@ -482,7 +488,7 @@ impl Div for NaturalNumber {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
-        self.divide(rhs).and_then(|res| Ok(res.0))
+        self.div_rem(rhs).and_then(|res| Ok(res.0))
     }
 }
 
@@ -490,7 +496,7 @@ impl Rem for NaturalNumber {
     type Output = Result<Self, ValueError>;
 
     fn rem(self, rhs: Self) -> Self::Output {
-        self.divide(rhs).and_then(|res| Ok(res.1))
+        self.div_rem(rhs).and_then(|res| Ok(res.1))
     }
 }
 

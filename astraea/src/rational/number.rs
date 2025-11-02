@@ -6,7 +6,11 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
-use crate::math::{Field, MathObject, Ring, SemiRing, Sign};
+use crate::math::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
+    MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, MulInversion,
+    NoZeroDivisors, Sign, Signed,
+};
 use crate::natural::NaturalNumber;
 
 /// Represents a rational number.
@@ -17,7 +21,12 @@ pub struct RationalNumber {
 }
 
 impl MathObject for RationalNumber {}
-impl SemiRing for RationalNumber {
+
+impl AddClosed for RationalNumber {}
+
+impl AddAssociative<Self> for RationalNumber {}
+
+impl AddIdentity<Self> for RationalNumber {
     fn zero() -> Self {
         Self {
             numerator: Integer::zero(),
@@ -25,15 +34,31 @@ impl SemiRing for RationalNumber {
         }
     }
 
+    fn is_zero(&self) -> bool {
+        self.numerator.is_zero()
+    }
+}
+
+impl AddInversion<Self> for RationalNumber {}
+
+impl AddCommutative<Self> for RationalNumber {}
+
+impl Signed for RationalNumber {
+    fn sign(&self) -> Sign {
+        self.numerator.sign()
+    }
+}
+
+impl MulClosed for RationalNumber {}
+
+impl MulAssociative<Self> for RationalNumber {}
+
+impl MulIdentity<Self> for RationalNumber {
     fn one() -> Self {
         Self {
             numerator: Integer::one(),
             denominator: NaturalNumber::one(),
         }
-    }
-
-    fn is_zero(&self) -> bool {
-        self.numerator.is_zero()
     }
 
     fn is_one(&self) -> bool {
@@ -44,11 +69,29 @@ impl SemiRing for RationalNumber {
     }
 }
 
-impl Ring for RationalNumber {
-    fn sign(&self) -> Sign {
-        self.numerator.sign()
+impl MulInversion<Self> for RationalNumber {
+    fn inverse(self) -> Result<Self, ValueError> {
+        let Self {
+            numerator,
+            denominator,
+        } = self;
+
+        if numerator.is_zero() {
+            return Err(ValueError::new("cannot invert zero element"));
+        }
+
+        let new_numerator = Integer::from_natural(denominator).with_sign(numerator.sign());
+        let new_denominator = numerator.abs().to_natural().unwrap();
+
+        Self::new(new_numerator, new_denominator)
     }
 }
+
+impl MulCommutative<Self> for RationalNumber {}
+
+impl Distributive for RationalNumber {}
+
+impl NoZeroDivisors for RationalNumber {}
 
 impl Field for RationalNumber {}
 
@@ -69,9 +112,7 @@ impl RationalNumber {
     /// Converts integer to rational number with denominator set to 1.
     ///
     /// ```
-    /// use astraea::integer::Integer;
-    /// use astraea::math::{Ring, SemiRing};
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::prelude::*;
     ///
     /// let i = Integer::from(1_000_000);
     /// let r = RationalNumber::from_integer(i);

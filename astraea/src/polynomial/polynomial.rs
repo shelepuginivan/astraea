@@ -7,7 +7,11 @@ use std::str::FromStr;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
-use crate::math::{EuclideanRing, Field, MathObject, Ring, SemiRing, Sign};
+use crate::math::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
+    IntegerDivision, MathObject, MulAssociative, MulClosed, MulIdentity, Ring, Semiring, Sign,
+    Signed,
+};
 use crate::natural::NaturalNumber;
 use crate::polynomial::monomial::Monomial;
 use crate::rational::RationalNumber;
@@ -16,6 +20,68 @@ use crate::rational::RationalNumber;
 pub struct Polynomial<T: Field> {
     coefficients: Vec<T>,
 }
+
+impl<T: Field> MathObject for Polynomial<T> {}
+
+impl<T: Field> AddClosed for Polynomial<T> {}
+
+impl<T: Field> AddAssociative<Self> for Polynomial<T> {}
+
+impl<T: Field> AddIdentity<Self> for Polynomial<T> {
+    fn zero() -> Self {
+        Self {
+            coefficients: vec![T::zero()],
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.degree() == 0 && self.coefficients[0].is_zero()
+    }
+}
+
+impl<T: Field> AddInversion<Self> for Polynomial<T> {}
+
+impl<T: Field> AddCommutative<Self> for Polynomial<T> {}
+
+impl<T: Field> MulClosed for Polynomial<T> {}
+
+impl<T: Field> MulAssociative<Self> for Polynomial<T> {}
+
+impl<T: Field> MulIdentity<Self> for Polynomial<T> {
+    fn one() -> Self {
+        Self {
+            coefficients: vec![T::one()],
+        }
+    }
+
+    fn is_one(&self) -> bool {
+        self.degree() == 0 && self.coefficients[0].is_one()
+    }
+}
+
+impl<T: Field> Distributive for Polynomial<T> {}
+
+impl<T: Field> Semiring for Polynomial<T> {}
+
+impl<T: Field> IntegerDivision for Polynomial<T> {
+    fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {
+        let mut quotient = Self::zero();
+        let mut remainder = self.clone();
+
+        while remainder.degree() >= rhs.degree() && !remainder.is_zero() {
+            let coeff = (remainder.leading_coefficient() / rhs.leading_coefficient())?;
+            let degree = remainder.degree() - rhs.degree();
+            let t = Polynomial::new(vec![coeff]).times_pow_x(degree);
+
+            quotient = quotient + t.clone();
+            remainder = remainder - t * rhs.clone();
+        }
+
+        Ok((quotient.normalize(), remainder.normalize()))
+    }
+}
+
+impl<T: Field> Ring for Polynomial<T> {}
 
 impl<T: Field> Polynomial<T> {
     /// Keeps the invariant of the polynomial - its leading coefficient must not be zero, unless
@@ -88,7 +154,9 @@ impl<T: Field> Polynomial<T> {
                     let monomial_str: String = monomial_chars.iter().collect();
                     let mut monomial = Monomial::<T>::from_str(monomial_str.as_str())?;
                     polynomial_degree = polynomial_degree.max(monomial.exponent);
-                    monomial.coefficient = monomial.coefficient.with_sign(next_sign);
+                    if next_sign == Sign::Negative {
+                        monomial.coefficient = -monomial.coefficient;
+                    }
                     monomials.push_back(monomial);
                     next_sign = Sign::from_char(chars[cursor])?;
                     monomial_chars.clear();
@@ -105,7 +173,9 @@ impl<T: Field> Polynomial<T> {
         let monomial_str: String = monomial_chars.iter().collect();
         let mut monomial = Monomial::<T>::from_str(monomial_str.as_str())?;
         polynomial_degree = polynomial_degree.max(monomial.exponent);
-        monomial.coefficient = monomial.coefficient.with_sign(next_sign);
+        if next_sign == Sign::Negative {
+            monomial.coefficient = -monomial.coefficient;
+        }
         monomials.push_back(monomial);
 
         let mut coefficients = vec![T::zero(); polynomial_degree + 1];
@@ -173,41 +243,6 @@ impl<T: Field> Polynomial<T> {
         Self {
             coefficients: [vec![T::zero(); k], self.coefficients].concat(),
         }
-    }
-
-    /// Divides polynomial by rhs, returning the quotient and the remainder. Error is returned if
-    /// and only if rhs is zero.
-    ///
-    /// ```
-    /// use astraea::formatting::Pretty;
-    /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
-    /// use std::str::FromStr;
-    ///
-    /// let lhs = Polynomial::<RationalNumber>::from_str("x³ - 6x² + 11x - 6").unwrap();
-    /// let rhs = Polynomial::<RationalNumber>::from_str("x² - 2x + 1").unwrap();
-    ///
-    /// // lhs is (x - 1)(x - 2)(x - 3)
-    /// // rhs is (x - 1)²
-    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
-    ///
-    /// assert_eq!(quotient.prettify(), "x - 4");
-    /// assert_eq!(remainder.prettify(), "2x - 2");
-    /// ```
-    pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
-        let mut quotient = Self::zero();
-        let mut remainder = self.clone();
-
-        while remainder.degree() >= rhs.degree() && !remainder.is_zero() {
-            let coeff = (remainder.leading_coefficient() / rhs.leading_coefficient())?;
-            let degree = remainder.degree() - rhs.degree();
-            let t = Polynomial::new(vec![coeff]).times_pow_x(degree);
-
-            quotient = quotient + t.clone();
-            remainder = remainder - t * rhs.clone();
-        }
-
-        Ok((quotient.normalize(), remainder.normalize()))
     }
 
     /// Derivative of the polynomial.
@@ -331,36 +366,6 @@ impl<T: Field> Polynomial<T> {
     }
 }
 
-impl<T: Field> MathObject for Polynomial<T> {}
-impl<T: Field> EuclideanRing for Polynomial<T> {}
-impl<T: Field> SemiRing for Polynomial<T> {
-    fn zero() -> Self {
-        Self {
-            coefficients: vec![T::zero()],
-        }
-    }
-
-    fn one() -> Self {
-        Self {
-            coefficients: vec![T::one()],
-        }
-    }
-
-    fn is_zero(&self) -> bool {
-        self.degree() == 0 && self.coefficients[0].is_zero()
-    }
-
-    fn is_one(&self) -> bool {
-        self.degree() == 0 && self.coefficients[0].is_one()
-    }
-}
-
-impl<T: Field> Ring for Polynomial<T> {
-    fn sign(&self) -> Sign {
-        self.leading_coefficient().sign()
-    }
-}
-
 impl<T: Field> Neg for Polynomial<T> {
     type Output = Self;
 
@@ -434,7 +439,7 @@ impl<T: Field> Div for Polynomial<T> {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
-        Ok(self.divide(rhs)?.0)
+        Ok(self.div_rem(rhs)?.0)
     }
 }
 
@@ -442,11 +447,11 @@ impl<T: Field> Rem for Polynomial<T> {
     type Output = Result<Self, ValueError>;
 
     fn rem(self, rhs: Self) -> Self::Output {
-        Ok(self.divide(rhs)?.1)
+        Ok(self.div_rem(rhs)?.1)
     }
 }
 
-impl<T: Field + Display> Display for Polynomial<T> {
+impl<T: Field + Display + Signed> Display for Polynomial<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut is_first_coefficient = true;
 
@@ -475,7 +480,7 @@ impl<T: Field + Display> Display for Polynomial<T> {
     }
 }
 
-impl<T: Field + Pretty> Pretty for Polynomial<T> {
+impl<T: Field + Pretty + Signed> Pretty for Polynomial<T> {
     fn prettify(&self) -> String {
         if self.is_zero() {
             return "0".to_string();
@@ -802,7 +807,7 @@ mod tests {
             let lhs = Polynomial::new(lhs);
             let rhs = Polynomial::new(rhs);
 
-            let (actual_quotient, actual_remainder) = lhs.divide(rhs).expect("should divide");
+            let (actual_quotient, actual_remainder) = lhs.div_rem(rhs).expect("should divide");
             let actual_quotient = actual_quotient.as_coefficients();
             let actual_remainder = actual_remainder.as_coefficients();
 

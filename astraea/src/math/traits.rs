@@ -11,44 +11,53 @@ use crate::math::Sign;
 /// and parsing capabilities.
 pub trait MathObject: Sized + Clone + FromStr<Err: Debug> {}
 
-/// A Semiring is an algebraic structure consisting of a set equipped with two binary operations:
-/// addition and multiplication, where addition is associative and commutative with an identity element,
-/// multiplication is associative with an identity element, and multiplication distributes over addition.
-///
-/// Unlike rings, semirings do not require additive inverses.
-pub trait SemiRing: MathObject + Add<Output = Self> + Mul<Output = Self> {
+pub trait AddClosed: MathObject + Add<Output = Self> {}
+
+pub trait AddAssociative<T>: MathObject + Add<Output = T> {}
+
+pub trait AddIdentity<T>: MathObject + Add<Output = T> {
     /// Returns the additive identity.
     fn zero() -> Self;
 
-    /// Returns the multiplicative identity.
-    fn one() -> Self;
-
     /// Reports whether the element is an additive identity.
     fn is_zero(&self) -> bool;
+}
+
+pub trait AddInversion<T>:
+    MathObject + Add<Output = T> + Sub<Output = T> + Neg<Output = Self>
+{
+}
+
+pub trait AddCommutative<T>: MathObject + Add<Output = T> {}
+
+pub trait MulClosed: MathObject + Mul<Output = Self> {}
+
+pub trait MulAssociative<T>: MathObject + Mul<T> {}
+
+pub trait MulIdentity<T>: MathObject + Mul<T> {
+    /// Returns the multiplicative identity.
+    fn one() -> Self;
 
     /// Reports whether the element is a multiplicative identity.
     fn is_one(&self) -> bool;
 }
 
-/// EuclideanRing is a semiring ring that can be endowed with a Euclidean function.
-///
-/// Supports integer division and remainder operations.
-///
-/// This trait generalizes the classical notion of Euclidean rings (which are integral domains) to
-/// include structures such as semirings (e.g., the natural numbers with 0) that may lack additive
-/// inverses but still support a division-with-remainder property.
-pub trait EuclideanRing:
-    SemiRing + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
-{
+pub trait MulInversion<T>: MathObject + Mul<T> + Div<Output = Result<T, ValueError>> {
+    fn inverse(self) -> Result<Self, ValueError>;
 }
 
-/// Ring represents an algebraic ring structure.
-///
-/// A ring is a set equipped with two binary operations: addition and multiplication,
-/// satisfying properties such as associativity, distributivity, and the existence of
-/// additive and multiplicative identities.
-pub trait Ring: Neg<Output = Self> + SemiRing + Sub {
+pub trait MulCommutative<T>: MathObject + Mul<T> {}
+
+pub trait Distributive: MathObject {}
+
+pub trait NoZeroDivisors: MathObject {}
+
+pub trait Signed: MathObject + AddIdentity<Self> + AddInversion<Self> {
     fn sign(&self) -> Sign;
+
+    fn opposite(self) -> Self {
+        -self
+    }
 
     fn is_positive(&self) -> bool {
         self.sign() == Sign::Positive
@@ -75,16 +84,78 @@ pub trait Ring: Neg<Output = Self> + SemiRing + Sub {
     }
 }
 
-/// A Field is an algebraic structure in which addition, subtraction, multiplication,
-/// and division (except by zero) are defined and satisfy the usual properties.
-pub trait Field: Ring + Div<Output = Result<Self, ValueError>> {}
+/// A Semiring is an algebraic structure consisting of a set equipped with two binary operations:
+/// addition and multiplication, where addition is associative and commutative with an identity element,
+/// multiplication is associative with an identity element, and multiplication distributes over addition.
+///
+/// Unlike rings, semirings do not require additive inverses.
+pub trait Semiring:
+    AddClosed
+    + AddAssociative<Self>
+    + AddIdentity<Self>
+    + AddCommutative<Self>
+    + MulClosed
+    + MulAssociative<Self>
+    + Distributive
+{
+}
+
+pub trait IntegerDivision:
+    Semiring + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
+{
+    fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError>;
+}
+
+pub trait Rng:
+    AddClosed
+    + AddAssociative<Self>
+    + AddIdentity<Self>
+    + AddInversion<Self>
+    + AddCommutative<Self>
+    + MulClosed
+    + MulAssociative<Self>
+    + Distributive
+{
+}
+
+/// A Ring is an algebraic structure in which addition (subtraction) and multiplication are defined
+/// and satisfy the ring axioms.
+pub trait Ring:
+    AddClosed
+    + AddAssociative<Self>
+    + AddIdentity<Self>
+    + AddInversion<Self>
+    + AddCommutative<Self>
+    + MulClosed
+    + MulAssociative<Self>
+    + MulIdentity<Self>
+    + Distributive
+{
+}
+
+/// A Field is an algebraic structure in which addition (subtraction), multiplication,
+/// and division (except by zero) are defined and satisfy the field axioms.
+pub trait Field:
+    AddClosed
+    + AddAssociative<Self>
+    + AddIdentity<Self>
+    + AddInversion<Self>
+    + AddCommutative<Self>
+    + MulClosed
+    + MulAssociative<Self>
+    + MulIdentity<Self>
+    + MulInversion<Self>
+    + MulCommutative<Self>
+    + Distributive
+{
+}
 
 /// Pow provides the exponentiation operation.
 pub trait Pow {
     fn pow(self, power: usize) -> Self;
 }
 
-impl<T: Ring> Pow for T {
+impl<T: Ring + MulIdentity<Self> + MulCommutative<Self>> Pow for T {
     fn pow(self, power: usize) -> Self {
         let mut a = self;
         let mut res = Self::one();

@@ -5,7 +5,11 @@ use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::math::{EuclideanRing, MathObject, Ring, SemiRing, Sign};
+use crate::math::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive,
+    IntegerDivision, MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, Semiring,
+    Sign, Signed,
+};
 use crate::natural::NaturalNumber;
 
 // Represents an integer.
@@ -16,9 +20,12 @@ pub struct Integer {
 }
 
 impl MathObject for Integer {}
-impl EuclideanRing for Integer {}
 
-impl SemiRing for Integer {
+impl AddClosed for Integer {}
+
+impl AddAssociative<Self> for Integer {}
+
+impl AddIdentity<Self> for Integer {
     fn zero() -> Self {
         Self {
             value: NaturalNumber::zero(),
@@ -26,6 +33,26 @@ impl SemiRing for Integer {
         }
     }
 
+    fn is_zero(&self) -> bool {
+        self.value.is_zero() || self.sign == Sign::Zero
+    }
+}
+
+impl AddInversion<Self> for Integer {}
+
+impl AddCommutative<Self> for Integer {}
+
+impl Signed for Integer {
+    fn sign(&self) -> Sign {
+        self.sign
+    }
+}
+
+impl MulClosed for Integer {}
+
+impl MulAssociative<Self> for Integer {}
+
+impl MulIdentity<Self> for Integer {
     fn one() -> Self {
         Self {
             value: NaturalNumber::one(),
@@ -33,21 +60,47 @@ impl SemiRing for Integer {
         }
     }
 
-    fn is_zero(&self) -> bool {
-        self.value.is_zero() || self.sign == Sign::Zero
-    }
-
     fn is_one(&self) -> bool {
         self.value.is_one()
     }
 }
 
-impl Ring for Integer {
-    fn sign(&self) -> Sign {
-        self.sign
+impl MulCommutative<Self> for Integer {}
+
+impl Distributive for Integer {}
+
+impl Semiring for Integer {}
+
+impl IntegerDivision for Integer {
+    fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {
+        if rhs.is_zero() {
+            return Err(ValueError::new("division by 0 is not allowed"));
+        }
+
+        if rhs.value > self.value {
+            return Ok((Self::zero(), self));
+        }
+
+        let res_sign = self.sign * rhs.sign;
+        let (quotient, remainder) = self.value.div_rem(rhs.value).unwrap();
+
+        let quotient = Self {
+            value: quotient,
+            sign: res_sign,
+        };
+
+        let remainder = if remainder.is_zero() {
+            Self::zero()
+        } else {
+            Self {
+                value: remainder,
+                sign: self.sign,
+            }
+        };
+
+        Ok((quotient, remainder))
     }
 }
-
 
 impl Integer {
     /// Creates a new Integer from natural value and sign.
@@ -95,63 +148,6 @@ impl Integer {
         }
     }
 
-    /// Divides number by rhs, returning the quotient and the remainder. Error is returned if and
-    /// only if rhs is zero.
-    ///
-    /// ```
-    /// use astraea::integer::Integer;
-    ///
-    /// let lhs = Integer::from(100);
-    /// let rhs = Integer::from(3);
-    ///
-    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
-    ///
-    /// assert_eq!(quotient, Integer::from(33));
-    /// assert_eq!(remainder, Integer::from(1));
-    /// ```
-    ///
-    /// The sign of the remainder is the same as the sign of the original number:
-    ///
-    /// ```
-    /// use astraea::integer::Integer;
-    ///
-    /// let lhs = Integer::from(-100);
-    /// let rhs = Integer::from(3);
-    ///
-    /// let (quotient, remainder) = lhs.divide(rhs).unwrap();
-    ///
-    /// assert_eq!(quotient, Integer::from(-33));
-    /// assert_eq!(remainder, Integer::from(-1));
-    /// ```
-    pub fn divide(self, rhs: Self) -> Result<(Self, Self), ValueError> {
-        if rhs.is_zero() {
-            return Err(ValueError::new("division by 0 is not allowed"));
-        }
-
-        if rhs.value > self.value {
-            return Ok((Self::zero(), self));
-        }
-
-        let res_sign = self.sign * rhs.sign;
-        let (quotient, remainder) = self.value.divide(rhs.value).unwrap();
-
-        let quotient = Self {
-            value: quotient,
-            sign: res_sign,
-        };
-
-        let remainder = if remainder.is_zero() {
-            Self::zero()
-        } else {
-            Self {
-                value: remainder,
-                sign: self.sign,
-            }
-        };
-
-        Ok((quotient, remainder))
-    }
-
     /// Calculates GCD (greatest common divisor) of two integers. The returned value is a
     /// non-negative integer.
     ///
@@ -176,6 +172,7 @@ impl Integer {
     /// non-negative integer.
     ///
     /// ```
+    /// use astraea::prelude::*;
     /// use astraea::integer::Integer;
     ///
     /// let a = Integer::from(-6);
@@ -249,7 +246,7 @@ impl Div for Integer {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
-        Ok(self.divide(rhs)?.0)
+        Ok(self.div_rem(rhs)?.0)
     }
 }
 
@@ -257,7 +254,7 @@ impl Rem for Integer {
     type Output = Result<Self, ValueError>;
 
     fn rem(self, rhs: Self) -> Self::Output {
-        Ok(self.divide(rhs)?.1)
+        Ok(self.div_rem(rhs)?.1)
     }
 }
 

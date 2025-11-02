@@ -7,8 +7,7 @@
 //! ```
 //! use std::str::FromStr;
 //!
-//! use astraea::math::SemiRing;
-//! use astraea::natural::NaturalNumber;
+//! use astraea::prelude::*;
 //!
 //! let a = NaturalNumber::from_str(&"9".repeat(1_000_000)).unwrap();
 //! let b = NaturalNumber::one();
@@ -23,7 +22,7 @@
 //! ## Integers
 //!
 //! ```
-//! use astraea::integer::Integer;
+//! use astraea::prelude::*;
 //!
 //! let a = Integer::from(2_u64.pow(60));
 //! let b = Integer::from(2_u128.pow(120));
@@ -40,9 +39,7 @@
 //! ```
 //! use std::str::FromStr;
 //!
-//! use astraea::formatting::Pretty;
-//! use astraea::math::Ring;
-//! use astraea::rational::RationalNumber;
+//! use astraea::prelude::*;
 //!
 //! let a = RationalNumber::from_str("1111111111111111/6666666666666666").unwrap();
 //! let b = RationalNumber::from_str("1111111111111111/3333333333333333").unwrap();
@@ -60,8 +57,7 @@
 //! ```
 //! use std::str::FromStr;
 //!
-//! use astraea::polynomial::Polynomial;
-//! use astraea::rational::RationalNumber;
+//! use astraea::prelude::*;
 //!
 //! let lhs = Polynomial::<RationalNumber>::from_str("x^100 + 1").unwrap();
 //! let rhs = Polynomial::<RationalNumber>::from_str("100x + 1").unwrap();
@@ -79,4 +75,5 @@ pub mod integer;
 pub mod math;
 pub mod natural;
 pub mod polynomial;
+pub mod prelude;
 pub mod rational;

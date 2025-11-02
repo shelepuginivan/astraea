@@ -1,6 +1,6 @@
 use astraea::formatting::Pretty;
 use astraea::integer::Integer;
-use astraea::math::Ring;
+use astraea::math::Signed;
 use astraea::natural::NaturalNumber;
 use std::collections::HashSet;
 
