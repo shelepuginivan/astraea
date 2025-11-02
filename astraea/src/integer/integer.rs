@@ -3,14 +3,15 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::error::{ParseError, ValueError};
-use crate::formatting::Pretty;
-use crate::math::{
+use crate::algebra::{
     AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive,
     IntegerDivision, MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, Semiring,
-    Sign, Signed,
+    Signed,
 };
+use crate::error::{ParseError, ValueError};
+use crate::formatting::Pretty;
 use crate::natural::NaturalNumber;
+use crate::sign::Sign;
 
 // Represents an integer.
 #[derive(Clone, Debug)]

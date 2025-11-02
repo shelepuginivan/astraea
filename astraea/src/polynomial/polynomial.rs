@@ -4,17 +4,17 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
+use crate::algebra::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
+    IntegerDivision, MathObject, MulAssociative, MulClosed, MulIdentity, Ring, Semiring, Signed,
+};
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
-use crate::math::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
-    IntegerDivision, MathObject, MulAssociative, MulClosed, MulIdentity, Ring, Semiring, Sign,
-    Signed,
-};
 use crate::natural::NaturalNumber;
 use crate::polynomial::monomial::Monomial;
 use crate::rational::RationalNumber;
+use crate::sign::Sign;
 
 #[derive(Clone)]
 pub struct Polynomial<T: Field> {

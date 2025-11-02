@@ -4,12 +4,13 @@ use std::iter;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Rem, Sub};
 use std::str::FromStr;
 
-use crate::error::{ParseError, ValueError};
-use crate::formatting::Pretty;
-use crate::math::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, Digit, Distributive, IntegerDivision,
+use crate::algebra::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, Distributive, IntegerDivision,
     MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, Semiring,
 };
+use crate::digit::Digit;
+use crate::error::{ParseError, ValueError};
+use crate::formatting::Pretty;
 
 /// Represents a natural number.
 #[derive(Clone, Debug)]
@@ -92,7 +93,7 @@ impl NaturalNumber {
     /// Creates a NaturalNumber from digits in direct order.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     /// use astraea::natural::NaturalNumber;
     ///
     /// let digits = vec![Digit::Nine; 999];
@@ -137,7 +138,7 @@ impl NaturalNumber {
     /// Returns digit by index, starting from 0 for the least significant digit of the number.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     /// use astraea::natural::NaturalNumber;
     ///
     /// let n = NaturalNumber::from(1234u16);
@@ -151,7 +152,7 @@ impl NaturalNumber {
     /// Returns digit by index, starting from 0 for the most significant digit of the number.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     /// use astraea::natural::NaturalNumber;
     ///
     /// let n = NaturalNumber::from(1234u16);
@@ -165,7 +166,7 @@ impl NaturalNumber {
     /// Appends digit to the number as least significant digit.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     /// use astraea::formatting::Pretty;
     /// use astraea::natural::NaturalNumber;
     /// use std::str::FromStr;
@@ -185,7 +186,7 @@ impl NaturalNumber {
     /// Returns digits of the number, in reverse order.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     /// use astraea::natural::NaturalNumber;
     ///
     /// let n = NaturalNumber::from(123u8);

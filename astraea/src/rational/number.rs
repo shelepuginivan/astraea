@@ -3,15 +3,16 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::str::FromStr;
 
+use crate::algebra::{
+    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
+    MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, MulInversion,
+    NoZeroDivisors, Signed,
+};
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
-use crate::math::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
-    MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, MulInversion,
-    NoZeroDivisors, Sign, Signed,
-};
 use crate::natural::NaturalNumber;
+use crate::sign::Sign;
 
 /// Represents a rational number.
 #[derive(Clone, Debug)]

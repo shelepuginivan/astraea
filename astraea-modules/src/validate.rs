@@ -1,4 +1,5 @@
-use astraea::math::{Digit, Field};
+use astraea::algebra::Field;
+use astraea::digit::Digit;
 use astraea::natural::NaturalNumber;
 use astraea::polynomial::Polynomial;
 use astraea::rational::RationalNumber;

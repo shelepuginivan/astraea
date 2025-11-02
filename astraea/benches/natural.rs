@@ -3,8 +3,7 @@ use criterion::Criterion;
 use criterion::Throughput;
 use criterion::{criterion_group, criterion_main};
 
-use astraea::digit;
-use astraea::math::Digit;
+use astraea::digit::Digit;
 use astraea::natural::NaturalNumber;
 
 pub fn natural_add(c: &mut Criterion) {
@@ -15,8 +14,8 @@ pub fn natural_add(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs + rhs
             });
@@ -33,8 +32,8 @@ pub fn natural_subtract(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs - rhs
             });
@@ -51,8 +50,8 @@ pub fn natural_mul(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs * rhs
             });
@@ -69,8 +68,8 @@ pub fn natural_div(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs / rhs
             });
@@ -87,8 +86,8 @@ pub fn natural_rem(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs / rhs
             });
@@ -105,8 +104,8 @@ pub fn natural_gcd(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs.gcd(rhs)
             });
@@ -123,8 +122,8 @@ pub fn natural_lcm(c: &mut Criterion) {
         group.sample_size(10);
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let lhs = NaturalNumber::new(vec![digit!(9); size]);
-                let rhs = NaturalNumber::new(vec![digit!(1); size]);
+                let lhs = NaturalNumber::new(vec![Digit::Nine; size]);
+                let rhs = NaturalNumber::new(vec![Digit::One; size]);
 
                 lhs.lcm(rhs)
             });

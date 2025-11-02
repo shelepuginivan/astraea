@@ -1,9 +1,9 @@
 use std::str::FromStr;
 use std::usize;
 
+use crate::algebra::Field;
 use crate::error::ParseError;
 use crate::formatting;
-use crate::math::Field;
 
 /// Monomial represents a single term of a polynomial, written as k &middot; x<sup>a</sup>, where k
 /// is a rational coefficient and a is an exponent of type usize.

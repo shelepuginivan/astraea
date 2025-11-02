@@ -36,7 +36,7 @@ impl Digit {
     /// Creates a new instance of Digit. Value must be a valid decimal digit, i.e. in range [0, 9].
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     ///
     /// let d = Digit::new(9).unwrap();
     /// assert_eq!(d, Digit::Nine);
@@ -79,7 +79,7 @@ impl Digit {
     /// Parses Digit from char.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     ///
     /// let d = Digit::from_char('7').unwrap();
     /// assert_eq!(d, Digit::Seven);
@@ -103,7 +103,7 @@ impl Digit {
     /// Char representation of the digit.
     ///
     /// ```
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     ///
     /// assert_eq!(Digit::Four.char(), '4');
     /// ```
@@ -131,7 +131,7 @@ impl Add for Digit {
     ///
     /// ```
     /// use astraea::digit;
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     ///
     /// let lhs = digit!(6);
     /// let rhs = digit!(7);
@@ -157,7 +157,7 @@ impl Sub for Digit {
     ///
     /// ```
     /// use astraea::digit;
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     ///
     /// let lhs = digit!(6);
     /// let rhs = digit!(9);
@@ -184,7 +184,7 @@ impl Mul for Digit {
     ///
     /// ```
     /// use astraea::digit;
-    /// use astraea::math::Digit;
+    /// use astraea::digit::Digit;
     ///
     /// let lhs = digit!(6);
     /// let rhs = digit!(7);

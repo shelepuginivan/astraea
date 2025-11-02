@@ -1,6 +1,7 @@
+use astraea::algebra::AddIdentity;
 use astraea::digit;
+use astraea::digit::Digit;
 use astraea::formatting::Pretty;
-use astraea::math::{AddIdentity, Digit};
 use astraea::natural::NaturalNumber;
 use std::collections::HashSet;
 

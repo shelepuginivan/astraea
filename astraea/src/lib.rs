@@ -69,11 +69,13 @@
 //! ```
 //!
 //! See: [`polynomial::Polynomial`].
+pub mod algebra;
+pub mod digit;
 pub mod error;
 pub mod formatting;
 pub mod integer;
-pub mod math;
 pub mod natural;
 pub mod polynomial;
 pub mod prelude;
 pub mod rational;
+pub mod sign;

@@ -3,7 +3,7 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::error::ValueError;
-use crate::math::Sign;
+use crate::sign::Sign;
 
 /// The base trait for all mathematical objects in the system.
 ///
