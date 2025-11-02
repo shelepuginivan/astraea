@@ -81,6 +81,7 @@ dependencies = [
 name = "astraea"
 version = "0.1.0"
 dependencies = [
+ "astraea-derive",
  "criterion",
  "rand",
 ]
@@ -93,6 +94,14 @@ dependencies = [
  "astraea",
  "astraea-modules",
  "clap",
+]
+
+[[package]]
+name = "astraea-derive"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]

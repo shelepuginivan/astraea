@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "astraea",
     "astraea-cli",
+    "astraea-derive",
     "astraea-modules",
 ]
 
@@ -17,4 +18,5 @@ keywords = ["astraea", "discrete-mathematics", "arbitrary-precision-arithmetic"]
 [workspace.dependencies]
 astraea = { path = "astraea" }
 astraea-cli = { path = "astraea-cli" }
+astraea-derive = { path = "astraea-derive" }
 astraea-modules = { path = "astraea-modules" }

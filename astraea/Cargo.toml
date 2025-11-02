@@ -7,6 +7,9 @@ repository = { workspace = true }
 categories = { workspace = true }
 keywords = { workspace = true }
 
+[dependencies]
+astraea-derive = { workspace = true, optional = true }
+
 [dev-dependencies]
 rand = "0.9.2"
 criterion = { version = "0.7.0", features = ["html_reports"] }
@@ -14,3 +17,6 @@ criterion = { version = "0.7.0", features = ["html_reports"] }
 [[bench]]
 name = "natural"
 harness = false
+
+[features]
+derive = ["dep:astraea-derive"]

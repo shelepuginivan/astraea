@@ -9,3 +9,6 @@ pub use object::*;
 pub use other::*;
 pub use properties::*;
 pub use ring_like::*;
+
+#[cfg(feature = "derive")]
+pub use astraea_derive::*;
