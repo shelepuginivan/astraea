@@ -1,6 +1,6 @@
 use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive,
-    MulAssociative, MulClosed, MulCommutative, MulWithIdentity, MulInvertible,
+    AddAssociative, AddClosed, AddCommutative, AddInvertible, AddWithIdentity, Distributive,
+    MulAssociative, MulClosed, MulCommutative, MulInvertible, MulWithIdentity,
 };
 
 /// Semiring is an algebraic structure, where
@@ -27,7 +27,7 @@ pub trait Semiring:
 /// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
 ///    commutative.
 /// 2. Multiplication is a **semigroup**: closed, associative.
-/// 3. Multiplication distributes over addition
+/// 3. Multiplication distributes over addition.
 ///
 /// Rng is a ring without multiplicative identity.
 pub trait Rng:
@@ -42,12 +42,12 @@ pub trait Rng:
 {
 }
 
-/// Rng is an algebraic structure, where
+/// Ring is an algebraic structure, where
 ///
 /// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
 ///    commutative.
 /// 2. Multiplication is a **monoid**: closed, associative, with identity.
-/// 3. Multiplication distributes over addition
+/// 3. Multiplication distributes over addition.
 pub trait Ring:
     AddClosed
     + AddAssociative<Self>
@@ -61,13 +61,35 @@ pub trait Ring:
 {
 }
 
+/// CommutativeRing is an algebraic structure, where
+///
+/// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
+///    commutative.
+/// 2. Multiplication is a **commutative monoid**: closed, associative, with identity, commutative.
+/// 3. Multiplication distributes over addition.
+///
+/// Commutative ring is a ring with commutative multiplication.
+pub trait CommutativeRing:
+    AddClosed
+    + AddAssociative<Self>
+    + AddWithIdentity<Self>
+    + AddInvertible<Self>
+    + AddCommutative<Self>
+    + MulClosed
+    + MulAssociative<Self>
+    + MulWithIdentity<Self>
+    + MulCommutative<Self>
+    + Distributive
+{
+}
+
 /// Field is an algebraic structure, where
 ///
 /// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
 ///    commutative.
 /// 2. Multiplication is an **abelian group**: closed, associative, with identity, invertible,
 ///    commutative.
-/// 3. Multiplication distributes over addition
+/// 3. Multiplication distributes over addition.
 pub trait Field:
     AddClosed
     + AddAssociative<Self>
