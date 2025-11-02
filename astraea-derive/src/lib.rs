@@ -4,6 +4,15 @@ use syn::{DeriveInput, parse_macro_input};
 
 extern crate proc_macro;
 
+/// Derive macro generating an impl of the `MathObject` trait.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`Sized`]
+/// - [`Clone`]
+/// - [`std::str::FromStr<Err: Debug>`]
 #[proc_macro_derive(MathObject)]
 pub fn derive_math_object(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -15,6 +24,23 @@ pub fn derive_math_object(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddMagma` trait.
+///
+/// Marks this type as a magma under addition, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddMagma`
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
 #[proc_macro_derive(AddMagma)]
 pub fn derive_add_magma(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -27,6 +53,27 @@ pub fn derive_add_magma(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddSemigroup` trait.
+///
+/// Marks this type as a semigroup under addition, generating implementations for the following
+/// traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
 #[proc_macro_derive(AddSemigroup)]
 pub fn derive_add_semigroup(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -41,6 +88,32 @@ pub fn derive_add_semigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddMonoid` trait.
+///
+/// Marks this type as a monoid under addition, generating implementations for the following
+/// traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
 #[proc_macro_derive(AddMonoid)]
 pub fn derive_add_monoid(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -56,6 +129,29 @@ pub fn derive_add_monoid(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddQuasigroup` trait.
+///
+/// Marks this type as a quasigroup under addition, generating implementations for the following
+/// traits:
+///
+/// - `AddClosed`
+/// - `AddInvertible<Self>`
+/// - `AddMagma`
+/// - `AddQuasigroup`
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = 0`.
 #[proc_macro_derive(AddQuasigroup)]
 pub fn derive_add_quasigroup(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -70,6 +166,33 @@ pub fn derive_add_quasigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddLoop` trait.
+///
+/// Marks this type as a loop under addition, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddInvertible<Self>`
+/// - `AddMagma`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = e`.
 #[proc_macro_derive(AddLoop)]
 pub fn derive_add_loop(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -85,6 +208,38 @@ pub fn derive_add_loop(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddGroup` trait.
+///
+/// Marks this type as a group under addition, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddInvertible<Self>`
+/// - `AddAssociative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+/// - `AddGroup`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = e`.
 #[proc_macro_derive(AddGroup)]
 pub fn derive_add_group(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -104,6 +259,42 @@ pub fn derive_add_group(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddAbelianGroup` trait.
+///
+/// Marks this type as an abelian group under addition, generating implementations for the
+/// following traits:
+///
+/// - `AddClosed`
+/// - `AddInvertible<Self>`
+/// - `AddAssociative<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+/// - `AddGroup`
+/// - `AddAbelianGroup`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = e`.
+/// - Commutative --- `a + b = b + a`.
 #[proc_macro_derive(AddAbelianGroup)]
 pub fn derive_add_abelian_group(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -125,6 +316,24 @@ pub fn derive_add_abelian_group(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulMagma` trait.
+///
+/// Marks this type as a magma under multiplication, generating implementations for the following
+/// traits:
+///
+/// - `MulClosed`
+/// - `MulMagma`
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
 #[proc_macro_derive(MulMagma)]
 pub fn derive_mul_magma(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -137,6 +346,27 @@ pub fn derive_mul_magma(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulSemigroup` trait.
+///
+/// Marks this type as a semigroup under multiplication, generating implementations for the
+/// following traits:
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
 #[proc_macro_derive(MulSemigroup)]
 pub fn derive_mul_semigroup(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -151,6 +381,32 @@ pub fn derive_mul_semigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulMonoid` trait.
+///
+/// Marks this type as a monoid under multiplication, generating implementations for the following
+/// traits:
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulMonoid`
+///
+/// `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - `MulWithIdentity<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
 #[proc_macro_derive(MulMonoid)]
 pub fn derive_mul_monoid(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -166,6 +422,30 @@ pub fn derive_mul_monoid(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulQuasigroup` trait.
+///
+/// Marks this type as a quasigroup under multiplication, generating implementations for the
+/// following traits:
+///
+/// - `MulClosed`
+/// - `MulMagma`
+/// - `MulQuasigroup`
+///
+/// `MulInvertible<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - [`std::ops::Div`]
+/// - `MulInvertible<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
 #[proc_macro_derive(MulQuasigroup)]
 pub fn derive_mul_quasigroup(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -179,6 +459,33 @@ pub fn derive_mul_quasigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulLoop` trait.
+///
+/// Marks this type as a loop under multiplication, generating implementations for the following
+/// traits:
+///
+/// - `MulClosed`
+/// - `MulMagma`
+/// - `MulQuasigroup`
+/// - `MulLoop`
+///
+/// `MulInvertible<Self>` and `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - [`std::ops::Div`]
+/// - `MulInvertible<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
 #[proc_macro_derive(MulLoop)]
 pub fn derive_mul_loop(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -193,6 +500,35 @@ pub fn derive_mul_loop(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulGroup` trait.
+///
+/// Marks this type as a group under multiplication, generating implementations for the following
+/// traits:
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulQuasigroup`
+/// - `MulLoop`
+///
+/// `MulInvertible<Self>` and `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - [`std::ops::Div`]
+/// - `MulInvertible<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
 #[proc_macro_derive(MulGroup)]
 pub fn derive_mul_group(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -211,6 +547,39 @@ pub fn derive_mul_group(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulAbelianGroup` trait.
+///
+/// Marks this type as an abelian group under multiplication, generating implementations for the
+/// following traits:
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulCommutative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulMonoid`
+/// - `MulQuasigroup`
+/// - `MulLoop`
+///
+/// `MulInvertible<Self>` and `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - [`std::ops::Div`]
+/// - `MulInvertible<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
+/// - Commutative --- `a * b = b * a`.
 #[proc_macro_derive(MulAbelianGroup)]
 pub fn derive_mul_abelian_group(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -231,6 +600,49 @@ pub fn derive_mul_abelian_group(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `Semiring` trait.
+///
+/// Marks this type as a semiring, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulMonoid`
+///
+/// - `Distributive`
+///
+/// `AddWithIdentity<Self>`, `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Mul`]
+/// - `AddWithIdentity<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Commutative --- `a + b = b + a`.
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
 #[proc_macro_derive(Semiring)]
 pub fn derive_semiring(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -256,6 +668,54 @@ pub fn derive_semiring(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `Rng` trait.
+///
+/// Marks this type as a rng, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddInvertible<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+/// - `AddGroup`
+/// - `AddAbelianGroup`
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+///
+/// - `Distributive`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - [`std::ops::Mul`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = 0`.
+/// - Commutative --- `a + b = b + a`.
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
 #[proc_macro_derive(Rng)]
 pub fn derive_rng(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -285,6 +745,57 @@ pub fn derive_rng(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `Ring` trait.
+///
+/// Marks this type as a ring, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddInvertible<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+/// - `AddGroup`
+/// - `AddAbelianGroup`
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulMonoid`
+///
+/// - `Distributive`
+///
+/// `AddWithIdentity<Self>`, `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - [`std::ops::Mul`]
+/// - `AddWithIdentity<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = 0`.
+/// - Commutative --- `a + b = b + a`.
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
 #[proc_macro_derive(Ring)]
 pub fn derive_ring(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -317,6 +828,59 @@ pub fn derive_ring(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `CommutativeRing` trait.
+///
+/// Marks this type as a commutative ring, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddInvertible<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+/// - `AddGroup`
+/// - `AddAbelianGroup`
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulCommutative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulMonoid`
+///
+/// - `Distributive`
+///
+/// `AddWithIdentity<Self>`, `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - [`std::ops::Mul`]
+/// - `AddWithIdentity<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = 0`.
+/// - Commutative --- `a + b = b + a`.
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+/// - Commutative --- `a * b = b * a`.
 #[proc_macro_derive(CommutativeRing)]
 pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
@@ -350,6 +914,65 @@ pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `Field` trait.
+///
+/// Marks this type as a field, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddInvertible<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddMonoid`
+/// - `AddQuasigroup`
+/// - `AddLoop`
+/// - `AddGroup`
+/// - `AddAbelianGroup`
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulCommutative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulMonoid`
+/// - `MulQuasigroup`
+/// - `MulLoop`
+/// - `MulGroup`
+/// - `MulAbelianGroup`
+///
+/// - `Distributive`
+///
+/// `AddWithIdentity<Self>`, `MulWithIdentity<Self>`, `MulInvertible<Self>` must be implemented
+/// manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - [`std::ops::Mul`]
+/// - `AddWithIdentity<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = 0`.
+/// - Commutative --- `a + b = b + a`.
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
+/// - Commutative --- `a * b = b * a`.
 #[proc_macro_derive(Field)]
 pub fn derive_field(input: TokenStream) -> TokenStream {
     let name = parse_macro_input!(input as DeriveInput).ident;
