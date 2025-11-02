@@ -1,4 +1,4 @@
-use astraea::algebra::AddIdentity;
+use astraea::algebra::AddWithIdentity;
 use astraea::digit;
 use astraea::digit::Digit;
 use astraea::formatting::Pretty;

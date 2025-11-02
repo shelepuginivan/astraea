@@ -1,12 +1,13 @@
 use std::ops::{Div, Rem};
 
 use crate::algebra::{
-    AddIdentity, AddInversion, MathObject, MulCommutative, MulIdentity, Ring, Semiring,
+    AddWithIdentity, AddInvertible, MathObject, MulCommutative, MulWithIdentity, Ring, Semiring,
 };
 use crate::error::ValueError;
 use crate::sign::Sign;
 
-pub trait Signed: MathObject + AddIdentity<Self> + AddInversion<Self> {
+/// Signed is a trait for algebraic structures with a sign.
+pub trait Signed: MathObject + AddWithIdentity<Self> + AddInvertible<Self> {
     fn sign(&self) -> Sign;
 
     fn opposite(self) -> Self {
@@ -38,6 +39,7 @@ pub trait Signed: MathObject + AddIdentity<Self> + AddInversion<Self> {
     }
 }
 
+/// IntegerDivision is a trait that defines integer division.
 pub trait IntegerDivision:
     Semiring + Div<Output = Result<Self, ValueError>> + Rem<Output = Result<Self, ValueError>>
 {
@@ -49,7 +51,7 @@ pub trait Pow {
     fn pow(self, power: usize) -> Self;
 }
 
-impl<T: Ring + MulIdentity<Self> + MulCommutative<Self>> Pow for T {
+impl<T: Ring + MulWithIdentity<Self> + MulCommutative<Self>> Pow for T {
     fn pow(self, power: usize) -> Self {
         let mut a = self;
         let mut res = Self::one();

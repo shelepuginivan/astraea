@@ -5,8 +5,8 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
-    IntegerDivision, MathObject, MulAssociative, MulClosed, MulIdentity, Ring, Semiring, Signed,
+    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive, Field,
+    IntegerDivision, MathObject, MulAssociative, MulClosed, MulWithIdentity, Ring, Semiring, Signed,
 };
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
@@ -27,7 +27,7 @@ impl<T: Field> AddClosed for Polynomial<T> {}
 
 impl<T: Field> AddAssociative<Self> for Polynomial<T> {}
 
-impl<T: Field> AddIdentity<Self> for Polynomial<T> {
+impl<T: Field> AddWithIdentity<Self> for Polynomial<T> {
     fn zero() -> Self {
         Self {
             coefficients: vec![T::zero()],
@@ -39,7 +39,7 @@ impl<T: Field> AddIdentity<Self> for Polynomial<T> {
     }
 }
 
-impl<T: Field> AddInversion<Self> for Polynomial<T> {}
+impl<T: Field> AddInvertible<Self> for Polynomial<T> {}
 
 impl<T: Field> AddCommutative<Self> for Polynomial<T> {}
 
@@ -47,7 +47,7 @@ impl<T: Field> MulClosed for Polynomial<T> {}
 
 impl<T: Field> MulAssociative<Self> for Polynomial<T> {}
 
-impl<T: Field> MulIdentity<Self> for Polynomial<T> {
+impl<T: Field> MulWithIdentity<Self> for Polynomial<T> {
     fn one() -> Self {
         Self {
             coefficients: vec![T::one()],

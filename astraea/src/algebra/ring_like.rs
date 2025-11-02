@@ -1,29 +1,40 @@
 use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive,
-    MulAssociative, MulClosed, MulCommutative, MulIdentity, MulInversion,
+    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive,
+    MulAssociative, MulClosed, MulCommutative, MulWithIdentity, MulInvertible,
 };
 
-/// A Semiring is an algebraic structure consisting of a set equipped with two binary operations:
-/// addition and multiplication, where addition is associative and commutative with an identity element,
-/// multiplication is associative with an identity element, and multiplication distributes over addition.
+/// Semiring is an algebraic structure, where
 ///
-/// Unlike rings, semirings do not require additive inverses.
+/// 1. Addition is a **commutative monoid**: closed, associative, with identity, commutative.
+/// 2. Multiplication is a **monoid**: closed, associative, with identity.
+/// 3. Multiplication distributes over addition
+///
+/// Semiring is a ring without additive inverses.
 pub trait Semiring:
     AddClosed
     + AddAssociative<Self>
-    + AddIdentity<Self>
+    + AddWithIdentity<Self>
     + AddCommutative<Self>
     + MulClosed
     + MulAssociative<Self>
+    + MulWithIdentity<Self>
     + Distributive
 {
 }
 
+/// Rng is an algebraic structure, where
+///
+/// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
+///    commutative.
+/// 2. Multiplication is a **semigroup**: closed, associative.
+/// 3. Multiplication distributes over addition
+///
+/// Rng is a ring without multiplicative identity.
 pub trait Rng:
     AddClosed
     + AddAssociative<Self>
-    + AddIdentity<Self>
-    + AddInversion<Self>
+    + AddWithIdentity<Self>
+    + AddInvertible<Self>
     + AddCommutative<Self>
     + MulClosed
     + MulAssociative<Self>
@@ -31,35 +42,43 @@ pub trait Rng:
 {
 }
 
-/// A Ring is an algebraic structure in which addition (subtraction) and multiplication are defined
-/// and satisfy the ring axioms.
+/// Rng is an algebraic structure, where
+///
+/// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
+///    commutative.
+/// 2. Multiplication is a **monoid**: closed, associative, with identity.
+/// 3. Multiplication distributes over addition
 pub trait Ring:
     AddClosed
     + AddAssociative<Self>
-    + AddIdentity<Self>
-    + AddInversion<Self>
+    + AddWithIdentity<Self>
+    + AddInvertible<Self>
     + AddCommutative<Self>
     + MulClosed
     + MulAssociative<Self>
-    + MulIdentity<Self>
+    + MulWithIdentity<Self>
     + Distributive
 {
 }
 
-/// A Field is an algebraic structure in which addition (subtraction), multiplication,
-/// and division (except by zero) are defined and satisfy the field axioms.
+/// Field is an algebraic structure, where
+///
+/// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
+///    commutative.
+/// 2. Multiplication is an **abelian group**: closed, associative, with identity, invertible,
+///    commutative.
+/// 3. Multiplication distributes over addition
 pub trait Field:
     AddClosed
     + AddAssociative<Self>
-    + AddIdentity<Self>
-    + AddInversion<Self>
+    + AddWithIdentity<Self>
+    + AddInvertible<Self>
     + AddCommutative<Self>
     + MulClosed
     + MulAssociative<Self>
-    + MulIdentity<Self>
-    + MulInversion<Self>
+    + MulWithIdentity<Self>
+    + MulInvertible<Self>
     + MulCommutative<Self>
     + Distributive
 {
 }
-

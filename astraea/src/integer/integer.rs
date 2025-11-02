@@ -4,8 +4,8 @@ use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
 use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive,
-    IntegerDivision, MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, Semiring,
+    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive,
+    IntegerDivision, MathObject, MulAssociative, MulClosed, MulCommutative, MulWithIdentity, Semiring,
     Signed,
 };
 use crate::error::{ParseError, ValueError};
@@ -26,7 +26,7 @@ impl AddClosed for Integer {}
 
 impl AddAssociative<Self> for Integer {}
 
-impl AddIdentity<Self> for Integer {
+impl AddWithIdentity<Self> for Integer {
     fn zero() -> Self {
         Self {
             value: NaturalNumber::zero(),
@@ -39,7 +39,7 @@ impl AddIdentity<Self> for Integer {
     }
 }
 
-impl AddInversion<Self> for Integer {}
+impl AddInvertible<Self> for Integer {}
 
 impl AddCommutative<Self> for Integer {}
 
@@ -53,7 +53,7 @@ impl MulClosed for Integer {}
 
 impl MulAssociative<Self> for Integer {}
 
-impl MulIdentity<Self> for Integer {
+impl MulWithIdentity<Self> for Integer {
     fn one() -> Self {
         Self {
             value: NaturalNumber::one(),

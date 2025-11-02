@@ -5,8 +5,8 @@ use std::ops::{Add, Div, Index, IndexMut, Mul, Rem, Sub};
 use std::str::FromStr;
 
 use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, Distributive, IntegerDivision,
-    MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, Semiring,
+    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, Distributive, IntegerDivision,
+    MathObject, MulAssociative, MulClosed, MulCommutative, MulWithIdentity, Semiring,
 };
 use crate::digit::Digit;
 use crate::error::{ParseError, ValueError};
@@ -24,7 +24,7 @@ impl MathObject for NaturalNumber {}
 impl AddClosed for NaturalNumber {}
 impl AddAssociative<Self> for NaturalNumber {}
 
-impl AddIdentity<Self> for NaturalNumber {
+impl AddWithIdentity<Self> for NaturalNumber {
     fn zero() -> Self {
         Self {
             digits: vec![Digit::Zero],
@@ -46,7 +46,7 @@ impl MulClosed for NaturalNumber {}
 
 impl MulAssociative<Self> for NaturalNumber {}
 
-impl MulIdentity<Self> for NaturalNumber {
+impl MulWithIdentity<Self> for NaturalNumber {
     fn one() -> Self {
         Self {
             digits: vec![Digit::One],

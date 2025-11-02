@@ -4,8 +4,8 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::str::FromStr;
 
 use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddIdentity, AddInversion, Distributive, Field,
-    MathObject, MulAssociative, MulClosed, MulCommutative, MulIdentity, MulInversion,
+    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive, Field,
+    MathObject, MulAssociative, MulClosed, MulCommutative, MulWithIdentity, MulInvertible,
     NoZeroDivisors, Signed,
 };
 use crate::error::{ParseError, ValueError};
@@ -27,7 +27,7 @@ impl AddClosed for RationalNumber {}
 
 impl AddAssociative<Self> for RationalNumber {}
 
-impl AddIdentity<Self> for RationalNumber {
+impl AddWithIdentity<Self> for RationalNumber {
     fn zero() -> Self {
         Self {
             numerator: Integer::zero(),
@@ -40,7 +40,7 @@ impl AddIdentity<Self> for RationalNumber {
     }
 }
 
-impl AddInversion<Self> for RationalNumber {}
+impl AddInvertible<Self> for RationalNumber {}
 
 impl AddCommutative<Self> for RationalNumber {}
 
@@ -54,7 +54,7 @@ impl MulClosed for RationalNumber {}
 
 impl MulAssociative<Self> for RationalNumber {}
 
-impl MulIdentity<Self> for RationalNumber {
+impl MulWithIdentity<Self> for RationalNumber {
     fn one() -> Self {
         Self {
             numerator: Integer::one(),
@@ -70,7 +70,7 @@ impl MulIdentity<Self> for RationalNumber {
     }
 }
 
-impl MulInversion<Self> for RationalNumber {
+impl MulInvertible<Self> for RationalNumber {
     fn inverse(self) -> Result<Self, ValueError> {
         let Self {
             numerator,
