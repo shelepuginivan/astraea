@@ -4,10 +4,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive, Field,
-    IntegerDivision, MathObject, MulAssociative, MulClosed, MulWithIdentity, Ring, Semiring, Signed,
-};
+use crate::algebra::*;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
@@ -59,9 +56,29 @@ impl<T: Field> MulWithIdentity<Self> for Polynomial<T> {
     }
 }
 
+impl<T: Field> MulCommutative<Self> for Polynomial<T> {}
+
 impl<T: Field> Distributive for Polynomial<T> {}
 
+impl<T: Field> AddMagma for Polynomial<T> {}
+impl<T: Field> AddSemigroup for Polynomial<T> {}
+impl<T: Field> AddQuasigroup for Polynomial<T> {}
+impl<T: Field> AddUnitalMagma for Polynomial<T> {}
+impl<T: Field> AddMonoid for Polynomial<T> {}
+impl<T: Field> AddLoop for Polynomial<T> {}
+impl<T: Field> AddInvertibleSemigroup for Polynomial<T> {}
+impl<T: Field> AddGroup for Polynomial<T> {}
+impl<T: Field> AddAbelianGroup for Polynomial<T> {}
+
+impl<T: Field> MulMagma for Polynomial<T> {}
+impl<T: Field> MulSemigroup for Polynomial<T> {}
+impl<T: Field> MulUnitalMagma for Polynomial<T> {}
+impl<T: Field> MulMonoid for Polynomial<T> {}
+
 impl<T: Field> Semiring for Polynomial<T> {}
+impl<T: Field> Rng for Polynomial<T> {}
+impl<T: Field> Ring for Polynomial<T> {}
+impl<T: Field> CommutativeRing for Polynomial<T> {}
 
 impl<T: Field> IntegerDivision for Polynomial<T> {
     fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {
@@ -80,8 +97,6 @@ impl<T: Field> IntegerDivision for Polynomial<T> {
         Ok((quotient.normalize(), remainder.normalize()))
     }
 }
-
-impl<T: Field> Ring for Polynomial<T> {}
 
 impl<T: Field> Polynomial<T> {
     /// Keeps the invariant of the polynomial - its leading coefficient must not be zero, unless

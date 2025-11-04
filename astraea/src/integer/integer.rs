@@ -3,11 +3,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
-use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive,
-    IntegerDivision, MathObject, MulAssociative, MulClosed, MulCommutative, MulWithIdentity, Semiring,
-    Signed,
-};
+use crate::algebra::*;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::natural::NaturalNumber;
@@ -70,7 +66,25 @@ impl MulCommutative<Self> for Integer {}
 
 impl Distributive for Integer {}
 
+impl AddMagma for Integer {}
+impl AddSemigroup for Integer {}
+impl AddQuasigroup for Integer {}
+impl AddUnitalMagma for Integer {}
+impl AddMonoid for Integer {}
+impl AddLoop for Integer {}
+impl AddInvertibleSemigroup for Integer {}
+impl AddGroup for Integer {}
+impl AddAbelianGroup for Integer {}
+
+impl MulMagma for Integer {}
+impl MulSemigroup for Integer {}
+impl MulUnitalMagma for Integer {}
+impl MulMonoid for Integer {}
+
 impl Semiring for Integer {}
+impl Rng for Integer {}
+impl Ring for Integer {}
+impl CommutativeRing for Integer {}
 
 impl IntegerDivision for Integer {
     fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {

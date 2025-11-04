@@ -3,11 +3,7 @@ use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 use std::str::FromStr;
 
-use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, AddInvertible, Distributive, Field,
-    MathObject, MulAssociative, MulClosed, MulCommutative, MulWithIdentity, MulInvertible,
-    NoZeroDivisors, Signed,
-};
+use crate::algebra::*;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
@@ -94,6 +90,30 @@ impl Distributive for RationalNumber {}
 
 impl NoZeroDivisors for RationalNumber {}
 
+impl AddMagma for RationalNumber {}
+impl AddSemigroup for RationalNumber {}
+impl AddQuasigroup for RationalNumber {}
+impl AddUnitalMagma for RationalNumber {}
+impl AddMonoid for RationalNumber {}
+impl AddLoop for RationalNumber {}
+impl AddInvertibleSemigroup for RationalNumber {}
+impl AddGroup for RationalNumber {}
+impl AddAbelianGroup for RationalNumber {}
+
+impl MulMagma for RationalNumber {}
+impl MulSemigroup for RationalNumber {}
+impl MulQuasigroup for RationalNumber {}
+impl MulUnitalMagma for RationalNumber {}
+impl MulMonoid for RationalNumber {}
+impl MulLoop for RationalNumber {}
+impl MulInvertibleSemigroup for RationalNumber {}
+impl MulGroup for RationalNumber {}
+impl MulAbelianGroup for RationalNumber {}
+
+impl Semiring for RationalNumber {}
+impl Rng for RationalNumber {}
+impl Ring for RationalNumber {}
+impl CommutativeRing for RationalNumber {}
 impl Field for RationalNumber {}
 
 impl RationalNumber {

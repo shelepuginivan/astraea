@@ -4,10 +4,7 @@ use std::iter;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Rem, Sub};
 use std::str::FromStr;
 
-use crate::algebra::{
-    AddAssociative, AddClosed, AddCommutative, AddWithIdentity, Distributive, IntegerDivision,
-    MathObject, MulAssociative, MulClosed, MulCommutative, MulWithIdentity, Semiring,
-};
+use crate::algebra::*;
 use crate::digit::Digit;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
@@ -61,6 +58,16 @@ impl MulWithIdentity<Self> for NaturalNumber {
 impl MulCommutative<Self> for NaturalNumber {}
 
 impl Distributive for NaturalNumber {}
+
+impl AddMagma for NaturalNumber {}
+impl AddSemigroup for NaturalNumber {}
+impl AddUnitalMagma for NaturalNumber {}
+impl AddMonoid for NaturalNumber {}
+
+impl MulMagma for NaturalNumber {}
+impl MulSemigroup for NaturalNumber {}
+impl MulUnitalMagma for NaturalNumber {}
+impl MulMonoid for NaturalNumber {}
 
 impl Semiring for NaturalNumber {}
 

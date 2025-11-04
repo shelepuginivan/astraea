@@ -88,47 +88,6 @@ pub fn derive_add_semigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
-/// Derive macro generating an impl of the `AddMonoid` trait.
-///
-/// Marks this type as a monoid under addition, generating implementations for the following
-/// traits:
-///
-/// - `AddClosed`
-/// - `AddAssociative<Self>`
-/// - `AddMagma`
-/// - `AddSemigroup`
-/// - `AddMonoid`
-///
-/// `AddWithIdentity<Self>` must be implemented manually.
-///
-/// # Requirements
-///
-/// The following traits must be implemented (or derived):
-///
-/// - [`MathObject`]
-/// - [`std::ops::Add`]
-/// - `AddWithIdentity<Self>`
-///
-/// Addition (`+`) must be:
-///
-/// - Closed --- sum of elements returns the same type.
-/// - Associative --- `a + (b + c) = (a + b) + c`.
-/// - With identity --- there exists `e = 0`, such that `a + e = a`.
-#[proc_macro_derive(AddMonoid)]
-pub fn derive_add_monoid(input: TokenStream) -> TokenStream {
-    let name = parse_macro_input!(input as DeriveInput).ident;
-
-    quote! {
-        impl astraea::algebra::AddClosed for #name {}
-        impl astraea::algebra::AddAssociative<Self> for #name {}
-
-        impl astraea::algebra::AddMagma for #name {}
-        impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
-    }
-    .into()
-}
-
 /// Derive macro generating an impl of the `AddQuasigroup` trait.
 ///
 /// Marks this type as a quasigroup under addition, generating implementations for the following
@@ -166,6 +125,85 @@ pub fn derive_add_quasigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `AddUnitalMagma` trait.
+///
+/// Marks this type as a unital magma under addition, generating implementations for the following
+/// traits:
+///
+/// - `AddClosed`
+/// - `AddMagma`
+/// - `AddUnitalMagma`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+#[proc_macro_derive(AddUnitalMagma)]
+pub fn derive_add_unital_magma(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::AddClosed for #name {}
+
+        impl astraea::algebra::AddMagma for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+    }
+    .into()
+}
+
+/// Derive macro generating an impl of the `AddMonoid` trait.
+///
+/// Marks this type as a monoid under addition, generating implementations for the following
+/// traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
+///
+/// `AddWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - `AddWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+#[proc_macro_derive(AddMonoid)]
+pub fn derive_add_monoid(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::AddClosed for #name {}
+        impl astraea::algebra::AddAssociative<Self> for #name {}
+
+        impl astraea::algebra::AddMagma for #name {}
+        impl astraea::algebra::AddSemigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
+    }
+    .into()
+}
+
 /// Derive macro generating an impl of the `AddLoop` trait.
 ///
 /// Marks this type as a loop under addition, generating implementations for the following traits:
@@ -173,6 +211,7 @@ pub fn derive_add_quasigroup(input: TokenStream) -> TokenStream {
 /// - `AddClosed`
 /// - `AddInvertible<Self>`
 /// - `AddMagma`
+/// - `AddUnitalMagma`
 /// - `AddQuasigroup`
 /// - `AddLoop`
 ///
@@ -202,8 +241,53 @@ pub fn derive_add_loop(input: TokenStream) -> TokenStream {
         impl astraea::algebra::AddInvertible<Self> for #name {}
 
         impl astraea::algebra::AddMagma for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
         impl astraea::algebra::AddLoop for #name {}
+    }
+    .into()
+}
+
+/// Derive macro generating an impl of the `AddInvertibleSemigroup` trait.
+///
+/// Marks this type as a semigroup under addition, generating implementations for the following
+/// traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddInvertible<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddQuasigroup`
+/// - `AddInvertibleSemigroup`
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = e`.
+#[proc_macro_derive(AddInvertibleSemigroup)]
+pub fn derive_add_invertible_semigroup(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::AddClosed for #name {}
+        impl astraea::algebra::AddAssociative<Self> for #name {}
+        impl astraea::algebra::AddInvertible<Self> for #name {}
+
+        impl astraea::algebra::AddMagma for #name {}
+        impl astraea::algebra::AddSemigroup for #name {}
+        impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
     }
     .into()
 }
@@ -217,9 +301,11 @@ pub fn derive_add_loop(input: TokenStream) -> TokenStream {
 /// - `AddAssociative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
-/// - `AddMonoid`
 /// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
 /// - `AddLoop`
+/// - `AddInvertibleSemigroup`
 /// - `AddGroup`
 ///
 /// `AddWithIdentity<Self>` must be implemented manually.
@@ -251,9 +337,11 @@ pub fn derive_add_group(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
         impl astraea::algebra::AddGroup for #name {}
     }
     .into()
@@ -270,9 +358,11 @@ pub fn derive_add_group(input: TokenStream) -> TokenStream {
 /// - `AddCommutative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
-/// - `AddMonoid`
 /// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
 /// - `AddLoop`
+/// - `AddInvertibleSemigroup`
 /// - `AddGroup`
 /// - `AddAbelianGroup`
 ///
@@ -307,9 +397,11 @@ pub fn derive_add_abelian_group(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
         impl astraea::algebra::AddGroup for #name {}
         impl astraea::algebra::AddAbelianGroup for #name {}
     }
@@ -381,47 +473,6 @@ pub fn derive_mul_semigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
-/// Derive macro generating an impl of the `MulMonoid` trait.
-///
-/// Marks this type as a monoid under multiplication, generating implementations for the following
-/// traits:
-///
-/// - `MulClosed`
-/// - `MulAssociative<Self>`
-/// - `MulMagma`
-/// - `MulSemigroup`
-/// - `MulMonoid`
-///
-/// `MulWithIdentity<Self>` must be implemented manually.
-///
-/// # Requirements
-///
-/// The following traits must be implemented (or derived):
-///
-/// - [`MathObject`]
-/// - [`std::ops::Mul`]
-/// - `MulWithIdentity<Self>`
-///
-/// Multiplication (`*`) must be:
-///
-/// - Closed --- product of elements returns the same type.
-/// - Associative --- `a * (b * c) = (a * b) * c`.
-/// - With identity --- there exists `e = 1`, such that `a * e = a`.
-#[proc_macro_derive(MulMonoid)]
-pub fn derive_mul_monoid(input: TokenStream) -> TokenStream {
-    let name = parse_macro_input!(input as DeriveInput).ident;
-
-    quote! {
-        impl astraea::algebra::MulClosed for #name {}
-        impl astraea::algebra::MulAssociative<Self> for #name {}
-
-        impl astraea::algebra::MulMagma for #name {}
-        impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::algebra::MulMonoid for #name {}
-    }
-    .into()
-}
-
 /// Derive macro generating an impl of the `MulQuasigroup` trait.
 ///
 /// Marks this type as a quasigroup under multiplication, generating implementations for the
@@ -459,6 +510,85 @@ pub fn derive_mul_quasigroup(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `MulUnitalMagma` trait.
+///
+/// Marks this type as a unital magma under multiplication, generating implementations for the
+/// following traits:
+///
+/// - `MulClosed`
+/// - `MulMagma`
+/// - `MulUnitalMagma`
+///
+/// `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - `MulWithIdentity<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+#[proc_macro_derive(MulUnitalMagma)]
+pub fn derive_mul_unital_magma(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::MulClosed for #name {}
+
+        impl astraea::algebra::MulMagma for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+    }
+    .into()
+}
+
+/// Derive macro generating an impl of the `MulMonoid` trait.
+///
+/// Marks this type as a monoid under multiplication, generating implementations for the following
+/// traits:
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulUnitalMagma`
+/// - `MulMonoid`
+///
+/// `MulWithIdentity<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - `MulWithIdentity<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+#[proc_macro_derive(MulMonoid)]
+pub fn derive_mul_monoid(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::MulClosed for #name {}
+        impl astraea::algebra::MulAssociative<Self> for #name {}
+
+        impl astraea::algebra::MulMagma for #name {}
+        impl astraea::algebra::MulSemigroup for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
+    }
+    .into()
+}
+
 /// Derive macro generating an impl of the `MulLoop` trait.
 ///
 /// Marks this type as a loop under multiplication, generating implementations for the following
@@ -466,6 +596,7 @@ pub fn derive_mul_quasigroup(input: TokenStream) -> TokenStream {
 ///
 /// - `MulClosed`
 /// - `MulMagma`
+/// - `MulUnitalMagma`
 /// - `MulQuasigroup`
 /// - `MulLoop`
 ///
@@ -494,8 +625,53 @@ pub fn derive_mul_loop(input: TokenStream) -> TokenStream {
         impl astraea::algebra::MulClosed for #name {}
 
         impl astraea::algebra::MulMagma for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
         impl astraea::algebra::MulQuasigroup for #name {}
         impl astraea::algebra::MulLoop for #name {}
+    }
+    .into()
+}
+
+/// Derive macro generating an impl of the `MulInvertibleSemigroup` trait.
+///
+/// Marks this type as a semigroup under multiplication, generating implementations for the
+/// following traits:
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulQuasigroup`
+/// - `MulInvertibleSemigroup`
+///
+/// `MulInvertible<Self>` must be implemented manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Mul`]
+/// - [`std::ops::Div`]
+/// - `MulInvertible<Self>`
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) + c`.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
+#[proc_macro_derive(MulInvertibleSemigroup)]
+pub fn derive_mul_invertible_semigroup(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::MulClosed for #name {}
+        impl astraea::algebra::MulAssociative<Self> for #name {}
+
+        impl astraea::algebra::MulMagma for #name {}
+        impl astraea::algebra::MulSemigroup for #name {}
+        impl astraea::algebra::MulQuasigroup for #name {}
+        impl astraea::algebra::MulInvertibleSemigroup for #name {}
     }
     .into()
 }
@@ -508,8 +684,13 @@ pub fn derive_mul_loop(input: TokenStream) -> TokenStream {
 /// - `MulClosed`
 /// - `MulAssociative<Self>`
 /// - `MulMagma`
+/// - `MulSemigroup`
 /// - `MulQuasigroup`
+/// - `MulUnitalMagma`
+/// - `MulMonoid`
 /// - `MulLoop`
+/// - `MulInvertibleSemigroup`
+/// - `MulGroup`
 ///
 /// `MulInvertible<Self>` and `MulWithIdentity<Self>` must be implemented manually.
 ///
@@ -539,9 +720,11 @@ pub fn derive_mul_group(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::MulMagma for #name {}
         impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::algebra::MulMonoid for #name {}
         impl astraea::algebra::MulQuasigroup for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
         impl astraea::algebra::MulLoop for #name {}
+        impl astraea::algebra::MulInvertibleSemigroup for #name {}
         impl astraea::algebra::MulGroup for #name {}
     }
     .into()
@@ -557,9 +740,13 @@ pub fn derive_mul_group(input: TokenStream) -> TokenStream {
 /// - `MulCommutative<Self>`
 /// - `MulMagma`
 /// - `MulSemigroup`
-/// - `MulMonoid`
 /// - `MulQuasigroup`
+/// - `MulUnitalMagma`
+/// - `MulMonoid`
 /// - `MulLoop`
+/// - `MulInvertibleSemigroup`
+/// - `MulGroup`
+/// - `MulAbelianGroup`
 ///
 /// `MulInvertible<Self>` and `MulWithIdentity<Self>` must be implemented manually.
 ///
@@ -591,9 +778,11 @@ pub fn derive_mul_abelian_group(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::MulMagma for #name {}
         impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::algebra::MulMonoid for #name {}
         impl astraea::algebra::MulQuasigroup for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
         impl astraea::algebra::MulLoop for #name {}
+        impl astraea::algebra::MulInvertibleSemigroup for #name {}
         impl astraea::algebra::MulGroup for #name {}
         impl astraea::algebra::MulAbelianGroup for #name {}
     }
@@ -609,12 +798,14 @@ pub fn derive_mul_abelian_group(input: TokenStream) -> TokenStream {
 /// - `AddCommutative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
+/// - `AddUnitalMagma`
 /// - `AddMonoid`
 ///
 /// - `MulClosed`
 /// - `MulAssociative<Self>`
 /// - `MulMagma`
 /// - `MulSemigroup`
+/// - `MulUnitalMagma`
 /// - `MulMonoid`
 ///
 /// - `Distributive`
@@ -657,11 +848,13 @@ pub fn derive_semiring(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
         impl astraea::algebra::AddMonoid for #name {}
 
         impl astraea::algebra::MulMagma for #name {}
         impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::astraea::MulMonoid for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
 
         impl astraea::algebra::Semiring for #name {}
     }
@@ -678,9 +871,11 @@ pub fn derive_semiring(input: TokenStream) -> TokenStream {
 /// - `AddCommutative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
-/// - `AddMonoid`
 /// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
 /// - `AddLoop`
+/// - `AddInvertibleSemigroup`
 /// - `AddGroup`
 /// - `AddAbelianGroup`
 ///
@@ -731,9 +926,11 @@ pub fn derive_rng(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
         impl astraea::algebra::AddGroup for #name {}
         impl astraea::algebra::AddAbelianGroup for #name {}
 
@@ -755,9 +952,11 @@ pub fn derive_rng(input: TokenStream) -> TokenStream {
 /// - `AddCommutative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
-/// - `AddMonoid`
 /// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
 /// - `AddLoop`
+/// - `AddInvertibleSemigroup`
 /// - `AddGroup`
 /// - `AddAbelianGroup`
 ///
@@ -765,6 +964,7 @@ pub fn derive_rng(input: TokenStream) -> TokenStream {
 /// - `MulAssociative<Self>`
 /// - `MulMagma`
 /// - `MulSemigroup`
+/// - `MulUnitalMagma`
 /// - `MulMonoid`
 ///
 /// - `Distributive`
@@ -811,15 +1011,18 @@ pub fn derive_ring(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
         impl astraea::algebra::AddGroup for #name {}
         impl astraea::algebra::AddAbelianGroup for #name {}
 
         impl astraea::algebra::MulMagma for #name {}
         impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::astraea::MulMonoid for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
 
         impl astraea::algebra::Semiring for #name {}
         impl astraea::algebra::Rng for #name {}
@@ -838,9 +1041,11 @@ pub fn derive_ring(input: TokenStream) -> TokenStream {
 /// - `AddCommutative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
-/// - `AddMonoid`
 /// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
 /// - `AddLoop`
+/// - `AddInvertibleSemigroup`
 /// - `AddGroup`
 /// - `AddAbelianGroup`
 ///
@@ -849,6 +1054,7 @@ pub fn derive_ring(input: TokenStream) -> TokenStream {
 /// - `MulCommutative<Self>`
 /// - `MulMagma`
 /// - `MulSemigroup`
+/// - `MulUnitalMagma`
 /// - `MulMonoid`
 ///
 /// - `Distributive`
@@ -897,15 +1103,18 @@ pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
         impl astraea::algebra::AddGroup for #name {}
         impl astraea::algebra::AddAbelianGroup for #name {}
 
         impl astraea::algebra::MulMagma for #name {}
         impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::astraea::MulMonoid for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
 
         impl astraea::algebra::Semiring for #name {}
         impl astraea::algebra::Rng for #name {}
@@ -924,9 +1133,11 @@ pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
 /// - `AddCommutative<Self>`
 /// - `AddMagma`
 /// - `AddSemigroup`
-/// - `AddMonoid`
 /// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
 /// - `AddLoop`
+/// - `AddInvertibleSemigroup`
 /// - `AddGroup`
 /// - `AddAbelianGroup`
 ///
@@ -935,9 +1146,11 @@ pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
 /// - `MulCommutative<Self>`
 /// - `MulMagma`
 /// - `MulSemigroup`
-/// - `MulMonoid`
 /// - `MulQuasigroup`
+/// - `MulUnitalMagma`
+/// - `MulMonoid`
 /// - `MulLoop`
+/// - `MulInvertibleSemigroup`
 /// - `MulGroup`
 /// - `MulAbelianGroup`
 ///
@@ -989,17 +1202,21 @@ pub fn derive_field(input: TokenStream) -> TokenStream {
 
         impl astraea::algebra::AddMagma for #name {}
         impl astraea::algebra::AddSemigroup for #name {}
-        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
         impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
         impl astraea::algebra::AddGroup for #name {}
         impl astraea::algebra::AddAbelianGroup for #name {}
 
         impl astraea::algebra::MulMagma for #name {}
         impl astraea::algebra::MulSemigroup for #name {}
-        impl astraea::algebra::MulMonoid for #name {}
         impl astraea::algebra::MulQuasigroup for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
         impl astraea::algebra::MulLoop for #name {}
+        impl astraea::algebra::MulInvertibleSemigroup for #name {}
         impl astraea::algebra::MulGroup for #name {}
         impl astraea::algebra::MulAbelianGroup for #name {}
 
