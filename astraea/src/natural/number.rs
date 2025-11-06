@@ -655,6 +655,47 @@ macro_rules! impl_natural_try_from {
 
 impl_natural_try_from!(i8, i16, i32, i64, i128, isize);
 
+/// Implements TryInto<T> for NaturalNumber for every integer type.
+macro_rules! impl_natural_try_into {
+    ($($t:ty),*) => {
+        $(
+            impl TryInto<$t> for NaturalNumber {
+                type Error = ValueError;
+
+                fn try_into(self) -> Result<$t, Self::Error> {
+                    let mut result: $t = 0;
+                    let mut radix = 1;
+
+                    for digit in self.digits.into_iter() {
+                        let digit: $t = digit.into();
+
+                        let added = match digit.checked_mul(digit * radix) {
+                            Some(v) => v,
+                            None => return Err(ValueError::new("value is too large")),
+                        };
+
+                        result = match result.checked_add(added) {
+                            Some(v) => v,
+                            None => return Err(ValueError::new("value is too large")),
+                        };
+
+                        radix = match radix.checked_mul(10) {
+                            Some(v) => v,
+                            None => return Err(ValueError::new("value is too large")),
+                        };
+                    }
+
+                    Ok(result)
+                }
+            }
+        )*
+    };
+}
+
+impl_natural_try_into!(
+    u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize
+);
+
 #[cfg(test)]
 mod tests {
     use rand::Rng;
