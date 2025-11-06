@@ -70,6 +70,7 @@
 //!
 //! See: [`polynomial::Polynomial`].
 pub mod algebra;
+pub mod combinatorics;
 pub mod digit;
 pub mod error;
 pub mod formatting;
