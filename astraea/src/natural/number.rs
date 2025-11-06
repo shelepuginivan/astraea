@@ -589,6 +589,10 @@ impl FromStr for NaturalNumber {
         let mut digits: Vec<Digit> = vec![Digit::Zero; length];
 
         for (index, char) in s.chars().enumerate() {
+            if index == 0 && char == '-' {
+                return Err(ParseError::new("natural number must not be negative"));
+            }
+
             let digit = Digit::from_char(char)?;
             digits[length - index - 1] = digit;
         }

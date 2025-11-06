@@ -88,10 +88,7 @@ where
         let arg = match T::from_str(&args[i]) {
             Ok(v) => v,
             Err(e) => {
-                return Err(InstructionError::invalid_arg(
-                    format!("cannot parse: {}", e),
-                    i,
-                ));
+                return Err(InstructionError::invalid_arg(e.to_string(), i));
             }
         };
 

@@ -40,7 +40,13 @@ impl Error {
         match self {
             Self::UnknownInstruction => "This instruction is unknown".to_string(),
             Self::InstructionNotImplemented => "Not implemented".to_string(),
-            Self::InvalidArgument(.., msg) => msg.to_string(),
+            Self::InvalidArgument(.., msg) => {
+                let message = msg.to_string();
+                let mut chars: Vec<char> = message.chars().collect();
+                chars[0] = chars[0].to_uppercase().nth(0).unwrap();
+
+                chars.into_iter().collect()
+            }
             Self::InvalidNumberOfArguments(expected, actual) => {
                 let diff = expected.abs_diff(*actual);
 
@@ -88,10 +94,28 @@ impl Error {
     }
 
     fn label_range(&self, args: &Args, cli: &String) -> Range<usize> {
-        if let Self::InvalidNumberOfArguments(expected, actual) = self
-            && actual < expected
-        {
-            return cli.chars().count()..cli.chars().count();
+        if let Self::InvalidNumberOfArguments(expected, actual) = self {
+            let chars_count = cli.chars().count();
+
+            if actual < expected {
+                return chars_count..chars_count;
+            }
+
+            let mut diff = actual - expected;
+            let mut offset = diff - 1;
+            let mut cli_args: Vec<String> = env::args().collect();
+
+            while diff > 0 {
+                let last_arg = match cli_args.pop() {
+                    Some(v) => v,
+                    None => break,
+                };
+
+                offset += last_arg.chars().count();
+                diff -= 1;
+            }
+
+            return chars_count - offset..chars_count;
         }
 
         let needle = self.needle(&args);

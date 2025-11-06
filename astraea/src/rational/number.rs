@@ -277,6 +277,10 @@ impl FromStr for RationalNumber {
             Err(e) => return Err(ParseError::new(e.message)),
         };
 
+        if tokens.next() != None {
+            return Err(ParseError::new("too many delimiters"));
+        }
+
         let sign = numerator.sign() * denominator.sign();
         let numerator = Integer::new(numerator.abs().to_natural().unwrap(), sign);
         let denominator = denominator.abs().to_natural().unwrap();
