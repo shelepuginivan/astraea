@@ -669,7 +669,7 @@ macro_rules! impl_natural_try_into {
                     for digit in self.digits.into_iter() {
                         let digit: $t = digit.into();
 
-                        let added = match digit.checked_mul(digit * radix) {
+                        let added = match digit.checked_mul(radix) {
                             Some(v) => v,
                             None => return Err(ValueError::new("value is too large")),
                         };
