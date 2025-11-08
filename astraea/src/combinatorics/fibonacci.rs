@@ -112,11 +112,29 @@ pub fn fibonacci(n: &NaturalNumber) -> NaturalNumber {
     FibMatrix::nth(n).c
 }
 
+/// Calculates nth Lucas number, starting with 2 for n = 0.
+///
+/// ```
+/// use astraea::combinatorics::lucas;
+/// use astraea::natural::NaturalNumber;
+///
+/// let n = NaturalNumber::from(300_u16);
+/// let luc = lucas(&n);
+///
+/// assert_eq!(luc.to_string(), "496926405783746676393791436882468230898067489522034699520200002");
+/// ```
+///
+/// Panics if n cannot be converted to usize.
+pub fn lucas(n: &NaturalNumber) -> NaturalNumber {
+    let v = FibMatrix::nth(n);
+    v.a + v.d
+}
+
 #[cfg(test)]
 mod tests {
     use crate::natural::NaturalNumber;
 
-    use super::fibonacci;
+    use super::*;
 
     #[test]
     fn test_fibonacci() {
@@ -133,6 +151,27 @@ mod tests {
         assert_eq!(
             fibonacci(&NaturalNumber::from(300_u16)).to_string(),
             "222232244629420445529739893461909967206666939096499764990979600",
+        );
+    }
+
+    #[test]
+    fn test_lucas() {
+        let tests: Vec<usize> = vec![
+            2, 1, 3, 4, 7, 11, 18, 29, 47, 76, 123, 199, 322, 521, 843, 1364, 2207, 3571, 5778,
+            9349,
+        ];
+
+        for (n, expected) in tests.into_iter().enumerate() {
+            let n = NaturalNumber::from(n);
+            let expected = NaturalNumber::from(expected);
+            let actual = lucas(&n);
+
+            assert_eq!(actual, expected, "mismatched for n={}", n.to_string());
+        }
+
+        assert_eq!(
+            lucas(&NaturalNumber::from(100_u8)).to_string(),
+            "792070839848372253127",
         );
     }
 }
