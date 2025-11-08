@@ -546,6 +546,126 @@ pub enum Instruction {
         serialize = "PolynomialFlatten"
     )]
     PolynomialFlatten,
+
+    /// Calculates n!
+    ///
+    /// - Index: CMB-1
+    /// - Opcode: FAC_N_N
+    #[strum(
+        props(opcode = "FAC_N_N", index = "CMB-1"),
+        serialize = "FAC_N_N",
+        serialize = "CMB-1",
+        serialize = "CombinatoricsFactorial"
+    )]
+    CombinatoricsFactorial,
+
+    /// Calculates !n
+    ///
+    /// - Index: CMB-2
+    /// - Opcode: SBF_N_N
+    #[strum(
+        props(opcode = "SBF_N_N", index = "CMB-2"),
+        serialize = "SBF_N_N",
+        serialize = "CMB-2",
+        serialize = "CombinatoricsSubfactorial"
+    )]
+    CombinatoricsSubfactorial,
+
+    /// Calculates number of combinations.
+    ///
+    /// - Index: CMB-3
+    /// - Opcode: Cnk_NN_N
+    #[strum(
+        props(opcode = "Cnk_NN_N", index = "CMB-3"),
+        serialize = "Cnk_NN_N",
+        serialize = "CMB-3",
+        serialize = "CombinatoricsCombinations"
+    )]
+    CombinatoricsCombinations,
+
+    /// Calculates number of placements.
+    ///
+    /// - Index: CMB-4
+    /// - Opcode: PLC_NN_N
+    #[strum(
+        props(opcode = "PLC_NN_N", index = "CMB-4"),
+        serialize = "PLC_NN_N",
+        serialize = "CMB-4",
+        serialize = "CombinatoricsPlacements"
+    )]
+    CombinatoricsPlacements,
+
+    /// Calculates Stirling number of the first kind (unsigned).
+    ///
+    /// - Index: CMB-5
+    /// - Opcode: ST1_NN_N
+    #[strum(
+        props(opcode = "ST1_NN_N", index = "CMB-5"),
+        serialize = "ST1_NN_N",
+        serialize = "CMB-5",
+        serialize = "CombinatoricsStirlingFirstKind"
+    )]
+    CombinatoricsStirlingFirstKind,
+
+    /// Calculates Stirling number of the second kind (unsigned).
+    ///
+    /// - Index: CMB-6
+    /// - Opcode: ST2_NN_N
+    #[strum(
+        props(opcode = "ST2_NN_N", index = "CMB-6"),
+        serialize = "ST2_NN_N",
+        serialize = "CMB-6",
+        serialize = "CombinatoricsStirlingSecondKind"
+    )]
+    CombinatoricsStirlingSecondKind,
+
+    /// Calculates nth Bell number.
+    ///
+    /// - Index: CMB-7
+    /// - Opcode: BEL_N_N
+    #[strum(
+        props(opcode = "BEL_N_N", index = "CMB-7"),
+        serialize = "bel_n_n",
+        serialize = "CMB-7",
+        serialize = "CombinatoricsBell"
+    )]
+    CombinatoricsBell,
+
+    /// Calculates nth Fibonacci number.
+    ///
+    /// - Index: CMB-8
+    /// - Opcode: FIB_N_N
+    #[strum(
+        props(opcode = "FIB_N_N", index = "CMB-8"),
+        serialize = "FIB_N_N",
+        serialize = "CMB-8",
+        serialize = "CombinatoricsFibonacci"
+    )]
+    CombinatoricsFibonacci,
+
+    /// Calculates nth Lucas number.
+    ///
+    /// - Index: CMB-9
+    /// - Opcode: LUK_N_N
+    #[strum(
+        props(opcode = "LUK_N_N", index = "CMB-9"),
+        serialize = "LUK_N_N",
+        serialize = "CMB-9",
+        serialize = "CombinatoricsLucas"
+    )]
+    CombinatoricsLucas,
+
+    /// Calculates nth Catalan number.
+    ///
+    /// - Index: CMB-10
+    /// - Opcode: CAT_N_N
+    #[strum(
+        props(opcode = "CAT_N_N", index = "CMB-10"),
+        serialize = "CAT_N_N",
+        serialize = "CMB-10",
+        serialize = "CombinatoricsCatalan"
+    )]
+    CombinatoricsCatalan,
 }
 
 impl Instruction {

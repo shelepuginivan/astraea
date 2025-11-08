@@ -169,6 +169,20 @@ where
     Ok((first, second))
 }
 
+/// Ensures that natural number can be converted into usize.
+pub fn natural_can_cast_to_usize(
+    n: NaturalNumber,
+    arg_index: usize,
+) -> Result<NaturalNumber, InstructionError> {
+    match TryInto::<usize>::try_into(n) {
+        Ok(v) => Ok(NaturalNumber::from(v)),
+        Err(..) => Err(InstructionError::invalid_arg(
+            "must not exceed usize",
+            arg_index,
+        )),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use astraea::{formatting::Pretty, integer::Integer};
