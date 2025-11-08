@@ -1,8 +1,6 @@
 use std::ops::{Div, Rem};
 
-use crate::algebra::{
-    AddWithIdentity, AddInvertible, MathObject, MulCommutative, MulWithIdentity, Ring, Semiring,
-};
+use crate::algebra::*;
 use crate::error::ValueError;
 use crate::sign::Sign;
 
@@ -51,7 +49,7 @@ pub trait Pow {
     fn pow(self, power: usize) -> Self;
 }
 
-impl<T: Ring + MulWithIdentity<Self> + MulCommutative<Self>> Pow for T {
+impl<T: MulClosed + MulWithIdentity<Self> + MulAssociative<Self>> Pow for T {
     fn pow(self, power: usize) -> Self {
         let mut a = self;
         let mut res = Self::one();
