@@ -105,6 +105,32 @@ pub fn stirling_second_kind(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumb
     stirling_second_kind_nth_row(n).swap_remove(k)
 }
 
+/// Calculates nth Bell number.
+///
+/// Bell number is the number of partitions of a set with n elements.
+///
+/// ```
+/// use astraea::combinatorics::bell;
+/// use astraea::natural::NaturalNumber;
+///
+/// let n = NaturalNumber::from(6_u8);
+/// let b = bell(&n);
+///
+/// assert_eq!(b, NaturalNumber::from(203_u8));
+/// ```
+///
+/// Panics if n cannot be converted to usize.
+pub fn bell(n: &NaturalNumber) -> NaturalNumber {
+    let n: usize = n.clone().try_into().expect("value is too large");
+    let mut res = NaturalNumber::zero();
+
+    for v in stirling_second_kind_nth_row(n).into_iter() {
+        res = res + v;
+    }
+
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use crate::natural::NaturalNumber;
@@ -168,6 +194,22 @@ mod tests {
 
                 assert_eq!(actual, expected, "mismatch for n={}, k={}", n, k);
             }
+        }
+    }
+
+    #[test]
+    fn test_bell() {
+        let tests: Vec<usize> = vec![
+            1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147, 115975, 678570, 4213597, 27644437,
+        ];
+
+        for (n, expected) in tests.into_iter().enumerate() {
+            let n = NaturalNumber::from(n);
+
+            let expected = NaturalNumber::from(expected);
+            let actual = bell(&n);
+
+            assert_eq!(actual, expected);
         }
     }
 }
