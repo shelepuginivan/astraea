@@ -89,23 +89,22 @@ impl Module for NaturalModule {
                 }
             }
 
-            Instruction::NaturalCalculateDivisionDigit => {
-                validate::ensure_args_count(&args, 3)?;
+            //Instruction::NaturalCalculateDivisionDigit => {
+            //    validate::ensure_args_count(&args, 3)?;
 
-                let lhs = validate::get_natural(&args, 0)?;
-                let rhs = validate::get_natural(&args, 1)?;
-                let k = validate::get_usize(&args, 2)?;
+            //    let lhs = validate::get_natural(&args, 0)?;
+            //    let rhs = validate::get_natural(&args, 1)?;
+            //    let k = validate::get_usize(&args, 2)?;
 
-                if k + rhs.len() > lhs.len() {
-                    return Ok(Box::new(digit!(0)));
-                }
+            //    if k + rhs.len() > lhs.len() {
+            //        return Ok(Box::new(digit!(0)));
+            //    }
 
-                let lhs_digit = lhs.lsd_at(k + rhs.len() - 1);
-                let rhs_digit = rhs.msd_at(0);
+            //    let lhs_digit = lhs.lsd_at(k + rhs.len() - 1);
+            //    let rhs_digit = rhs.msd_at(0);
 
-                Ok(Box::new(lhs_digit / rhs_digit))
-            }
-
+            //    Ok(Box::new(lhs_digit / rhs_digit))
+            //}
             Instruction::NaturalQuotient => {
                 let (lhs, rhs) = validate::two_args::<Natural>(args)?;
 

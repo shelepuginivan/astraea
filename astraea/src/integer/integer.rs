@@ -378,7 +378,7 @@ macro_rules! impl_integer_from_signed {
     };
 }
 
-impl_integer_from_signed!(i8, i16, i32, i64, i128, isize);
+impl_integer_from_signed!(i32, i64); // , i128, isize i32, i8, i16, 
 
 /// Implements From<T> for Integer for every unsigned integer type.
 macro_rules! impl_integer_from_unsigned {
@@ -393,7 +393,7 @@ macro_rules! impl_integer_from_unsigned {
     };
 }
 
-impl_integer_from_unsigned!(u8, u16, u32, u64, u128, usize);
+impl_integer_from_unsigned!(u8, u16, u32, u64, usize); // u128, 
 
 #[cfg(test)]
 mod tests {
@@ -525,7 +525,7 @@ mod tests {
             assert_eq!(expected, actual);
         }
 
-        let zero_division = Integer::from(234234i32) / Integer::from(0i8);
+        let zero_division = Integer::from(234234i32) / Integer::from(0i32);
         assert!(zero_division.is_err());
     }
 

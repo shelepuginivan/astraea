@@ -1,6 +1,5 @@
 use astraea::algebra::Field;
-use astraea::digit::Digit;
-use astraea::natural::Natural;
+use astraea::natural::{Digit, Natural};
 use astraea::polynomial::Polynomial;
 use astraea::rational::Rational;
 use std::{fmt::Display, str::FromStr};
@@ -210,7 +209,7 @@ mod tests {
     #[test]
     fn test_get_digit() {
         let actual = get_digit(&vec!["9".to_string()], 0).unwrap();
-        assert_eq!(actual, Digit::Nine);
+        assert_eq!(actual, Digit(9));
         assert!(get_digit(&vec!["99".to_string()], 0).is_err());
     }
 
