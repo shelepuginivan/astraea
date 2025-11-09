@@ -1,5 +1,4 @@
 pub use crate::algebra::*;
-pub use crate::digit::*;
 pub use crate::formatting::Pretty;
 pub use crate::sign::*;
 
