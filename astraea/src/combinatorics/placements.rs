@@ -1,26 +1,26 @@
 use crate::algebra::{AddWithIdentity, MulWithIdentity};
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Calculates number of placements, or partial permutations of set with n elements into sequences
 /// of k elements, such that order of elements matters.
 ///
 /// ```
 /// use astraea::combinatorics::placements;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(5_u8);
-/// let k = NaturalNumber::from(3_u8);
+/// let n = Natural::from(5_u8);
+/// let k = Natural::from(3_u8);
 /// let p = placements(&n, &k);
 ///
-/// assert_eq!(p, NaturalNumber::from(60_u8));
+/// assert_eq!(p, Natural::from(60_u8));
 /// ```
-pub fn placements(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumber {
+pub fn placements(n: &Natural, k: &Natural) -> Natural {
     if n < k {
-        return NaturalNumber::zero();
+        return Natural::zero();
     }
 
-    let mut multiplier = (n.clone() - k.clone()).unwrap() + NaturalNumber::one();
-    let mut res = NaturalNumber::one();
+    let mut multiplier = (n.clone() - k.clone()).unwrap() + Natural::one();
+    let mut res = Natural::one();
 
     while multiplier <= *n {
         res = res * multiplier.clone();
@@ -57,8 +57,8 @@ mod tests {
         ];
 
         for ((n, k), expected) in tests {
-            let n_val = NaturalNumber::from(n);
-            let k_val = NaturalNumber::from(k);
+            let n_val = Natural::from(n);
+            let k_val = Natural::from(k);
             let actual = placements(&n_val, &k_val);
             assert_eq!(actual.to_string(), expected);
         }
@@ -68,8 +68,8 @@ mod tests {
     fn test_placements_against_formula() {
         for n in 0u8..=15 {
             for k in 0u8..=n {
-                let n_val = NaturalNumber::from(n);
-                let k_val = NaturalNumber::from(k);
+                let n_val = Natural::from(n);
+                let k_val = Natural::from(k);
 
                 let actual = placements(&n_val.clone(), &k_val.clone());
 

@@ -1,28 +1,28 @@
 use std::ops::Div;
 
 use crate::algebra::MulWithIdentity;
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Calculates nth Catalan number.
 ///
 /// ```
 /// use astraea::combinatorics::catalan;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(10_u8);
+/// let n = Natural::from(10_u8);
 /// let c = catalan(&n);
 ///
-/// assert_eq!(c, NaturalNumber::from(16796_u32));
+/// assert_eq!(c, Natural::from(16796_u32));
 /// ```
-pub fn catalan(n: &NaturalNumber) -> NaturalNumber {
-    let mut res = NaturalNumber::one();
-    let mut numerator = NaturalNumber::from(2_u8);
-    let mut denominator = NaturalNumber::one();
+pub fn catalan(n: &Natural) -> Natural {
+    let mut res = Natural::one();
+    let mut numerator = Natural::from(2_u8);
+    let mut denominator = Natural::one();
 
     while denominator <= *n {
         denominator = denominator.inc();
         res = (res * numerator.clone()).div(denominator.clone()).unwrap();
-        numerator = numerator + NaturalNumber::from(4_u8);
+        numerator = numerator + Natural::from(4_u8);
     }
 
     res
@@ -32,7 +32,7 @@ pub fn catalan(n: &NaturalNumber) -> NaturalNumber {
 mod tests {
     use super::catalan;
 
-    use crate::natural::NaturalNumber;
+    use crate::natural::Natural;
 
     #[test]
     fn test_catalan() {
@@ -42,8 +42,8 @@ mod tests {
         ];
 
         for (n, expected) in tests.into_iter().enumerate() {
-            let n = NaturalNumber::from(n);
-            let expected = NaturalNumber::from(expected);
+            let n = Natural::from(n);
+            let expected = Natural::from(expected);
             let actual = catalan(&n);
 
             assert_eq!(actual, expected);

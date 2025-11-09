@@ -1,6 +1,6 @@
 use astraea::algebra::Field;
 use astraea::digit::Digit;
-use astraea::natural::NaturalNumber;
+use astraea::natural::Natural;
 use astraea::polynomial::Polynomial;
 use astraea::rational::RationalNumber;
 use std::{fmt::Display, str::FromStr};
@@ -115,12 +115,9 @@ pub fn get_digit(args: &Vec<String>, arg_index: usize) -> Result<Digit, Instruct
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
-/// Parses argument at the specified index as NaturalNumber.
-pub fn get_natural(
-    args: &Vec<String>,
-    arg_index: usize,
-) -> Result<NaturalNumber, InstructionError> {
-    NaturalNumber::from_str(&args[arg_index])
+/// Parses argument at the specified index as Natural.
+pub fn get_natural(args: &Vec<String>, arg_index: usize) -> Result<Natural, InstructionError> {
+    Natural::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
@@ -171,11 +168,11 @@ where
 
 /// Ensures that natural number can be converted into usize.
 pub fn natural_can_cast_to_usize(
-    n: NaturalNumber,
+    n: Natural,
     arg_index: usize,
-) -> Result<NaturalNumber, InstructionError> {
+) -> Result<Natural, InstructionError> {
     match TryInto::<usize>::try_into(n) {
-        Ok(v) => Ok(NaturalNumber::from(v)),
+        Ok(v) => Ok(Natural::from(v)),
         Err(..) => Err(InstructionError::invalid_arg(
             "must not exceed usize",
             arg_index,
@@ -223,7 +220,7 @@ mod tests {
     #[test]
     fn test_get_natural() {
         let actual = get_natural(&vec!["51".to_string()], 0).unwrap();
-        assert_eq!(actual, NaturalNumber::from(51u8));
+        assert_eq!(actual, Natural::from(51u8));
         assert!(get_natural(&vec!["-11".to_string()], 0).is_err());
         assert!(get_natural(&vec!["a".to_string()], 0).is_err());
     }
@@ -233,7 +230,7 @@ mod tests {
         let actual = get_rational(&vec!["7/5".to_string()], 0).unwrap();
         assert_eq!(
             actual,
-            RationalNumber::new(Integer::from(7), NaturalNumber::from(5u8)).unwrap()
+            RationalNumber::new(Integer::from(7), Natural::from(5u8)).unwrap()
         );
         assert!(get_rational(&vec!["8/0".to_string()], 0).is_err());
         assert!(get_rational(&vec!["sadkfsjafokdjh".to_string()], 0).is_err());
@@ -249,8 +246,8 @@ mod tests {
 
     #[test]
     fn test_one_arg() {
-        let actual: NaturalNumber = one_arg(vec!["12321".into()]).unwrap();
-        assert_eq!(actual, NaturalNumber::from(12321u16));
+        let actual: Natural = one_arg(vec!["12321".into()]).unwrap();
+        assert_eq!(actual, Natural::from(12321u16));
         assert!(one_arg::<RationalNumber>(vec![]).is_err());
         assert!(one_arg::<RationalNumber>(vec!["24".into(), "11".into()]).is_err());
     }

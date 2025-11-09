@@ -3,15 +3,15 @@ use std::str::FromStr;
 
 use crate::algebra::*;
 use crate::error::ParseError;
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Matrix representation of the Fibonacci sequence.
 #[derive(Clone, Debug)]
 struct FibMatrix {
-    a: NaturalNumber,
-    b: NaturalNumber,
-    c: NaturalNumber,
-    d: NaturalNumber,
+    a: Natural,
+    b: Natural,
+    c: Natural,
+    d: Natural,
 }
 
 impl MathObject for FibMatrix {}
@@ -23,10 +23,10 @@ impl MulAssociative<Self> for FibMatrix {}
 impl MulWithIdentity<Self> for FibMatrix {
     fn one() -> Self {
         Self {
-            a: NaturalNumber::one(),
-            b: NaturalNumber::zero(),
-            c: NaturalNumber::zero(),
-            d: NaturalNumber::one(),
+            a: Natural::one(),
+            b: Natural::zero(),
+            c: Natural::zero(),
+            d: Natural::one(),
         }
     }
 
@@ -42,10 +42,10 @@ impl FibMatrix {
     /// > 1 0
     fn new() -> Self {
         Self {
-            a: NaturalNumber::one(),
-            b: NaturalNumber::one(),
-            c: NaturalNumber::one(),
-            d: NaturalNumber::zero(),
+            a: Natural::one(),
+            b: Natural::one(),
+            c: Natural::one(),
+            d: Natural::zero(),
         }
     }
 
@@ -53,7 +53,7 @@ impl FibMatrix {
     ///
     /// > Fₙ₊₁ Fₙ
     /// > Fₙ   Fₙ₋₁
-    fn nth(n: &NaturalNumber) -> Self {
+    fn nth(n: &Natural) -> Self {
         let n: usize = n.clone().try_into().expect("value is too large");
 
         Self::new().pow(n)
@@ -99,16 +99,16 @@ impl FromStr for FibMatrix {
 ///
 /// ```
 /// use astraea::combinatorics::fibonacci;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(300_u16);
+/// let n = Natural::from(300_u16);
 /// let fib = fibonacci(&n);
 ///
 /// assert_eq!(fib.to_string(), "222232244629420445529739893461909967206666939096499764990979600");
 /// ```
 ///
 /// Panics if n cannot be converted to usize.
-pub fn fibonacci(n: &NaturalNumber) -> NaturalNumber {
+pub fn fibonacci(n: &Natural) -> Natural {
     FibMatrix::nth(n).c
 }
 
@@ -116,23 +116,23 @@ pub fn fibonacci(n: &NaturalNumber) -> NaturalNumber {
 ///
 /// ```
 /// use astraea::combinatorics::lucas;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(300_u16);
+/// let n = Natural::from(300_u16);
 /// let luc = lucas(&n);
 ///
 /// assert_eq!(luc.to_string(), "496926405783746676393791436882468230898067489522034699520200002");
 /// ```
 ///
 /// Panics if n cannot be converted to usize.
-pub fn lucas(n: &NaturalNumber) -> NaturalNumber {
+pub fn lucas(n: &Natural) -> Natural {
     let v = FibMatrix::nth(n);
     v.a + v.d
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::natural::NaturalNumber;
+    use crate::natural::Natural;
 
     use super::*;
 
@@ -141,15 +141,15 @@ mod tests {
         let tests: Vec<usize> = vec![0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610];
 
         for (n, expected) in tests.into_iter().enumerate() {
-            let n = NaturalNumber::from(n);
-            let expected = NaturalNumber::from(expected);
+            let n = Natural::from(n);
+            let expected = Natural::from(expected);
             let actual = fibonacci(&n);
 
             assert_eq!(actual, expected, "mismatched for n={}", n.to_string());
         }
 
         assert_eq!(
-            fibonacci(&NaturalNumber::from(300_u16)).to_string(),
+            fibonacci(&Natural::from(300_u16)).to_string(),
             "222232244629420445529739893461909967206666939096499764990979600",
         );
     }
@@ -162,15 +162,15 @@ mod tests {
         ];
 
         for (n, expected) in tests.into_iter().enumerate() {
-            let n = NaturalNumber::from(n);
-            let expected = NaturalNumber::from(expected);
+            let n = Natural::from(n);
+            let expected = Natural::from(expected);
             let actual = lucas(&n);
 
             assert_eq!(actual, expected, "mismatched for n={}", n.to_string());
         }
 
         assert_eq!(
-            lucas(&NaturalNumber::from(100_u8)).to_string(),
+            lucas(&Natural::from(100_u8)).to_string(),
             "792070839848372253127",
         );
     }

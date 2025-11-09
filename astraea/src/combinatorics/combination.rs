@@ -1,7 +1,7 @@
 use std::ops::{Div, Sub};
 
 use crate::algebra::{AddWithIdentity, MulWithIdentity};
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Calculates number of combinations.
 ///
@@ -12,29 +12,29 @@ use crate::natural::NaturalNumber;
 ///
 /// ```
 /// use astraea::combinatorics::combinations;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(20_u8);
-/// let k = NaturalNumber::from(3_u8);
+/// let n = Natural::from(20_u8);
+/// let k = Natural::from(3_u8);
 /// let c = combinations(&n, &k);
 ///
-/// assert_eq!(c, NaturalNumber::from(1140_u16));
+/// assert_eq!(c, Natural::from(1140_u16));
 /// ```
-pub fn combinations(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumber {
-    let mut res = NaturalNumber::one();
+pub fn combinations(n: &Natural, k: &Natural) -> Natural {
+    let mut res = Natural::one();
     let mut numerator = n.clone();
 
     let k = match n.clone() - k.clone() {
         Ok(v) => k.to_owned().min(v),
-        Err(..) => return NaturalNumber::zero(),
+        Err(..) => return Natural::zero(),
     };
 
-    let mut denominator = NaturalNumber::one();
+    let mut denominator = Natural::one();
 
     while denominator <= k {
         res = (res * numerator.clone()).div(denominator.clone()).unwrap();
         denominator = denominator.inc();
-        numerator = numerator.sub(NaturalNumber::one()).unwrap();
+        numerator = numerator.sub(Natural::one()).unwrap();
     }
 
     res
@@ -46,7 +46,7 @@ mod tests {
 
     use super::combinations;
     use crate::combinatorics::factorial;
-    use crate::natural::NaturalNumber;
+    use crate::natural::Natural;
 
     #[test]
     fn test_combinations() {
@@ -69,8 +69,8 @@ mod tests {
         ];
 
         for ((n, k), expected) in tests {
-            let n_val = NaturalNumber::from(n);
-            let k_val = NaturalNumber::from(k);
+            let n_val = Natural::from(n);
+            let k_val = Natural::from(k);
             let actual = combinations(&n_val, &k_val);
             assert_eq!(actual.to_string(), expected);
         }
@@ -80,8 +80,8 @@ mod tests {
     fn test_combinations_against_formula() {
         for n in 0u8..=15 {
             for k in 0u8..=n {
-                let n_val = NaturalNumber::from(n);
-                let k_val = NaturalNumber::from(k);
+                let n_val = Natural::from(n);
+                let k_val = Natural::from(k);
 
                 let actual = combinations(&n_val.clone(), &k_val.clone());
 

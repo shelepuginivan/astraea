@@ -8,7 +8,7 @@ use crate::algebra::*;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 use crate::polynomial::monomial::Monomial;
 use crate::rational::RationalNumber;
 use crate::sign::Sign;
@@ -567,7 +567,7 @@ impl Polynomial<RationalNumber> {
     /// ```
     pub fn content(self) -> RationalNumber {
         let mut numerator_gcd = Integer::zero();
-        let mut denominator_lcm = NaturalNumber::one();
+        let mut denominator_lcm = Natural::one();
 
         for coefficient in self.coefficients {
             let (numerator, denominator) = coefficient.as_values();

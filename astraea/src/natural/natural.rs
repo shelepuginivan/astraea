@@ -11,17 +11,17 @@ use crate::formatting::Pretty;
 
 /// Represents a natural number.
 #[derive(Clone, Debug)]
-pub struct NaturalNumber {
+pub struct Natural {
     /// Digits of the natural number, stored in reverse order.
     digits: Vec<Digit>,
 }
 
-impl MathObject for NaturalNumber {}
+impl MathObject for Natural {}
 
-impl AddClosed for NaturalNumber {}
-impl AddAssociative<Self> for NaturalNumber {}
+impl AddClosed for Natural {}
+impl AddAssociative<Self> for Natural {}
 
-impl AddWithIdentity<Self> for NaturalNumber {
+impl AddWithIdentity<Self> for Natural {
     fn zero() -> Self {
         Self {
             digits: vec![Digit::Zero],
@@ -37,13 +37,13 @@ impl AddWithIdentity<Self> for NaturalNumber {
     }
 }
 
-impl AddCommutative<Self> for NaturalNumber {}
+impl AddCommutative<Self> for Natural {}
 
-impl MulClosed for NaturalNumber {}
+impl MulClosed for Natural {}
 
-impl MulAssociative<Self> for NaturalNumber {}
+impl MulAssociative<Self> for Natural {}
 
-impl MulWithIdentity<Self> for NaturalNumber {
+impl MulWithIdentity<Self> for Natural {
     fn one() -> Self {
         Self {
             digits: vec![Digit::One],
@@ -55,23 +55,23 @@ impl MulWithIdentity<Self> for NaturalNumber {
     }
 }
 
-impl MulCommutative<Self> for NaturalNumber {}
+impl MulCommutative<Self> for Natural {}
 
-impl Distributive for NaturalNumber {}
+impl Distributive for Natural {}
 
-impl AddMagma for NaturalNumber {}
-impl AddSemigroup for NaturalNumber {}
-impl AddUnitalMagma for NaturalNumber {}
-impl AddMonoid for NaturalNumber {}
+impl AddMagma for Natural {}
+impl AddSemigroup for Natural {}
+impl AddUnitalMagma for Natural {}
+impl AddMonoid for Natural {}
 
-impl MulMagma for NaturalNumber {}
-impl MulSemigroup for NaturalNumber {}
-impl MulUnitalMagma for NaturalNumber {}
-impl MulMonoid for NaturalNumber {}
+impl MulMagma for Natural {}
+impl MulSemigroup for Natural {}
+impl MulUnitalMagma for Natural {}
+impl MulMonoid for Natural {}
 
-impl Semiring for NaturalNumber {}
+impl Semiring for Natural {}
 
-impl IntegerDivision for NaturalNumber {
+impl IntegerDivision for Natural {
     fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {
         if rhs.is_zero() {
             return Err(ValueError::new("division by 0 is not allowed"));
@@ -96,15 +96,15 @@ impl IntegerDivision for NaturalNumber {
     }
 }
 
-impl NaturalNumber {
-    /// Creates a NaturalNumber from digits in direct order.
+impl Natural {
+    /// Creates a Natural from digits in direct order.
     ///
     /// ```
     /// use astraea::digit::Digit;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
     /// let digits = vec![Digit::Nine; 999];
-    /// let n = NaturalNumber::new(digits);
+    /// let n = Natural::new(digits);
     ///
     /// assert_eq!(n.to_string(), "9".repeat(999));
     /// ```
@@ -113,7 +113,7 @@ impl NaturalNumber {
         Self::from_reversed(digits)
     }
 
-    /// Creates a NaturalNumber from digits in reverse order.
+    /// Creates a Natural from digits in reverse order.
     pub fn from_reversed(mut digits: Vec<Digit>) -> Self {
         loop {
             match digits.pop_if(|d| *d == Digit::Zero) {
@@ -126,15 +126,15 @@ impl NaturalNumber {
             digits.push(Digit::Zero);
         }
 
-        NaturalNumber { digits }
+        Natural { digits }
     }
 
     /// Number of digits in a number.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
-    /// let n = NaturalNumber::from(12345678u32);
+    /// let n = Natural::from(12345678u32);
     ///
     /// assert_eq!(n.len(), 8);
     /// ```
@@ -146,9 +146,9 @@ impl NaturalNumber {
     ///
     /// ```
     /// use astraea::digit::Digit;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
-    /// let n = NaturalNumber::from(1234u16);
+    /// let n = Natural::from(1234u16);
     ///
     /// assert_eq!(n.lsd_at(1), Digit::Three);
     /// ```
@@ -160,9 +160,9 @@ impl NaturalNumber {
     ///
     /// ```
     /// use astraea::digit::Digit;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
-    /// let n = NaturalNumber::from(1234u16);
+    /// let n = Natural::from(1234u16);
     ///
     /// assert_eq!(n.msd_at(1), Digit::Two);
     /// ```
@@ -175,10 +175,10 @@ impl NaturalNumber {
     /// ```
     /// use astraea::digit::Digit;
     /// use astraea::formatting::Pretty;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// let n = NaturalNumber::from_str("12345689").unwrap();
+    /// let n = Natural::from_str("12345689").unwrap();
     /// let n = n.append(Digit::Zero);
     ///
     /// assert_eq!(n.prettify(), "123456890");
@@ -194,9 +194,9 @@ impl NaturalNumber {
     ///
     /// ```
     /// use astraea::digit::Digit;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
-    /// let n = NaturalNumber::from(123u8);
+    /// let n = Natural::from(123u8);
     ///
     /// assert_eq!(n.as_digits(), vec![Digit::Three, Digit::Two, Digit::One]);
     /// ```
@@ -207,12 +207,12 @@ impl NaturalNumber {
     /// Increments number by 1.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
-    /// let n = NaturalNumber::from(999999u32);
+    /// let n = Natural::from(999999u32);
     /// let n = n.inc();
     ///
-    /// assert_eq!(n, NaturalNumber::from(1000000u32));
+    /// assert_eq!(n, Natural::from(1000000u32));
     /// ```
     pub fn inc(self) -> Self {
         if self.is_zero() {
@@ -243,12 +243,12 @@ impl NaturalNumber {
     /// Multiplies number by 10<sup>k</sup>.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     ///
-    /// let n = NaturalNumber::from(1u8);
+    /// let n = Natural::from(1u8);
     /// let n = n.times_pow10(9);
     ///
-    /// assert_eq!(n, NaturalNumber::from(1_000_000_000u32));
+    /// assert_eq!(n, Natural::from(1_000_000_000u32));
     /// ```
     pub fn times_pow10(self, k: usize) -> Self {
         if self.is_zero() {
@@ -265,8 +265,8 @@ impl NaturalNumber {
     /// ```
     /// use astraea::prelude::*;
     ///
-    /// let a = NaturalNumber::from(12u8);
-    /// let b = NaturalNumber::from(18u8);
+    /// let a = Natural::from(12u8);
+    /// let b = Natural::from(18u8);
     /// let gcd = a.gcd(b);
     ///
     /// assert_eq!(gcd.to_string(), "6")
@@ -278,8 +278,8 @@ impl NaturalNumber {
     /// use astraea::prelude::*;
     /// use std::str::FromStr;
     ///
-    /// let a = NaturalNumber::zero();
-    /// let b = NaturalNumber::from_str("1234123412341234").unwrap();
+    /// let a = Natural::zero();
+    /// let b = Natural::from_str("1234123412341234").unwrap();
     /// let gcd = a.gcd(b);
     ///
     /// assert_eq!(gcd.to_string(), "1234123412341234")
@@ -312,8 +312,8 @@ impl NaturalNumber {
     /// use astraea::prelude::*;
     /// use std::str::FromStr;
     ///
-    /// let a = NaturalNumber::from(12u8);
-    /// let b = NaturalNumber::from(18u8);
+    /// let a = Natural::from(12u8);
+    /// let b = Natural::from(18u8);
     /// let lcm = a.lcm(b);
     ///
     /// assert_eq!(lcm.to_string(), "36")
@@ -324,8 +324,8 @@ impl NaturalNumber {
     /// ```
     /// use astraea::prelude::*;
     ///
-    /// let a = NaturalNumber::from(12u8);
-    /// let b = NaturalNumber::zero();
+    /// let a = Natural::from(12u8);
+    /// let b = Natural::zero();
     /// let lcm = a.lcm(b);
     ///
     /// assert!(lcm.is_zero())
@@ -345,7 +345,7 @@ impl NaturalNumber {
     }
 }
 
-impl Add for NaturalNumber {
+impl Add for Natural {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -354,7 +354,7 @@ impl Add for NaturalNumber {
 
         let result_digit_cap = lhs_len.max(rhs_len) + 1;
         if result_digit_cap == 1 {
-            return NaturalNumber::zero();
+            return Natural::zero();
         }
 
         let mut digits: Vec<Digit> = Vec::with_capacity(result_digit_cap);
@@ -389,7 +389,7 @@ impl Add for NaturalNumber {
     }
 }
 
-impl Sub for NaturalNumber {
+impl Sub for Natural {
     type Output = Result<Self, ValueError>;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -436,7 +436,7 @@ impl Sub for NaturalNumber {
     }
 }
 
-impl Mul<Digit> for NaturalNumber {
+impl Mul<Digit> for Natural {
     type Output = Self;
 
     fn mul(self, rhs: Digit) -> Self::Output {
@@ -473,7 +473,7 @@ impl Mul<Digit> for NaturalNumber {
     }
 }
 
-impl Mul<Self> for NaturalNumber {
+impl Mul<Self> for Natural {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -492,7 +492,7 @@ impl Mul<Self> for NaturalNumber {
     }
 }
 
-impl Div for NaturalNumber {
+impl Div for Natural {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -500,7 +500,7 @@ impl Div for NaturalNumber {
     }
 }
 
-impl Rem for NaturalNumber {
+impl Rem for Natural {
     type Output = Result<Self, ValueError>;
 
     fn rem(self, rhs: Self) -> Self::Output {
@@ -508,7 +508,7 @@ impl Rem for NaturalNumber {
     }
 }
 
-impl Display for NaturalNumber {
+impl Display for Natural {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s: String = self.digits.iter().rev().map(|digit| digit.char()).collect();
 
@@ -516,21 +516,21 @@ impl Display for NaturalNumber {
     }
 }
 
-impl Pretty for NaturalNumber {
+impl Pretty for Natural {
     fn prettify(&self) -> String {
         self.to_string()
     }
 }
 
-impl PartialEq for NaturalNumber {
+impl PartialEq for Natural {
     fn eq(&self, other: &Self) -> bool {
         self.digits == other.digits
     }
 }
 
-impl Eq for NaturalNumber {}
+impl Eq for Natural {}
 
-impl PartialOrd for NaturalNumber {
+impl PartialOrd for Natural {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let cmp_radix = self.digits.len().cmp(&other.digits.len());
 
@@ -553,13 +553,13 @@ impl PartialOrd for NaturalNumber {
     }
 }
 
-impl Ord for NaturalNumber {
+impl Ord for Natural {
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other).unwrap()
     }
 }
 
-impl Index<usize> for NaturalNumber {
+impl Index<usize> for Natural {
     type Output = Digit;
 
     /// Returns digit by index, starting from 0 for the most significant digit of the number.
@@ -568,13 +568,13 @@ impl Index<usize> for NaturalNumber {
     }
 }
 
-impl IndexMut<usize> for NaturalNumber {
+impl IndexMut<usize> for Natural {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.digits[index]
     }
 }
 
-impl FromStr for NaturalNumber {
+impl FromStr for Natural {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -597,15 +597,15 @@ impl FromStr for NaturalNumber {
             digits[length - index - 1] = digit;
         }
 
-        Ok(NaturalNumber::from_reversed(digits))
+        Ok(Natural::from_reversed(digits))
     }
 }
 
-/// Implements From<T> for NaturalNumber for every unsigned integer type.
+/// Implements From<T> for Natural for every unsigned integer type.
 macro_rules! impl_natural_from {
     ($($t:ty),*) => {
         $(
-            impl From<$t> for NaturalNumber {
+            impl From<$t> for Natural {
                 fn from(value: $t) -> Self {
                     let mut value = value;
                     let mut digits: Vec<Digit> = Vec::new();
@@ -625,11 +625,11 @@ macro_rules! impl_natural_from {
 
 impl_natural_from!(u8, u16, u32, u64, u128, usize);
 
-/// Implements TryFrom<T> for NaturalNumber for every signed integer type.
+/// Implements TryFrom<T> for Natural for every signed integer type.
 macro_rules! impl_natural_try_from {
     ($($t:ty),*) => {
         $(
-            impl TryFrom<$t> for NaturalNumber {
+            impl TryFrom<$t> for Natural {
                 type Error = ValueError;
 
                 fn try_from(value: $t) -> Result<Self, Self::Error> {
@@ -655,11 +655,11 @@ macro_rules! impl_natural_try_from {
 
 impl_natural_try_from!(i8, i16, i32, i64, i128, isize);
 
-/// Implements TryInto<T> for NaturalNumber for every integer type.
+/// Implements TryInto<T> for Natural for every integer type.
 macro_rules! impl_natural_try_into {
     ($($t:ty),*) => {
         $(
-            impl TryInto<$t> for NaturalNumber {
+            impl TryInto<$t> for Natural {
                 type Error = ValueError;
 
                 fn try_into(self) -> Result<$t, Self::Error> {
@@ -706,19 +706,19 @@ mod tests {
 
     #[test]
     fn test_natural_number_cmp() {
-        let lhs = NaturalNumber::from_str("1234").unwrap();
-        let rhs = NaturalNumber::from_str("5678").unwrap();
+        let lhs = Natural::from_str("1234").unwrap();
+        let rhs = Natural::from_str("5678").unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Less);
 
-        let lhs = NaturalNumber::new(vec![digit!(1); 1_000_000]);
-        let rhs = NaturalNumber::new(vec![digit!(1); 1_000_000]);
+        let lhs = Natural::new(vec![digit!(1); 1_000_000]);
+        let rhs = Natural::new(vec![digit!(1); 1_000_000]);
         assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
 
         let lhs_str = "2".to_owned() + "0".repeat(999_999).as_str();
         let rhs_str = "1".to_owned() + "9".repeat(999_999).as_str();
 
-        let lhs = NaturalNumber::from_str(lhs_str.as_str()).unwrap();
-        let rhs = NaturalNumber::from_str(rhs_str.as_str()).unwrap();
+        let lhs = Natural::from_str(lhs_str.as_str()).unwrap();
+        let rhs = Natural::from_str(rhs_str.as_str()).unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
     }
 
@@ -728,7 +728,7 @@ mod tests {
 
         for _ in 0..1000 {
             let v: u32 = rng.random_range(..u32::MAX - 1);
-            let n = NaturalNumber::from_str(&v.to_string()).unwrap();
+            let n = Natural::from_str(&v.to_string()).unwrap();
             let expected = (v + 1).to_string();
             let actual = n.inc().to_string();
 
@@ -745,13 +745,13 @@ mod tests {
             let rhs: u32 = rng.random_range(..2u32.pow(31));
             let expected = lhs + rhs;
 
-            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
-            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
+            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
             assert_eq!((lhs + rhs).to_string(), expected.to_string());
         }
 
-        let lhs = NaturalNumber::from_str(&"9".repeat(999_999)).unwrap();
-        let rhs = NaturalNumber::from_str("1").unwrap();
+        let lhs = Natural::from_str(&"9".repeat(999_999)).unwrap();
+        let rhs = Natural::from_str("1").unwrap();
 
         let expected = "1".to_owned() + &"0".repeat(999_999);
         let actual = (lhs + rhs).to_string();
@@ -768,24 +768,24 @@ mod tests {
             let lhs: u32 = rng.random_range(rhs..=u32::MAX);
             let expected = lhs - rhs;
 
-            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
-            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
+            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
             assert_eq!((lhs - rhs).unwrap().to_string(), expected.to_string());
         }
 
         let lhs_value = "1".to_owned() + &"0".repeat(999_999);
-        let lhs = NaturalNumber::from_str(&lhs_value).unwrap();
-        let rhs = NaturalNumber::from_str("1").unwrap();
+        let lhs = Natural::from_str(&lhs_value).unwrap();
+        let rhs = Natural::from_str("1").unwrap();
 
         let expected = "9".repeat(999_999);
         let actual = (lhs - rhs).unwrap().to_string();
 
         assert_eq!(expected, actual);
 
-        let rhs_gt_lhs = NaturalNumber::from(123u8) - NaturalNumber::from(3234672789346usize);
+        let rhs_gt_lhs = Natural::from(123u8) - Natural::from(3234672789346usize);
         assert!(rhs_gt_lhs.is_err());
 
-        let rhs_gt_lhs = NaturalNumber::from(123u8) - NaturalNumber::from(124u16);
+        let rhs_gt_lhs = Natural::from(123u8) - Natural::from(124u16);
         assert!(rhs_gt_lhs.is_err());
     }
 
@@ -798,7 +798,7 @@ mod tests {
             let rhs = rng.random_range(0..9);
             let expected = lhs * rhs;
 
-            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
+            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
             let rhs = digit!(rhs as u8);
             let actual = lhs * rhs;
 
@@ -815,8 +815,8 @@ mod tests {
             let rhs = rng.random_range(..2u32.pow(16));
             let expected = lhs * rhs;
 
-            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
-            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
+            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
             let actual = lhs * rhs;
 
             assert_eq!(expected.to_string(), actual.to_string());
@@ -832,14 +832,14 @@ mod tests {
             let rhs = rng.random_range(1..u32::MAX);
             let expected = lhs / rhs;
 
-            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
-            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
+            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
             let actual = lhs / rhs;
 
             assert_eq!(expected.to_string(), actual.unwrap().to_string());
         }
 
-        let zero_division = NaturalNumber::from(9u8) / NaturalNumber::from(0u8);
+        let zero_division = Natural::from(9u8) / Natural::from(0u8);
         assert!(zero_division.is_err());
     }
 
@@ -852,8 +852,8 @@ mod tests {
             let rhs = rng.random_range(1..u32::MAX);
             let expected = lhs % rhs;
 
-            let lhs = NaturalNumber::from_str(&lhs.to_string()).unwrap();
-            let rhs = NaturalNumber::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
+            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
             let actual = lhs % rhs;
 
             assert_eq!(expected.to_string(), actual.unwrap().to_string());
@@ -862,45 +862,45 @@ mod tests {
 
     #[test]
     fn test_natural_number_gcd() {
-        let lhs = NaturalNumber::from_str("21").unwrap();
-        let rhs = NaturalNumber::from_str("6").unwrap();
+        let lhs = Natural::from_str("21").unwrap();
+        let rhs = Natural::from_str("6").unwrap();
         assert_eq!("3", lhs.gcd(rhs).to_string());
 
-        let lhs = NaturalNumber::from_str("8").unwrap();
-        let rhs = NaturalNumber::from_str("0").unwrap();
+        let lhs = Natural::from_str("8").unwrap();
+        let rhs = Natural::from_str("0").unwrap();
         assert_eq!("8", lhs.gcd(rhs).to_string());
 
-        let lhs = NaturalNumber::from_str("0").unwrap();
-        let rhs = NaturalNumber::from_str("6").unwrap();
+        let lhs = Natural::from_str("0").unwrap();
+        let rhs = Natural::from_str("6").unwrap();
         assert_eq!("6", lhs.gcd(rhs).to_string());
 
-        let lhs = NaturalNumber::from_str("0").unwrap();
-        let rhs = NaturalNumber::from_str("0").unwrap();
+        let lhs = Natural::from_str("0").unwrap();
+        let rhs = Natural::from_str("0").unwrap();
         assert_eq!("0", lhs.gcd(rhs).to_string());
     }
 
     #[test]
     fn test_natural_number_lcm() {
-        let lhs = NaturalNumber::from_str("21").unwrap();
-        let rhs = NaturalNumber::from_str("14").unwrap();
+        let lhs = Natural::from_str("21").unwrap();
+        let rhs = Natural::from_str("14").unwrap();
         assert_eq!("42", lhs.lcm(rhs).to_string());
 
-        let lhs = NaturalNumber::from_str("8").unwrap();
-        let rhs = NaturalNumber::from_str("0").unwrap();
+        let lhs = Natural::from_str("8").unwrap();
+        let rhs = Natural::from_str("0").unwrap();
         assert_eq!("0", lhs.lcm(rhs).to_string());
 
-        let lhs = NaturalNumber::from_str("0").unwrap();
-        let rhs = NaturalNumber::from_str("6").unwrap();
+        let lhs = Natural::from_str("0").unwrap();
+        let rhs = Natural::from_str("6").unwrap();
         assert_eq!("0", lhs.lcm(rhs).to_string());
 
-        let lhs = NaturalNumber::from_str("0").unwrap();
-        let rhs = NaturalNumber::from_str("0").unwrap();
+        let lhs = Natural::from_str("0").unwrap();
+        let rhs = Natural::from_str("0").unwrap();
         assert_eq!("0", lhs.lcm(rhs).to_string());
     }
 
     #[test]
     fn test_natural_number_as_digits() {
-        let n = NaturalNumber::from_str("123412341234").unwrap();
+        let n = Natural::from_str("123412341234").unwrap();
         let digits = n.as_digits();
 
         assert_eq!(digits.len(), 12);
@@ -909,15 +909,15 @@ mod tests {
 
     #[test]
     fn test_natural_number_is_zero() {
-        assert!(NaturalNumber::new(vec![]).is_zero());
-        assert!(NaturalNumber::new(vec![digit!(0)]).is_zero());
-        assert!(!NaturalNumber::new(vec![digit!(1)]).is_zero());
-        assert!(NaturalNumber::new(vec![digit!(0); 2]).is_zero());
+        assert!(Natural::new(vec![]).is_zero());
+        assert!(Natural::new(vec![digit!(0)]).is_zero());
+        assert!(!Natural::new(vec![digit!(1)]).is_zero());
+        assert!(Natural::new(vec![digit!(0); 2]).is_zero());
     }
 
     #[test]
     fn test_natural_number_times_pow10() {
-        let n = NaturalNumber::from_str("123").unwrap();
+        let n = Natural::from_str("123").unwrap();
         let expected = "12300000000000000";
         let actual = n.times_pow10(14).to_string();
 
@@ -927,10 +927,10 @@ mod tests {
     #[test]
     fn test_natural_number_to_string() {
         let digits = vec![digit!(9); 999];
-        let n = NaturalNumber::new(digits);
+        let n = Natural::new(digits);
         assert_eq!(n.to_string(), "9".repeat(999));
 
-        let n = NaturalNumber::from_str("3739847457938742").unwrap();
+        let n = Natural::from_str("3739847457938742").unwrap();
         assert_eq!(n.to_string(), "3739847457938742");
     }
 }

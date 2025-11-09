@@ -2,7 +2,7 @@ use astraea::algebra::AddWithIdentity;
 use astraea::digit;
 use astraea::digit::Digit;
 use astraea::formatting::Pretty;
-use astraea::natural::NaturalNumber;
+use astraea::natural::Natural;
 use std::collections::HashSet;
 
 use crate::instruction::Instruction;
@@ -25,27 +25,27 @@ impl Module for NaturalModule {
     ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::NaturalCompare => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(lhs.cmp(&rhs)))
             }
 
             Instruction::NaturalIsZero => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 Ok(Box::new(n.is_zero()))
             }
 
             Instruction::NaturalIncrement => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 Ok(Box::new(n.inc()))
             }
 
             Instruction::NaturalAdd => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(lhs + rhs))
             }
 
             Instruction::NaturalSubtract => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
 
                 match lhs - rhs {
                     Ok(res) => Ok(Box::new(res)),
@@ -72,7 +72,7 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalMultiply => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(lhs * rhs))
             }
 
@@ -107,7 +107,7 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalQuotient => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
 
                 match lhs / rhs {
                     Ok(v) => Ok(Box::new(v)),
@@ -116,7 +116,7 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalRemainder => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
 
                 match lhs % rhs {
                     Ok(v) => Ok(Box::new(v)),
@@ -125,12 +125,12 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalGCD => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(lhs.gcd(rhs)))
             }
 
             Instruction::NaturalLCM => {
-                let (lhs, rhs) = validate::two_args::<NaturalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(lhs.lcm(rhs)))
             }
 

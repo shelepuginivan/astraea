@@ -6,13 +6,13 @@ use std::str::FromStr;
 use crate::algebra::*;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 use crate::sign::Sign;
 
 // Represents an integer.
 #[derive(Clone, Debug)]
 pub struct Integer {
-    value: NaturalNumber,
+    value: Natural,
     sign: Sign,
 }
 
@@ -25,7 +25,7 @@ impl AddAssociative<Self> for Integer {}
 impl AddWithIdentity<Self> for Integer {
     fn zero() -> Self {
         Self {
-            value: NaturalNumber::zero(),
+            value: Natural::zero(),
             sign: Sign::Zero,
         }
     }
@@ -52,7 +52,7 @@ impl MulAssociative<Self> for Integer {}
 impl MulWithIdentity<Self> for Integer {
     fn one() -> Self {
         Self {
-            value: NaturalNumber::one(),
+            value: Natural::one(),
             sign: Sign::Positive,
         }
     }
@@ -119,22 +119,22 @@ impl IntegerDivision for Integer {
 
 impl Integer {
     /// Creates a new Integer from natural value and sign.
-    pub fn new(value: NaturalNumber, sign: Sign) -> Self {
+    pub fn new(value: Natural, sign: Sign) -> Self {
         Self { value, sign }
     }
 
     /// Creates a positive Integer from natural number.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     /// use astraea::integer::Integer;
     ///
-    /// let n = NaturalNumber::from(123u8);
+    /// let n = Natural::from(123u8);
     /// let i = Integer::from_natural(n);
     ///
     /// assert_eq!(i, Integer::from(123));
     /// ```
-    pub fn from_natural(n: NaturalNumber) -> Self {
+    pub fn from_natural(n: Natural) -> Self {
         Self {
             value: n,
             sign: Sign::Positive,
@@ -144,17 +144,17 @@ impl Integer {
     /// Converts integer to natural. Returns error for negative integers.
     ///
     /// ```
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     /// use astraea::integer::Integer;
     ///
     /// let i = Integer::from(1000);
     /// let n = i.to_natural().unwrap();
-    /// assert_eq!(n, NaturalNumber::from(1000u16));
+    /// assert_eq!(n, Natural::from(1000u16));
     ///
     /// let i = Integer::from(-1000);
     /// assert!(i.to_natural().is_err());
     /// ```
-    pub fn to_natural(self) -> Result<NaturalNumber, ValueError> {
+    pub fn to_natural(self) -> Result<Natural, ValueError> {
         match self.sign {
             Sign::Negative => Err(ValueError::new(
                 "cannot convert negative integer to natural",
@@ -350,7 +350,7 @@ impl FromStr for Integer {
             Sign::Negative
         };
 
-        let value = NaturalNumber::from_str(s)?;
+        let value = Natural::from_str(s)?;
         if value.is_zero() {
             sign = Sign::Zero;
         }
@@ -427,7 +427,7 @@ mod tests {
             }
 
             let actual = v.to_natural().unwrap();
-            let expected: NaturalNumber = i.try_into().unwrap();
+            let expected: Natural = i.try_into().unwrap();
 
             assert_eq!(actual, expected);
         }

@@ -7,14 +7,14 @@ use crate::algebra::*;
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
 use crate::integer::Integer;
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 use crate::sign::Sign;
 
 /// Represents a rational number.
 #[derive(Clone, Debug)]
 pub struct RationalNumber {
     numerator: Integer,
-    denominator: NaturalNumber,
+    denominator: Natural,
 }
 
 impl MathObject for RationalNumber {}
@@ -27,7 +27,7 @@ impl AddWithIdentity<Self> for RationalNumber {
     fn zero() -> Self {
         Self {
             numerator: Integer::zero(),
-            denominator: NaturalNumber::one(),
+            denominator: Natural::one(),
         }
     }
 
@@ -54,7 +54,7 @@ impl MulWithIdentity<Self> for RationalNumber {
     fn one() -> Self {
         Self {
             numerator: Integer::one(),
-            denominator: NaturalNumber::one(),
+            denominator: Natural::one(),
         }
     }
 
@@ -118,7 +118,7 @@ impl Field for RationalNumber {}
 
 impl RationalNumber {
     /// Creates a new RationalNumber with specified numerator and denominator.
-    pub fn new(numerator: Integer, denominator: NaturalNumber) -> Result<Self, ValueError> {
+    pub fn new(numerator: Integer, denominator: Natural) -> Result<Self, ValueError> {
         if denominator.is_zero() {
             return Err(ValueError::new("denominator cannot be 0"));
         }
@@ -146,7 +146,7 @@ impl RationalNumber {
     pub fn from_integer(integer: Integer) -> Self {
         Self {
             numerator: integer,
-            denominator: NaturalNumber::one(),
+            denominator: Natural::one(),
         }
     }
 
@@ -226,7 +226,7 @@ impl RationalNumber {
     pub fn to_integer(self) -> Result<Integer, ValueError> {
         let reduced = self.reduce();
 
-        if reduced.denominator != NaturalNumber::one() {
+        if reduced.denominator != Natural::one() {
             return Err(ValueError::new("not an integer"));
         }
 
@@ -237,7 +237,7 @@ impl RationalNumber {
     ///
     /// ```
     /// use astraea::integer::Integer;
-    /// use astraea::natural::NaturalNumber;
+    /// use astraea::natural::Natural;
     /// use astraea::rational::RationalNumber;
     /// use std::str::FromStr;
     ///
@@ -246,9 +246,9 @@ impl RationalNumber {
     /// let (numerator, denominator) = r.as_values();
     ///
     /// assert_eq!(numerator, Integer::from(-34));
-    /// assert_eq!(denominator, NaturalNumber::from(23u8));
+    /// assert_eq!(denominator, Natural::from(23u8));
     /// ```
-    pub fn as_values(self) -> (Integer, NaturalNumber) {
+    pub fn as_values(self) -> (Integer, Natural) {
         (self.numerator, self.denominator)
     }
 }
@@ -570,7 +570,7 @@ mod tests {
         for _ in 0..1000 {
             let v: i32 = rng.random();
             let expected_numerator = Integer::from(v);
-            let expected_denominator = NaturalNumber::one();
+            let expected_denominator = Natural::one();
 
             let (actual_numerator, actual_denominator) =
                 RationalNumber::from_integer(Integer::from(v)).as_values();
@@ -839,16 +839,12 @@ mod tests {
             let rhs_numerator: i32 = rng.random();
             let rhs_denominator = rng.random::<u16>().max(1);
 
-            let lhs = RationalNumber::new(
-                Integer::from(lhs_numerator),
-                NaturalNumber::from(lhs_denominator),
-            )
-            .unwrap();
-            let rhs = RationalNumber::new(
-                Integer::from(rhs_numerator),
-                NaturalNumber::from(rhs_denominator),
-            )
-            .unwrap();
+            let lhs =
+                RationalNumber::new(Integer::from(lhs_numerator), Natural::from(lhs_denominator))
+                    .unwrap();
+            let rhs =
+                RationalNumber::new(Integer::from(rhs_numerator), Natural::from(rhs_denominator))
+                    .unwrap();
 
             assert_eq!(
                 lhs.cmp(&rhs),

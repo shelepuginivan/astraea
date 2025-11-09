@@ -9,15 +9,15 @@
 //!
 //! use astraea::prelude::*;
 //!
-//! let a = NaturalNumber::from_str(&"9".repeat(1_000_000)).unwrap();
-//! let b = NaturalNumber::one();
+//! let a = Natural::from_str(&"9".repeat(1_000_000)).unwrap();
+//! let b = Natural::one();
 //!
 //! let sum = a + b;
 //!
 //! println!("The result contains {} digits!", sum.len());
 //! ```
 //!
-//! See: [`natural::NaturalNumber`].
+//! See: [`natural::Natural`].
 //!
 //! ## Integers
 //!

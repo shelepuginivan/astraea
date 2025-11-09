@@ -1,3 +1,3 @@
-pub mod number;
+pub mod natural;
 
-pub use number::*;
+pub use natural::*;

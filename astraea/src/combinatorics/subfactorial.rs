@@ -1,5 +1,5 @@
 use crate::algebra::{AddWithIdentity, MulWithIdentity};
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Calculates subfactorial of n.
 ///
@@ -7,25 +7,25 @@ use crate::natural::NaturalNumber;
 ///
 /// ```
 /// use astraea::combinatorics::subfactorial;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(8_u8);
+/// let n = Natural::from(8_u8);
 /// let n_subfactorial = subfactorial(&n);
 ///
-/// assert_eq!(n_subfactorial, NaturalNumber::from(14833_u16));
+/// assert_eq!(n_subfactorial, Natural::from(14833_u16));
 /// ```
-pub fn subfactorial(n: &NaturalNumber) -> NaturalNumber {
+pub fn subfactorial(n: &Natural) -> Natural {
     if n.is_zero() {
-        return NaturalNumber::one();
+        return Natural::one();
     }
 
     if n.is_one() {
-        return NaturalNumber::zero();
+        return Natural::zero();
     }
 
-    let mut prev = NaturalNumber::one();
-    let mut curr = NaturalNumber::zero();
-    let mut multiplier = NaturalNumber::from(1_u8);
+    let mut prev = Natural::one();
+    let mut curr = Natural::zero();
+    let mut multiplier = Natural::from(1_u8);
 
     while &multiplier < n {
         let prev_tmp = curr.clone();
@@ -40,7 +40,7 @@ pub fn subfactorial(n: &NaturalNumber) -> NaturalNumber {
 #[cfg(test)]
 mod tests {
     use super::subfactorial;
-    use crate::natural::NaturalNumber;
+    use crate::natural::Natural;
 
     #[test]
     fn test_subfactorial() {
@@ -69,7 +69,7 @@ mod tests {
         ];
 
         for (v, expected) in tests {
-            let value = NaturalNumber::from(v);
+            let value = Natural::from(v);
             let actual = subfactorial(&value);
 
             assert_eq!(actual.to_string(), expected);

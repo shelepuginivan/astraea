@@ -1,7 +1,7 @@
+use astraea::algebra::Signed;
 use astraea::formatting::Pretty;
 use astraea::integer::Integer;
-use astraea::algebra::Signed;
-use astraea::natural::NaturalNumber;
+use astraea::natural::Natural;
 use std::collections::HashSet;
 
 use crate::instruction::Instruction;
@@ -42,7 +42,7 @@ impl Module for IntegerModule {
             }
 
             Instruction::IntegerFromNatural => {
-                let v: NaturalNumber = validate::one_arg(args)?;
+                let v: Natural = validate::one_arg(args)?;
 
                 Ok(Box::new(Integer::from_natural(v)))
             }

@@ -1,5 +1,5 @@
 use crate::algebra::MulWithIdentity;
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Calculates factorial of n.
 ///
@@ -7,16 +7,16 @@ use crate::natural::NaturalNumber;
 ///
 /// ```
 /// use astraea::combinatorics::factorial;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(7_u8);
+/// let n = Natural::from(7_u8);
 /// let n_factorial = factorial(&n);
 ///
-/// assert_eq!(n_factorial, NaturalNumber::from(5040_u16));
+/// assert_eq!(n_factorial, Natural::from(5040_u16));
 /// ```
-pub fn factorial(n: &NaturalNumber) -> NaturalNumber {
-    let mut result = NaturalNumber::one();
-    let mut multiplier = NaturalNumber::from(2_u8);
+pub fn factorial(n: &Natural) -> Natural {
+    let mut result = Natural::one();
+    let mut multiplier = Natural::from(2_u8);
 
     while multiplier <= *n {
         result = result * multiplier.clone();
@@ -29,7 +29,7 @@ pub fn factorial(n: &NaturalNumber) -> NaturalNumber {
 #[cfg(test)]
 mod tests {
     use super::factorial;
-    use crate::natural::NaturalNumber;
+    use crate::natural::Natural;
 
     #[test]
     fn test_factorial() {
@@ -58,7 +58,7 @@ mod tests {
         ];
 
         for (v, expected) in tests {
-            let value = NaturalNumber::from(v);
+            let value = Natural::from(v);
             let actual = factorial(&value);
 
             assert_eq!(actual.to_string(), expected);

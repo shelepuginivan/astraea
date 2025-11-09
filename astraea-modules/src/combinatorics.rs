@@ -1,6 +1,6 @@
 use astraea::combinatorics;
 use astraea::formatting::Pretty;
-use astraea::natural::NaturalNumber;
+use astraea::natural::Natural;
 use std::collections::HashSet;
 
 use crate::instruction::Instruction;
@@ -23,59 +23,59 @@ impl Module for CombinatoricsModule {
     ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::CombinatoricsFactorial => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 Ok(Box::new(combinatorics::factorial(&n)))
             }
 
             Instruction::CombinatoricsSubfactorial => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 Ok(Box::new(combinatorics::subfactorial(&n)))
             }
 
             Instruction::CombinatoricsCombinations => {
-                let (n, k) = validate::two_args::<NaturalNumber>(args)?;
+                let (n, k) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(combinatorics::combinations(&n, &k)))
             }
 
             Instruction::CombinatoricsPlacements => {
-                let (n, k) = validate::two_args::<NaturalNumber>(args)?;
+                let (n, k) = validate::two_args::<Natural>(args)?;
                 Ok(Box::new(combinatorics::placements(&n, &k)))
             }
 
             Instruction::CombinatoricsStirlingFirstKind => {
-                let (n, k) = validate::two_args::<NaturalNumber>(args)?;
+                let (n, k) = validate::two_args::<Natural>(args)?;
                 let n = validate::natural_can_cast_to_usize(n, 0)?;
                 let k = validate::natural_can_cast_to_usize(k, 0)?;
                 Ok(Box::new(combinatorics::stirling_first_kind(&n, &k)))
             }
 
             Instruction::CombinatoricsStirlingSecondKind => {
-                let (n, k) = validate::two_args::<NaturalNumber>(args)?;
+                let (n, k) = validate::two_args::<Natural>(args)?;
                 let n = validate::natural_can_cast_to_usize(n, 0)?;
                 let k = validate::natural_can_cast_to_usize(k, 0)?;
                 Ok(Box::new(combinatorics::stirling_second_kind(&n, &k)))
             }
 
             Instruction::CombinatoricsBell => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 let n = validate::natural_can_cast_to_usize(n, 0)?;
                 Ok(Box::new(combinatorics::bell(&n)))
             }
 
             Instruction::CombinatoricsFibonacci => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 let n = validate::natural_can_cast_to_usize(n, 0)?;
                 Ok(Box::new(combinatorics::fibonacci(&n)))
             }
 
             Instruction::CombinatoricsLucas => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 let n = validate::natural_can_cast_to_usize(n, 0)?;
                 Ok(Box::new(combinatorics::lucas(&n)))
             }
 
             Instruction::CombinatoricsCatalan => {
-                let n: NaturalNumber = validate::one_arg(args)?;
+                let n: Natural = validate::one_arg(args)?;
                 Ok(Box::new(combinatorics::catalan(&n)))
             }
 

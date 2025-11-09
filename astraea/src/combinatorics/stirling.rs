@@ -1,7 +1,7 @@
 use std::mem;
 
 use crate::algebra::{AddWithIdentity, MulWithIdentity};
-use crate::natural::NaturalNumber;
+use crate::natural::Natural;
 
 /// Calculates Stirling number of the first kind (unsigned).
 ///
@@ -10,40 +10,40 @@ use crate::natural::NaturalNumber;
 ///
 /// ```
 /// use astraea::combinatorics::stirling_first_kind;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(5_u8);
-/// let k = NaturalNumber::from(3_u8);
+/// let n = Natural::from(5_u8);
+/// let k = Natural::from(3_u8);
 /// let p = stirling_first_kind(&n, &k);
 ///
-/// assert_eq!(p, NaturalNumber::from(35_u8));
+/// assert_eq!(p, Natural::from(35_u8));
 /// ```
 ///
 /// Panics if n or k cannot be converted to usize.
-pub fn stirling_first_kind(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumber {
+pub fn stirling_first_kind(n: &Natural, k: &Natural) -> Natural {
     if n.is_zero() && k.is_zero() || n == k {
-        return NaturalNumber::one();
+        return Natural::one();
     }
 
     if k > n || n.is_zero() || k.is_zero() {
-        return NaturalNumber::zero();
+        return Natural::zero();
     }
 
     let n: usize = n.clone().try_into().expect("value is too large");
     let k: usize = k.clone().try_into().expect("value is too large");
 
-    let mut current_row = vec![NaturalNumber::zero(); n + 1];
-    current_row[0] = NaturalNumber::one();
+    let mut current_row = vec![Natural::zero(); n + 1];
+    current_row[0] = Natural::one();
 
     for i in 1..=n {
         for k in (0..i + 1).rev() {
             if k == 0 {
-                current_row[k] = NaturalNumber::zero();
+                current_row[k] = Natural::zero();
                 continue;
             }
 
-            let prev = mem::replace(&mut current_row[k], NaturalNumber::zero());
-            let row_index = NaturalNumber::from(i - 1);
+            let prev = mem::replace(&mut current_row[k], Natural::zero());
+            let row_index = Natural::from(i - 1);
             current_row[k] = current_row[k - 1].clone() + prev * row_index;
         }
     }
@@ -53,19 +53,19 @@ pub fn stirling_first_kind(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumbe
 
 /// Returns nth row of the triangular array representation of the Stirling numbers of the second
 /// kind.
-fn stirling_second_kind_nth_row(n: usize) -> Vec<NaturalNumber> {
-    let mut current_row = vec![NaturalNumber::zero(); n + 1];
-    current_row[0] = NaturalNumber::one();
+fn stirling_second_kind_nth_row(n: usize) -> Vec<Natural> {
+    let mut current_row = vec![Natural::zero(); n + 1];
+    current_row[0] = Natural::one();
 
     for i in 1..=n {
         for k in (0..i + 1).rev() {
             if k == 0 {
-                current_row[k] = NaturalNumber::zero();
+                current_row[k] = Natural::zero();
                 continue;
             }
 
-            let prev = mem::replace(&mut current_row[k], NaturalNumber::zero());
-            let col_index = NaturalNumber::from(k);
+            let prev = mem::replace(&mut current_row[k], Natural::zero());
+            let col_index = Natural::from(k);
             current_row[k] = current_row[k - 1].clone() + prev * col_index;
         }
     }
@@ -80,23 +80,23 @@ fn stirling_second_kind_nth_row(n: usize) -> Vec<NaturalNumber> {
 ///
 /// ```
 /// use astraea::combinatorics::stirling_second_kind;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(6_u8);
-/// let k = NaturalNumber::from(2_u8);
+/// let n = Natural::from(6_u8);
+/// let k = Natural::from(2_u8);
 /// let p = stirling_second_kind(&n, &k);
 ///
-/// assert_eq!(p, NaturalNumber::from(31_u8));
+/// assert_eq!(p, Natural::from(31_u8));
 /// ```
 ///
 /// Panics if n or k cannot be converted to usize.
-pub fn stirling_second_kind(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumber {
+pub fn stirling_second_kind(n: &Natural, k: &Natural) -> Natural {
     if n.is_zero() && k.is_zero() || n == k {
-        return NaturalNumber::one();
+        return Natural::one();
     }
 
     if k > n || n.is_zero() || k.is_zero() {
-        return NaturalNumber::zero();
+        return Natural::zero();
     }
 
     let n: usize = n.clone().try_into().expect("value is too large");
@@ -111,18 +111,18 @@ pub fn stirling_second_kind(n: &NaturalNumber, k: &NaturalNumber) -> NaturalNumb
 ///
 /// ```
 /// use astraea::combinatorics::bell;
-/// use astraea::natural::NaturalNumber;
+/// use astraea::natural::Natural;
 ///
-/// let n = NaturalNumber::from(6_u8);
+/// let n = Natural::from(6_u8);
 /// let b = bell(&n);
 ///
-/// assert_eq!(b, NaturalNumber::from(203_u8));
+/// assert_eq!(b, Natural::from(203_u8));
 /// ```
 ///
 /// Panics if n cannot be converted to usize.
-pub fn bell(n: &NaturalNumber) -> NaturalNumber {
+pub fn bell(n: &Natural) -> Natural {
     let n: usize = n.clone().try_into().expect("value is too large");
-    let mut res = NaturalNumber::zero();
+    let mut res = Natural::zero();
 
     for v in stirling_second_kind_nth_row(n).into_iter() {
         res = res + v;
@@ -133,7 +133,7 @@ pub fn bell(n: &NaturalNumber) -> NaturalNumber {
 
 #[cfg(test)]
 mod tests {
-    use crate::natural::NaturalNumber;
+    use crate::natural::Natural;
 
     use super::*;
 
@@ -156,10 +156,10 @@ mod tests {
 
         for (n, row) in tests.into_iter().enumerate() {
             for (k, expected) in row.into_iter().enumerate() {
-                let n = NaturalNumber::from(n);
-                let k = NaturalNumber::from(k);
+                let n = Natural::from(n);
+                let k = Natural::from(k);
 
-                let expected = NaturalNumber::from(expected);
+                let expected = Natural::from(expected);
                 let actual = stirling_first_kind(&n, &k);
 
                 assert_eq!(actual, expected, "mismatch for n={}, k={}", n, k);
@@ -186,10 +186,10 @@ mod tests {
 
         for (n, row) in tests.into_iter().enumerate() {
             for (k, expected) in row.into_iter().enumerate() {
-                let n = NaturalNumber::from(n);
-                let k = NaturalNumber::from(k);
+                let n = Natural::from(n);
+                let k = Natural::from(k);
 
-                let expected = NaturalNumber::from(expected);
+                let expected = Natural::from(expected);
                 let actual = stirling_second_kind(&n, &k);
 
                 assert_eq!(actual, expected, "mismatch for n={}, k={}", n, k);
@@ -204,9 +204,9 @@ mod tests {
         ];
 
         for (n, expected) in tests.into_iter().enumerate() {
-            let n = NaturalNumber::from(n);
+            let n = Natural::from(n);
 
-            let expected = NaturalNumber::from(expected);
+            let expected = Natural::from(expected);
             let actual = bell(&n);
 
             assert_eq!(actual, expected);
