@@ -10,7 +10,7 @@ use crate::formatting::{self, Pretty};
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::polynomial::monomial::Monomial;
-use crate::rational::RationalNumber;
+use crate::rational::Rational;
 use crate::sign::Sign;
 
 #[derive(Clone)]
@@ -114,12 +114,12 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let k0 = RationalNumber::from_str("1/2").unwrap();
-    /// let k1 = RationalNumber::from_str("-3").unwrap();
-    /// let k2 = RationalNumber::from_str("6").unwrap();
+    /// let k0 = Rational::from_str("1/2").unwrap();
+    /// let k1 = Rational::from_str("-3").unwrap();
+    /// let k2 = Rational::from_str("6").unwrap();
     ///
     /// let p = Polynomial::new(vec![k0, k1, k2]);
     ///
@@ -149,10 +149,10 @@ impl<T: Field> Polynomial<T> {
     ///
     /// ```
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     ///
     /// let s = "1/2 * x^2 - 16x³⁹ + 123/2";
-    /// let p = Polynomial::<RationalNumber>::from_canonical_form(s).unwrap();
+    /// let p = Polynomial::<Rational>::from_canonical_form(s).unwrap();
     /// ```
     pub fn from_canonical_form<S: Into<String>>(s: S) -> Result<Self, ParseError> {
         let chars: Vec<char> = s.into().trim().chars().collect();
@@ -212,9 +212,9 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
-    /// let p = Polynomial::<RationalNumber>::from_str("x³ - 7x² - 4x + 13").unwrap();
+    /// let p = Polynomial::<Rational>::from_str("x³ - 7x² - 4x + 13").unwrap();
     ///
     /// assert_eq!(p.degree(), 3);
     /// ```
@@ -227,10 +227,10 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let p = Polynomial::<RationalNumber>::from_str("21/4 * x³ - 7x² - 4x + 13").unwrap();
+    /// let p = Polynomial::<Rational>::from_str("21/4 * x³ - 7x² - 4x + 13").unwrap();
     /// assert_eq!(p.leading_coefficient().prettify(), "21/4");
     /// ```
     pub fn leading_coefficient(&self) -> T {
@@ -246,10 +246,10 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let p = Polynomial::<RationalNumber>::from_str("x + 1").unwrap();
+    /// let p = Polynomial::<Rational>::from_str("x + 1").unwrap();
     /// let p = p.times_pow_x(2);
     ///
     /// assert_eq!(p.prettify(), "x³ + x²");
@@ -265,10 +265,10 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let p = Polynomial::<RationalNumber>::from_str("4x³ + 2x² - 5x + 7").unwrap();
+    /// let p = Polynomial::<Rational>::from_str("4x³ + 2x² - 5x + 7").unwrap();
     /// let d = p.derivative();
     ///
     /// assert_eq!(d.prettify(), "12x² + 4x - 5")
@@ -295,11 +295,11 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let lhs = Polynomial::<RationalNumber>::from_str("x³ - 6x² + 11x - 6").unwrap();
-    /// let rhs = Polynomial::<RationalNumber>::from_str("x² - 2x + 1").unwrap();
+    /// let lhs = Polynomial::<Rational>::from_str("x³ - 6x² + 11x - 6").unwrap();
+    /// let rhs = Polynomial::<Rational>::from_str("x² - 2x + 1").unwrap();
     ///
     /// // lhs is (x - 1)(x - 2)(x - 3)
     /// // rhs is (x - 1)²
@@ -328,10 +328,10 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let p = Polynomial::<RationalNumber>::from_str("2x² - 4x + 5").unwrap();
+    /// let p = Polynomial::<Rational>::from_str("2x² - 4x + 5").unwrap();
     /// let monic = p.monic();
     ///
     /// assert_eq!(monic.prettify(), "x² - 2x + 5/2");
@@ -352,10 +352,10 @@ impl<T: Field> Polynomial<T> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let p = Polynomial::<RationalNumber>::from_str("x³ - x² - x + 1").unwrap();    // (x - 1)²(x + 1)
+    /// let p = Polynomial::<Rational>::from_str("x³ - x² - x + 1").unwrap();    // (x - 1)²(x + 1)
     /// let f = p.flatten();
     ///
     /// assert_eq!(f.prettify(), "x² - 1");    // (x - 1)(x + 1)
@@ -544,7 +544,7 @@ impl<T: Field> FromStr for Polynomial<T> {
     }
 }
 
-impl Polynomial<RationalNumber> {
+impl Polynomial<Rational> {
     /// Content of the rational polynomial, defined as a rational number
     ///
     /// > a / b
@@ -556,16 +556,16 @@ impl Polynomial<RationalNumber> {
     /// ```
     /// use astraea::formatting::Pretty;
     /// use astraea::polynomial::Polynomial;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let p = Polynomial::<RationalNumber>::from_str("36 * x² - 48/5 * x + 24/7").unwrap();
+    /// let p = Polynomial::<Rational>::from_str("36 * x² - 48/5 * x + 24/7").unwrap();
     ///
     /// // GCD(36, 48, 24) = 12
     /// // LCD(1, 5, 7) = 35
     /// assert_eq!(p.content().prettify(), "12/35");
     /// ```
-    pub fn content(self) -> RationalNumber {
+    pub fn content(self) -> Rational {
         let mut numerator_gcd = Integer::zero();
         let mut denominator_lcm = Natural::one();
 
@@ -576,7 +576,7 @@ impl Polynomial<RationalNumber> {
             denominator_lcm = denominator_lcm.lcm(denominator);
         }
 
-        RationalNumber::new(numerator_gcd, denominator_lcm).unwrap()
+        Rational::new(numerator_gcd, denominator_lcm).unwrap()
     }
 }
 
@@ -584,8 +584,8 @@ impl Polynomial<RationalNumber> {
 mod tests {
     use super::*;
 
-    fn q(numerator: i32, denominator: i32) -> RationalNumber {
-        RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
+    fn q(numerator: i32, denominator: i32) -> Rational {
+        Rational::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
     }
 
     #[test]
@@ -597,7 +597,7 @@ mod tests {
         ];
 
         for (canonical_form, expected) in tests {
-            let p = Polynomial::<RationalNumber>::from_canonical_form(canonical_form)
+            let p = Polynomial::<Rational>::from_canonical_form(canonical_form)
                 .expect(&format!("failed to parse '{}'", canonical_form));
 
             for (expected_exponent, actual_exponent) in expected.iter().zip(p.coefficients) {

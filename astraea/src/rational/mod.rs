@@ -1,3 +1,3 @@
-pub mod number;
+pub mod rational;
 
-pub use number::*;
+pub use rational::*;

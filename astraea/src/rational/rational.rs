@@ -12,18 +12,18 @@ use crate::sign::Sign;
 
 /// Represents a rational number.
 #[derive(Clone, Debug)]
-pub struct RationalNumber {
+pub struct Rational {
     numerator: Integer,
     denominator: Natural,
 }
 
-impl MathObject for RationalNumber {}
+impl MathObject for Rational {}
 
-impl AddClosed for RationalNumber {}
+impl AddClosed for Rational {}
 
-impl AddAssociative<Self> for RationalNumber {}
+impl AddAssociative<Self> for Rational {}
 
-impl AddWithIdentity<Self> for RationalNumber {
+impl AddWithIdentity<Self> for Rational {
     fn zero() -> Self {
         Self {
             numerator: Integer::zero(),
@@ -36,21 +36,21 @@ impl AddWithIdentity<Self> for RationalNumber {
     }
 }
 
-impl AddInvertible<Self> for RationalNumber {}
+impl AddInvertible<Self> for Rational {}
 
-impl AddCommutative<Self> for RationalNumber {}
+impl AddCommutative<Self> for Rational {}
 
-impl Signed for RationalNumber {
+impl Signed for Rational {
     fn sign(&self) -> Sign {
         self.numerator.sign()
     }
 }
 
-impl MulClosed for RationalNumber {}
+impl MulClosed for Rational {}
 
-impl MulAssociative<Self> for RationalNumber {}
+impl MulAssociative<Self> for Rational {}
 
-impl MulWithIdentity<Self> for RationalNumber {
+impl MulWithIdentity<Self> for Rational {
     fn one() -> Self {
         Self {
             numerator: Integer::one(),
@@ -66,7 +66,7 @@ impl MulWithIdentity<Self> for RationalNumber {
     }
 }
 
-impl MulInvertible<Self> for RationalNumber {
+impl MulInvertible<Self> for Rational {
     fn inverse(self) -> Result<Self, ValueError> {
         let Self {
             numerator,
@@ -84,40 +84,40 @@ impl MulInvertible<Self> for RationalNumber {
     }
 }
 
-impl MulCommutative<Self> for RationalNumber {}
+impl MulCommutative<Self> for Rational {}
 
-impl Distributive for RationalNumber {}
+impl Distributive for Rational {}
 
-impl NoZeroDivisors for RationalNumber {}
+impl NoZeroDivisors for Rational {}
 
-impl AddMagma for RationalNumber {}
-impl AddSemigroup for RationalNumber {}
-impl AddQuasigroup for RationalNumber {}
-impl AddUnitalMagma for RationalNumber {}
-impl AddMonoid for RationalNumber {}
-impl AddLoop for RationalNumber {}
-impl AddInvertibleSemigroup for RationalNumber {}
-impl AddGroup for RationalNumber {}
-impl AddAbelianGroup for RationalNumber {}
+impl AddMagma for Rational {}
+impl AddSemigroup for Rational {}
+impl AddQuasigroup for Rational {}
+impl AddUnitalMagma for Rational {}
+impl AddMonoid for Rational {}
+impl AddLoop for Rational {}
+impl AddInvertibleSemigroup for Rational {}
+impl AddGroup for Rational {}
+impl AddAbelianGroup for Rational {}
 
-impl MulMagma for RationalNumber {}
-impl MulSemigroup for RationalNumber {}
-impl MulQuasigroup for RationalNumber {}
-impl MulUnitalMagma for RationalNumber {}
-impl MulMonoid for RationalNumber {}
-impl MulLoop for RationalNumber {}
-impl MulInvertibleSemigroup for RationalNumber {}
-impl MulGroup for RationalNumber {}
-impl MulAbelianGroup for RationalNumber {}
+impl MulMagma for Rational {}
+impl MulSemigroup for Rational {}
+impl MulQuasigroup for Rational {}
+impl MulUnitalMagma for Rational {}
+impl MulMonoid for Rational {}
+impl MulLoop for Rational {}
+impl MulInvertibleSemigroup for Rational {}
+impl MulGroup for Rational {}
+impl MulAbelianGroup for Rational {}
 
-impl Semiring for RationalNumber {}
-impl Rng for RationalNumber {}
-impl Ring for RationalNumber {}
-impl CommutativeRing for RationalNumber {}
-impl Field for RationalNumber {}
+impl Semiring for Rational {}
+impl Rng for Rational {}
+impl Ring for Rational {}
+impl CommutativeRing for Rational {}
+impl Field for Rational {}
 
-impl RationalNumber {
-    /// Creates a new RationalNumber with specified numerator and denominator.
+impl Rational {
+    /// Creates a new Rational with specified numerator and denominator.
     pub fn new(numerator: Integer, denominator: Natural) -> Result<Self, ValueError> {
         if denominator.is_zero() {
             return Err(ValueError::new("denominator cannot be 0"));
@@ -136,7 +136,7 @@ impl RationalNumber {
     /// use astraea::prelude::*;
     ///
     /// let i = Integer::from(1_000_000);
-    /// let r = RationalNumber::from_integer(i);
+    /// let r = Rational::from_integer(i);
     ///
     /// let (numerator, denominator) = r.as_values();
     ///
@@ -155,11 +155,11 @@ impl RationalNumber {
     ///
     /// ```
     /// use astraea::formatting::Pretty;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
     /// // This automatically reduces the rational number.
-    /// let r = RationalNumber::from_str("6/9").unwrap();
+    /// let r = Rational::from_str("6/9").unwrap();
     ///
     /// assert_eq!(r.prettify(), "2/3");
     /// ```
@@ -194,13 +194,13 @@ impl RationalNumber {
     /// denominator.
     ///
     /// ```
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let r = RationalNumber::from_str("22/11").unwrap();
+    /// let r = Rational::from_str("22/11").unwrap();
     /// assert!(r.is_integer());
     ///
-    /// let r = RationalNumber::from_str("23/11").unwrap();
+    /// let r = Rational::from_str("23/11").unwrap();
     /// assert!(!r.is_integer());
     /// ```
     pub fn is_integer(&self) -> bool {
@@ -213,14 +213,14 @@ impl RationalNumber {
     ///
     /// ```
     /// use astraea::integer::Integer;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let r = RationalNumber::from_str("22/11").unwrap();
+    /// let r = Rational::from_str("22/11").unwrap();
     /// let i = r.to_integer().unwrap();
     /// assert_eq!(i, Integer::from(2));
     ///
-    /// let r = RationalNumber::from_str("23/11").unwrap();
+    /// let r = Rational::from_str("23/11").unwrap();
     /// assert!(r.to_integer().is_err());
     /// ```
     pub fn to_integer(self) -> Result<Integer, ValueError> {
@@ -238,10 +238,10 @@ impl RationalNumber {
     /// ```
     /// use astraea::integer::Integer;
     /// use astraea::natural::Natural;
-    /// use astraea::rational::RationalNumber;
+    /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let r = RationalNumber::from_str("-34 / 23").unwrap();
+    /// let r = Rational::from_str("-34 / 23").unwrap();
     ///
     /// let (numerator, denominator) = r.as_values();
     ///
@@ -253,7 +253,7 @@ impl RationalNumber {
     }
 }
 
-impl FromStr for RationalNumber {
+impl FromStr for Rational {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -292,7 +292,7 @@ impl FromStr for RationalNumber {
     }
 }
 
-impl Neg for RationalNumber {
+impl Neg for Rational {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -303,7 +303,7 @@ impl Neg for RationalNumber {
     }
 }
 
-impl Add for RationalNumber {
+impl Add for Rational {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -338,7 +338,7 @@ impl Add for RationalNumber {
     }
 }
 
-impl Sub for RationalNumber {
+impl Sub for Rational {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -346,7 +346,7 @@ impl Sub for RationalNumber {
     }
 }
 
-impl Mul for RationalNumber {
+impl Mul for Rational {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
@@ -358,7 +358,7 @@ impl Mul for RationalNumber {
     }
 }
 
-impl Div for RationalNumber {
+impl Div for Rational {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
@@ -385,15 +385,15 @@ impl Div for RationalNumber {
     }
 }
 
-impl PartialEq for RationalNumber {
+impl PartialEq for Rational {
     fn eq(&self, other: &Self) -> bool {
         self.numerator == other.numerator && self.denominator == other.denominator
     }
 }
 
-impl Eq for RationalNumber {}
+impl Eq for Rational {}
 
-impl PartialOrd for RationalNumber {
+impl PartialOrd for Rational {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let lhs = self.numerator.clone() * Integer::from_natural(other.denominator.clone());
         let rhs = other.numerator.clone() * Integer::from_natural(self.denominator.clone());
@@ -402,19 +402,19 @@ impl PartialOrd for RationalNumber {
     }
 }
 
-impl Ord for RationalNumber {
+impl Ord for Rational {
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(&other).unwrap()
     }
 }
 
-impl Display for RationalNumber {
+impl Display for Rational {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.numerator, self.denominator)
     }
 }
 
-impl Pretty for RationalNumber {
+impl Pretty for Rational {
     fn prettify(&self) -> String {
         let r = self.clone().reduce();
 
@@ -433,74 +433,65 @@ mod tests {
 
     use super::*;
 
-    fn rat(numerator: i32, denominator: i32) -> RationalNumber {
-        RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
+    fn rat(numerator: i32, denominator: i32) -> Rational {
+        Rational::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
     }
 
     #[test]
     fn test_rational_number_from_str() {
         let expected = "8/7";
-        let actual = RationalNumber::from_str("8/7").unwrap().to_string();
+        let actual = Rational::from_str("8/7").unwrap().to_string();
         assert_eq!(expected, actual);
 
         let expected = "-6/5";
-        let actual = RationalNumber::from_str("-6 /  5 ").unwrap().to_string();
+        let actual = Rational::from_str("-6 /  5 ").unwrap().to_string();
         assert_eq!(expected, actual);
 
         let expected = "-37/29";
-        let actual = RationalNumber::from_str(" 37/ -29").unwrap().to_string();
+        let actual = Rational::from_str(" 37/ -29").unwrap().to_string();
         assert_eq!(expected, actual);
 
         let expected = "13/11";
-        let actual = RationalNumber::from_str("-13 / -11").unwrap().to_string();
+        let actual = Rational::from_str("-13 / -11").unwrap().to_string();
         assert_eq!(expected, actual);
 
         let expected = "1/1";
-        let actual = RationalNumber::from_str("1").unwrap().to_string();
+        let actual = Rational::from_str("1").unwrap().to_string();
         assert_eq!(expected, actual);
 
-        assert!(RationalNumber::from_str("1/").is_err());
-        assert!(RationalNumber::from_str("/23435").is_err());
-        assert!(RationalNumber::from_str("   / ").is_err());
-        assert!(RationalNumber::from_str("1/0").is_err());
-        assert!(RationalNumber::from_str("").is_err());
+        assert!(Rational::from_str("1/").is_err());
+        assert!(Rational::from_str("/23435").is_err());
+        assert!(Rational::from_str("   / ").is_err());
+        assert!(Rational::from_str("1/0").is_err());
+        assert!(Rational::from_str("").is_err());
     }
 
     #[test]
     fn test_rational_number_reduce() {
         let expected = "2/1";
-        let actual = RationalNumber::from_str("8/4")
-            .unwrap()
-            .reduce()
-            .to_string();
+        let actual = Rational::from_str("8/4").unwrap().reduce().to_string();
         assert_eq!(expected, actual);
 
         let expected = "2/3";
-        let actual = RationalNumber::from_str("2/3")
-            .unwrap()
-            .reduce()
-            .to_string();
+        let actual = Rational::from_str("2/3").unwrap().reduce().to_string();
         assert_eq!(expected, actual);
 
         let expected = "1/334";
-        let actual = RationalNumber::from_str("1324234 / 442294156")
+        let actual = Rational::from_str("1324234 / 442294156")
             .unwrap()
             .reduce()
             .to_string();
         assert_eq!(expected, actual);
 
         let expected = "0/1";
-        let actual = RationalNumber::from_str("0/2495734985739854")
+        let actual = Rational::from_str("0/2495734985739854")
             .unwrap()
             .reduce()
             .to_string();
         assert_eq!(expected, actual);
 
         let expected = "7/5";
-        let actual = RationalNumber::from_str("42/30")
-            .unwrap()
-            .reduce()
-            .to_string();
+        let actual = Rational::from_str("42/30").unwrap().reduce().to_string();
         assert_eq!(expected, actual);
     }
 
@@ -516,29 +507,29 @@ mod tests {
             }
 
             let expected = numerator % denominator == 0;
-            let actual = RationalNumber::from_str(&format!("{}/{}", numerator, denominator))
+            let actual = Rational::from_str(&format!("{}/{}", numerator, denominator))
                 .unwrap()
                 .is_integer();
 
             assert_eq!(expected, actual);
         }
 
-        let is_integer = RationalNumber::from_str("8/4").unwrap().is_integer();
+        let is_integer = Rational::from_str("8/4").unwrap().is_integer();
         assert!(is_integer);
 
-        let is_integer = RationalNumber::from_str("2/3").unwrap().is_integer();
+        let is_integer = Rational::from_str("2/3").unwrap().is_integer();
         assert!(!is_integer);
 
-        let is_integer = RationalNumber::from_str("30/42").unwrap().is_integer();
+        let is_integer = Rational::from_str("30/42").unwrap().is_integer();
         assert!(!is_integer);
 
-        let is_integer = RationalNumber::from_str("900/30").unwrap().is_integer();
+        let is_integer = Rational::from_str("900/30").unwrap().is_integer();
         assert!(is_integer);
 
-        let is_integer = RationalNumber::from_str("0/1").unwrap().is_integer();
+        let is_integer = Rational::from_str("0/1").unwrap().is_integer();
         assert!(is_integer);
 
-        let is_integer = RationalNumber::from_str("1").unwrap().is_integer();
+        let is_integer = Rational::from_str("1").unwrap().is_integer();
         assert!(is_integer);
     }
 
@@ -550,7 +541,7 @@ mod tests {
             let numerator: i32 = rng.random();
             let denominator: i32 = rng.random_range(1..10);
 
-            let v = RationalNumber::from_str(&format!("{}/{}", numerator, denominator)).unwrap();
+            let v = Rational::from_str(&format!("{}/{}", numerator, denominator)).unwrap();
 
             if numerator % denominator == 0 {
                 assert_eq!(
@@ -573,7 +564,7 @@ mod tests {
             let expected_denominator = Natural::one();
 
             let (actual_numerator, actual_denominator) =
-                RationalNumber::from_integer(Integer::from(v)).as_values();
+                Rational::from_integer(Integer::from(v)).as_values();
 
             assert_eq!(actual_numerator, expected_numerator);
             assert_eq!(actual_denominator, expected_denominator);
@@ -839,12 +830,10 @@ mod tests {
             let rhs_numerator: i32 = rng.random();
             let rhs_denominator = rng.random::<u16>().max(1);
 
-            let lhs =
-                RationalNumber::new(Integer::from(lhs_numerator), Natural::from(lhs_denominator))
-                    .unwrap();
-            let rhs =
-                RationalNumber::new(Integer::from(rhs_numerator), Natural::from(rhs_denominator))
-                    .unwrap();
+            let lhs = Rational::new(Integer::from(lhs_numerator), Natural::from(lhs_denominator))
+                .unwrap();
+            let rhs = Rational::new(Integer::from(rhs_numerator), Natural::from(rhs_denominator))
+                .unwrap();
 
             assert_eq!(
                 lhs.cmp(&rhs),

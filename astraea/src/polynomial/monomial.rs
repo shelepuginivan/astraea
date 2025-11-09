@@ -209,7 +209,7 @@ impl<T: Field> FromStr for Monomial<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::rational::RationalNumber;
+    use crate::rational::Rational;
 
     use super::*;
     use std::str::FromStr;
@@ -234,7 +234,7 @@ mod tests {
         ];
 
         for (input, expected_coeff, expected_exp) in cases {
-            let monomial = Monomial::<RationalNumber>::from_str(input)
+            let monomial = Monomial::<Rational>::from_str(input)
                 .expect(&format!("Failed to parse '{}'", input));
             assert_eq!(
                 expected_coeff.to_string(),
@@ -267,7 +267,7 @@ mod tests {
 
         for input in invalid_cases {
             assert!(
-                Monomial::<RationalNumber>::from_str(input).is_err(),
+                Monomial::<Rational>::from_str(input).is_err(),
                 "Expected error for '{}'",
                 input
             );

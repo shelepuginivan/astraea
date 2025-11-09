@@ -41,16 +41,16 @@
 //!
 //! use astraea::prelude::*;
 //!
-//! let a = RationalNumber::from_str("1111111111111111/6666666666666666").unwrap();
-//! let b = RationalNumber::from_str("1111111111111111/3333333333333333").unwrap();
-//! let c = RationalNumber::from_str("1111111111111111/2222222222222222").unwrap();
+//! let a = Rational::from_str("1111111111111111/6666666666666666").unwrap();
+//! let b = Rational::from_str("1111111111111111/3333333333333333").unwrap();
+//! let c = Rational::from_str("1111111111111111/2222222222222222").unwrap();
 //!
 //! let sum = a + b + c;
 //!
 //! assert!(sum.is_integer());
 //! ```
 //!
-//! See: [`rational::RationalNumber`].
+//! See: [`rational::Rational`].
 //!
 //! ## Polynomials
 //!
@@ -59,8 +59,8 @@
 //!
 //! use astraea::prelude::*;
 //!
-//! let lhs = Polynomial::<RationalNumber>::from_str("x^100 + 1").unwrap();
-//! let rhs = Polynomial::<RationalNumber>::from_str("100x + 1").unwrap();
+//! let lhs = Polynomial::<Rational>::from_str("x^100 + 1").unwrap();
+//! let rhs = Polynomial::<Rational>::from_str("100x + 1").unwrap();
 //!
 //! let quotient = (lhs / rhs).unwrap();
 //!

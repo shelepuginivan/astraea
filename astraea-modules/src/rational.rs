@@ -1,6 +1,6 @@
 use astraea::formatting::Pretty;
 use astraea::integer::Integer;
-use astraea::rational::RationalNumber;
+use astraea::rational::Rational;
 use std::collections::HashSet;
 
 use crate::instruction::Instruction;
@@ -23,13 +23,13 @@ impl Module for RationalModule {
     ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::RationalReduce => {
-                let v: RationalNumber = validate::one_arg(args)?;
+                let v: Rational = validate::one_arg(args)?;
 
                 Ok(Box::new(v.reduce()))
             }
 
             Instruction::RationalIsInteger => {
-                let v: RationalNumber = validate::one_arg(args)?;
+                let v: Rational = validate::one_arg(args)?;
 
                 Ok(Box::new(v.is_integer()))
             }
@@ -37,11 +37,11 @@ impl Module for RationalModule {
             Instruction::RationalFromInteger => {
                 let v: Integer = validate::one_arg(args)?;
 
-                Ok(Box::new(RationalNumber::from_integer(v)))
+                Ok(Box::new(Rational::from_integer(v)))
             }
 
             Instruction::RationalToInteger => {
-                let v: RationalNumber = validate::one_arg(args)?;
+                let v: Rational = validate::one_arg(args)?;
 
                 match v.to_integer() {
                     Ok(int) => Ok(Box::new(int)),
@@ -50,25 +50,25 @@ impl Module for RationalModule {
             }
 
             Instruction::RationalAdd => {
-                let (lhs, rhs) = validate::two_args::<RationalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Rational>(args)?;
 
                 Ok(Box::new((lhs + rhs).reduce()))
             }
 
             Instruction::RationalSubtract => {
-                let (lhs, rhs) = validate::two_args::<RationalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Rational>(args)?;
 
                 Ok(Box::new((lhs - rhs).reduce()))
             }
 
             Instruction::RationalMultiply => {
-                let (lhs, rhs) = validate::two_args::<RationalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Rational>(args)?;
 
                 Ok(Box::new((lhs * rhs).reduce()))
             }
 
             Instruction::RationalDivide => {
-                let (lhs, rhs) = validate::two_args::<RationalNumber>(args)?;
+                let (lhs, rhs) = validate::two_args::<Rational>(args)?;
 
                 match lhs / rhs {
                     Ok(v) => Ok(Box::new(v.reduce())),

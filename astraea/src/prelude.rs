@@ -6,4 +6,4 @@ pub use crate::sign::*;
 pub use crate::integer::Integer;
 pub use crate::natural::Natural;
 pub use crate::polynomial::Polynomial;
-pub use crate::rational::RationalNumber;
+pub use crate::rational::Rational;

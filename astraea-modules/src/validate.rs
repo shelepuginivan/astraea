@@ -2,7 +2,7 @@ use astraea::algebra::Field;
 use astraea::digit::Digit;
 use astraea::natural::Natural;
 use astraea::polynomial::Polynomial;
-use astraea::rational::RationalNumber;
+use astraea::rational::Rational;
 use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug)]
@@ -121,12 +121,9 @@ pub fn get_natural(args: &Vec<String>, arg_index: usize) -> Result<Natural, Inst
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
-/// Parses argument at the specified index as RationalNumber.
-pub fn get_rational(
-    args: &Vec<String>,
-    arg_index: usize,
-) -> Result<RationalNumber, InstructionError> {
-    RationalNumber::from_str(&args[arg_index])
+/// Parses argument at the specified index as Rational.
+pub fn get_rational(args: &Vec<String>, arg_index: usize) -> Result<Rational, InstructionError> {
+    Rational::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
@@ -230,7 +227,7 @@ mod tests {
         let actual = get_rational(&vec!["7/5".to_string()], 0).unwrap();
         assert_eq!(
             actual,
-            RationalNumber::new(Integer::from(7), Natural::from(5u8)).unwrap()
+            Rational::new(Integer::from(7), Natural::from(5u8)).unwrap()
         );
         assert!(get_rational(&vec!["8/0".to_string()], 0).is_err());
         assert!(get_rational(&vec!["sadkfsjafokdjh".to_string()], 0).is_err());
@@ -238,8 +235,7 @@ mod tests {
 
     #[test]
     fn test_get_polynomial() {
-        let actual: Polynomial<RationalNumber> =
-            get_polynomial(&vec!["7x+1".to_string()], 0).unwrap();
+        let actual: Polynomial<Rational> = get_polynomial(&vec!["7x+1".to_string()], 0).unwrap();
         assert_eq!(actual.prettify(), "7x + 1");
         assert!(get_rational(&vec!["x^hfjwhf".to_string()], 0).is_err());
     }
@@ -248,8 +244,8 @@ mod tests {
     fn test_one_arg() {
         let actual: Natural = one_arg(vec!["12321".into()]).unwrap();
         assert_eq!(actual, Natural::from(12321u16));
-        assert!(one_arg::<RationalNumber>(vec![]).is_err());
-        assert!(one_arg::<RationalNumber>(vec!["24".into(), "11".into()]).is_err());
+        assert!(one_arg::<Rational>(vec![]).is_err());
+        assert!(one_arg::<Rational>(vec!["24".into(), "11".into()]).is_err());
     }
 
     #[test]
