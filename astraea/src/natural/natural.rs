@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::iter;
-use std::ops::{Add, Div, Mul, Rem, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Rem, Sub};
 use std::str::FromStr;
 
 use crate::algebra::*;
@@ -287,6 +287,46 @@ impl Add for Natural {
         }
 
         Self::from_little_endian(digits)
+    }
+}
+
+impl AddAssign for Natural {
+    fn add_assign(&mut self, rhs: Self) {
+        let lhs_len = self.digits.len();
+        let rhs_len = rhs.digits.len();
+
+        if lhs_len < rhs_len {
+            self.digits.resize(rhs_len, Digit::ZERO);
+        }
+
+        let mut next_carry = Digit::ZERO;
+
+        for (index, rhs_digit) in rhs.digits.into_iter().enumerate() {
+            let carry = self.digits[index].carrying_add_mut(rhs_digit);
+            let self_carry = self.digits[index].carrying_add_mut(next_carry);
+            next_carry = carry.carrying_add(self_carry).0;
+        }
+
+        if next_carry == Digit::ZERO {
+            return;
+        }
+
+        if lhs_len <= rhs_len {
+            self.digits.push(next_carry);
+            return;
+        }
+
+        for i in rhs_len..lhs_len {
+            next_carry = self.digits[i].carrying_add_mut(next_carry);
+
+            if next_carry == Digit::ZERO {
+                break;
+            }
+        }
+
+        if next_carry != Digit::ZERO {
+            self.digits.push(next_carry);
+        }
     }
 }
 
@@ -587,6 +627,25 @@ mod tests {
             let actual = lhs + rhs;
 
             assert_eq!(actual.to_string(), expected.to_string());
+        }
+    }
+
+    #[test]
+    fn test_natural_add_assign() {
+        let mut rng = rand::rng();
+
+        for _ in 0..RANDOM_TEST_COUNT {
+            let lhs: u32 = rng.random();
+            let rhs: u32 = rng.random();
+            let expected = lhs as u64 + rhs as u64;
+
+            let mut lhs: Natural = lhs.into();
+            let rhs: Natural = rhs.into();
+
+            let expected: Natural = expected.into();
+            lhs += rhs;
+
+            assert_eq!(lhs.to_string(), expected.to_string());
         }
     }
 
