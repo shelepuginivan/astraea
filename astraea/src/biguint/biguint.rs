@@ -49,3 +49,34 @@ impl PartialOrd for BigUint {
         Some(self.cmp(other))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use rand::Rng;
+
+    use super::*;
+
+    const RANDOM_TEST_COUNT: usize = 1000;
+
+    #[test]
+    fn test_biguint_cmp() {
+        let mut rng = rand::rng();
+
+        for _ in 0..RANDOM_TEST_COUNT {
+            let lhs_msd: u32 = rng.random_range((0)..(2 << 16));
+            let rhs_msd: u32 = rng.random_range(lhs_msd..u32::MAX);
+
+            let lhs = BigUint::from_little_endian(vec![Digit(lhs_msd); 128]);
+            let rhs = BigUint::from_little_endian(vec![Digit(rhs_msd); 128]);
+
+            assert!(lhs < rhs);
+            assert!(rhs > lhs);
+
+            let lhs = BigUint::from_little_endian(vec![Digit(lhs_msd); 128]);
+            let rhs = BigUint::from_little_endian(vec![Digit(rhs_msd); 127]);
+
+            assert!(lhs > rhs);
+            assert!(rhs < lhs);
+        }
+    }
+}
