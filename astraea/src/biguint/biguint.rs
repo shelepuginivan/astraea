@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::ops::{Add, AddAssign};
 
 use super::digit::Digit;
 
@@ -47,6 +48,55 @@ impl Ord for BigUint {
 impl PartialOrd for BigUint {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl Add<&BigUint> for BigUint {
+    type Output = BigUint;
+
+    fn add(mut self, other: &BigUint) -> BigUint {
+        self += other;
+        self
+    }
+}
+
+impl AddAssign<&BigUint> for BigUint {
+    fn add_assign(&mut self, other: &BigUint) {
+        let lhs_len = self.digits.len();
+        let rhs_len = other.digits.len();
+
+        if lhs_len < rhs_len {
+            self.digits.resize(rhs_len, Digit::ZERO);
+        }
+
+        let mut next_carry = Digit::ZERO;
+
+        for (index, rhs_digit) in other.digits.iter().enumerate() {
+            let carry = self.digits[index].carrying_add_mut(*rhs_digit);
+            let self_carry = self.digits[index].carrying_add_mut(next_carry);
+            next_carry = carry.carrying_add(self_carry).0;
+        }
+
+        if next_carry == Digit::ZERO {
+            return;
+        }
+
+        if lhs_len <= rhs_len {
+            self.digits.push(next_carry);
+            return;
+        }
+
+        for i in rhs_len..lhs_len {
+            next_carry = self.digits[i].carrying_add_mut(next_carry);
+
+            if next_carry == Digit::ZERO {
+                break;
+            }
+        }
+
+        if next_carry != Digit::ZERO {
+            self.digits.push(next_carry);
+        }
     }
 }
 
