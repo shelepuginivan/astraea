@@ -1,15 +1,23 @@
 use std::cmp::Ordering;
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::iter;
+use std::ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign};
 
 use super::digit::Digit;
 
 /// Represents a big unsigned integer number.
+#[derive(Debug)]
 pub struct BigUint {
     /// Digits of BigUint, stored in little-endian order (least-significant first).
     digits: Vec<Digit>,
 }
 
 impl BigUint {
+    pub fn zero() -> Self {
+        Self {
+            digits: vec![Digit::ZERO],
+        }
+    }
+
     pub fn from_big_endian(mut digits: Vec<Digit>) -> Self {
         digits.reverse();
         Self::from_little_endian(digits)
@@ -25,6 +33,39 @@ impl BigUint {
         }
 
         Self { digits }
+    }
+
+    fn split_at(&self, n: usize) -> (Self, Self) {
+        let low_len = self.digits.len().min(n);
+        let high_len = self.digits.len() - low_len;
+
+        let low_digits = self.digits[..low_len].to_vec();
+        let high_digits = if high_len > 0 {
+            self.digits[low_len..].to_vec()
+        } else {
+            vec![Digit::ZERO]
+        };
+
+        (
+            Self::from_little_endian(high_digits),
+            Self::from_little_endian(low_digits),
+        )
+    }
+
+    pub fn shift_left(&mut self, n: usize) {
+        self.digits.splice(0..0, vec![Digit::ZERO; n]);
+    }
+}
+
+impl Clone for BigUint {
+    fn clone(&self) -> Self {
+        Self {
+            digits: self.digits.clone(),
+        }
+    }
+
+    fn clone_from(&mut self, other: &Self) {
+        self.digits.clone_from(&other.digits);
     }
 }
 
@@ -57,6 +98,50 @@ impl Add<&BigUint> for BigUint {
     fn add(mut self, other: &BigUint) -> BigUint {
         self += other;
         self
+    }
+}
+
+impl Add<&BigUint> for &BigUint {
+    type Output = BigUint;
+
+    fn add(self, rhs: &BigUint) -> BigUint {
+        let lhs_len = self.digits.len();
+        let rhs_len = rhs.digits.len();
+
+        let result_digit_cap = lhs_len.max(rhs_len) + 1;
+        if result_digit_cap == 1 {
+            return BigUint::zero();
+        }
+
+        let mut digits: Vec<Digit> = Vec::with_capacity(result_digit_cap);
+        let mut next_carry = Digit::ZERO;
+
+        let lhs_digits = self.digits.iter();
+        let rhs_digits = rhs.digits.iter();
+
+        let (shorter, longer) = if lhs_len > rhs_len {
+            (rhs_digits, lhs_digits)
+        } else {
+            (lhs_digits, rhs_digits)
+        };
+
+        let radix = longer.zip(shorter.chain(iter::repeat(&Digit::ZERO)));
+
+        for (lhs_digit, rhs_digit) in radix {
+            let (sum, carry) = lhs_digit.carrying_add(*rhs_digit);
+            let (sum, self_carry) = sum.carrying_add(next_carry);
+            let carry = carry.carrying_add(self_carry).0;
+
+            digits.push(sum);
+
+            next_carry = carry;
+        }
+
+        if next_carry != Digit::ZERO {
+            digits.push(next_carry);
+        }
+
+        BigUint::from_little_endian(digits)
     }
 }
 
@@ -137,6 +222,97 @@ impl SubAssign<&BigUint> for BigUint {
         if next_borrow != Digit::ZERO {
             panic!("rhs must be less than or equal to lhs");
         }
+    }
+}
+
+impl Mul<Digit> for BigUint {
+    type Output = BigUint;
+
+    fn mul(mut self, rhs: Digit) -> Self::Output {
+        self *= rhs;
+        self
+    }
+}
+
+impl MulAssign<Digit> for BigUint {
+    fn mul_assign(&mut self, rhs: Digit) {
+        let mut next_carry = Digit::ZERO;
+
+        for i in 0..self.digits.len() {
+            let carry = self.digits[i].carrying_mul_mut(rhs);
+            let self_carry = self.digits[i].carrying_add_mut(next_carry);
+            next_carry = carry.carrying_add(self_carry).0;
+        }
+
+        if next_carry != Digit::ZERO {
+            self.digits.push(next_carry);
+        }
+    }
+}
+
+impl Mul<&BigUint> for BigUint {
+    type Output = BigUint;
+
+    fn mul(mut self, rhs: &BigUint) -> Self::Output {
+        self *= rhs;
+        self
+    }
+}
+
+impl MulAssign<&BigUint> for BigUint {
+    fn mul_assign(&mut self, rhs: &BigUint) {
+        if self.digits.len() == 1 {
+            let res = rhs.clone() * self.digits[0];
+            self.digits = res.digits;
+            return;
+        }
+
+        if rhs.digits.len() == 1 {
+            *self *= rhs.digits[0];
+            return;
+        }
+
+        let m = self.digits.len().max(rhs.digits.len()) / 2;
+
+        // lhs = ax + b
+        // rhs = cx + d
+        let (mut a, mut b) = self.split_at(m);
+        let (c, d) = rhs.split_at(m);
+
+        // a + b
+        // c + d
+        let mut s1 = &a + &b;
+        let s2 = &c + &d;
+
+        // ac
+        // bd
+        a *= &c;
+        b *= &d;
+
+        // (a + b)(c + d)
+        // ac + bd
+        s1 *= &s2;
+        let mut s2 = &a + &b;
+
+        // ac << n + bd
+        a.shift_left(2 * m);
+        a += &b;
+
+        match s1.cmp(&s2) {
+            Ordering::Less => {
+                s2 -= &s1;
+                s2.shift_left(m);
+                a -= &s2;
+            }
+            Ordering::Equal => {}
+            Ordering::Greater => {
+                s1 -= &s2;
+                s1.shift_left(m);
+                a += &s1;
+            }
+        }
+
+        self.digits = a.digits;
     }
 }
 
