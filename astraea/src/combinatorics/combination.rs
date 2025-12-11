@@ -33,7 +33,7 @@ pub fn combinations(n: &Natural, k: &Natural) -> Natural {
 
     while denominator <= k {
         res = (res * numerator.clone()).div(denominator.clone()).unwrap();
-        denominator = denominator.inc();
+        denominator.inc();
         numerator = numerator.sub(Natural::one()).unwrap();
     }
 

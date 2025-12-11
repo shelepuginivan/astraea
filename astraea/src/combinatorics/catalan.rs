@@ -20,7 +20,7 @@ pub fn catalan(n: &Natural) -> Natural {
     let mut denominator = Natural::one();
 
     while denominator <= *n {
-        denominator = denominator.inc();
+        denominator.inc();
         res = (res * numerator.clone()).div(denominator.clone()).unwrap();
         numerator = numerator + Natural::from(4_u8);
     }

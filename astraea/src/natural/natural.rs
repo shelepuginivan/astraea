@@ -140,30 +140,20 @@ impl Natural {
     }
 
     /// Increments number by 1.
-    pub fn inc(self) -> Self {
-        if self.is_zero() {
-            return Self::one();
-        }
-
-        let mut digits = self.as_digits();
+    pub fn inc(&mut self) {
         let mut next_carry = Digit::ONE;
 
-        for idx in 0..digits.len() {
-            let (digit, carry) = digits[idx].carrying_add(next_carry);
-
-            digits[idx] = digit;
-            next_carry = carry;
+        for i in 0..self.digits.len() {
+            next_carry = self.digits[i].carrying_add_mut(next_carry);
 
             if next_carry == Digit::ZERO {
-                break;
+                return;
             }
         }
 
         if next_carry != Digit::ZERO {
-            digits.push(next_carry);
+            self.digits.push(next_carry);
         }
-
-        Self::from_little_endian(digits)
     }
 
     /// Multiplies number by 10<sup>k</sup>.

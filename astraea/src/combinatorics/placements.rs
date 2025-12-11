@@ -24,7 +24,7 @@ pub fn placements(n: &Natural, k: &Natural) -> Natural {
 
     while multiplier <= *n {
         res = res * multiplier.clone();
-        multiplier = multiplier.inc();
+        multiplier.inc();
     }
 
     res

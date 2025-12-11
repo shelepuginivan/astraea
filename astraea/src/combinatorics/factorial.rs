@@ -20,7 +20,7 @@ pub fn factorial(n: &Natural) -> Natural {
 
     while multiplier <= *n {
         result = result * multiplier.clone();
-        multiplier = multiplier.inc();
+        multiplier.inc();
     }
 
     result

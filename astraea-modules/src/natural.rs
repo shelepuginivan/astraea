@@ -35,8 +35,9 @@ impl Module for NaturalModule {
             }
 
             Instruction::NaturalIncrement => {
-                let n: Natural = validate::one_arg(args)?;
-                Ok(Box::new(n.inc()))
+                let mut n: Natural = validate::one_arg(args)?;
+                n.inc();
+                Ok(Box::new(n))
             }
 
             Instruction::NaturalAdd => {

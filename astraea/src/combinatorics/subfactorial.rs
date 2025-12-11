@@ -31,7 +31,7 @@ pub fn subfactorial(n: &Natural) -> Natural {
         let prev_tmp = curr.clone();
         curr = multiplier.clone() * (curr + prev);
         prev = prev_tmp;
-        multiplier = multiplier.inc()
+        multiplier.inc()
     }
 
     curr
