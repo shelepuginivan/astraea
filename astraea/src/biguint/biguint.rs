@@ -1,5 +1,5 @@
 use std::cmp::Ordering;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 use super::digit::Digit;
 
@@ -96,6 +96,46 @@ impl AddAssign<&BigUint> for BigUint {
 
         if next_carry != Digit::ZERO {
             self.digits.push(next_carry);
+        }
+    }
+}
+
+impl Sub<&BigUint> for BigUint {
+    type Output = BigUint;
+
+    fn sub(mut self, rhs: &BigUint) -> Self::Output {
+        self -= rhs;
+        self
+    }
+}
+
+impl SubAssign<&BigUint> for BigUint {
+    fn sub_assign(&mut self, rhs: &BigUint) {
+        let lhs_len = self.digits.len();
+        let rhs_len = rhs.digits.len();
+
+        if lhs_len < rhs_len {
+            panic!("rhs must be less than or equal to lhs");
+        }
+
+        let mut next_borrow = Digit::ZERO;
+
+        for (index, rhs_digit) in rhs.digits.iter().enumerate() {
+            let borrow = self.digits[index].carrying_sub_mut(*rhs_digit);
+            let self_borrow = self.digits[index].carrying_sub_mut(next_borrow);
+            next_borrow = borrow.carrying_add(self_borrow).0;
+        }
+
+        for index in rhs_len..lhs_len {
+            next_borrow = self.digits[index].carrying_sub_mut(next_borrow);
+
+            if next_borrow == Digit::ZERO {
+                return;
+            }
+        }
+
+        if next_borrow != Digit::ZERO {
+            panic!("rhs must be less than or equal to lhs");
         }
     }
 }
