@@ -23,6 +23,7 @@ impl Digit {
     /// use astraea::natural::Digit;
     ///
     /// let (lo, hi) = Digit::low_high(0x12345678_87654321);
+    ///
     /// assert_eq!(lo, Digit(0x87654321));
     /// assert_eq!(hi, Digit(0x12345678));
     /// ```
@@ -55,12 +56,33 @@ impl Digit {
     /// use astraea::natural::Digit;
     ///
     /// let (result, carry) = Digit(u32::MAX).carrying_add(Digit(1));
+    ///
     /// assert_eq!(result, Digit(0));
     /// assert_eq!(carry, Digit(1));
     /// ```
     pub fn carrying_add(self, rhs: Self) -> (Self, Self) {
         let sum = self.0 as u64 + rhs.0 as u64;
         Self::low_high(sum)
+    }
+
+    /// Add a digit to this digit in place, returning the carry.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let mut digit = Digit(u32::MAX);
+    /// let carry = digit.carrying_add_mut(Digit(1));
+    ///
+    /// assert_eq!(digit, Digit(0));
+    /// assert_eq!(carry, Digit(1));
+    /// ```
+    pub fn carrying_add_mut(&mut self, rhs: Self) -> Self {
+        let sum = self.0 as u64 + rhs.0 as u64;
+        let low = sum & Self::LOW_MASK;
+        let high = sum >> Self::BIT_DEPTH;
+
+        self.0 = low as u32;
+        Self(high as u32)
     }
 
     /// Subtract second digit from first. The first returned value is the digit in the same
@@ -70,6 +92,7 @@ impl Digit {
     /// use astraea::natural::Digit;
     ///
     /// let (result, carry) = Digit(0).carrying_sub(Digit(1));
+    ///
     /// assert_eq!(result, Digit(u32::MAX));
     /// assert_eq!(carry, Digit(1));
     /// ```
@@ -82,6 +105,27 @@ impl Digit {
         (Self(result), Self::ONE)
     }
 
+    /// Subtract a digit from this digit in place, returning the borrow.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let mut digit = Digit(0);
+    /// let borrow = digit.carrying_sub_mut(Digit(1));
+    ///
+    /// assert_eq!(digit, Digit(u32::MAX));
+    /// assert_eq!(borrow, Digit::ONE);
+    /// ```
+    pub fn carrying_sub_mut(&mut self, rhs: Self) -> Self {
+        if self.0 >= rhs.0 {
+            self.0 -= rhs.0;
+            return Self::ZERO;
+        }
+
+        self.0 = self.0.wrapping_sub(rhs.0);
+        Self::ONE
+    }
+
     /// Multiply two digits. The first returned value is the digit in the same position, and the
     /// second is the carry digit.
     ///
@@ -89,12 +133,33 @@ impl Digit {
     /// use astraea::natural::Digit;
     ///
     /// let (result, carry) = Digit(u32::MAX).carrying_mul(Digit(2));
+    ///
     /// assert_eq!(result, Digit(u32::MAX - 1));
     /// assert_eq!(carry, Digit(1));
     /// ```
     pub fn carrying_mul(self, rhs: Self) -> (Self, Self) {
         let product = self.0 as u64 * rhs.0 as u64;
         Self::low_high(product)
+    }
+
+    /// Multiply this digit by another in place, returning the carry.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let mut digit = Digit(0x80000000); // 2^31
+    /// let carry = digit.carrying_mul_mut(Digit(2));
+    ///
+    /// assert_eq!(digit, Digit(0));
+    /// assert_eq!(carry, Digit(1));
+    /// ```
+    pub fn carrying_mul_mut(&mut self, rhs: Self) -> Self {
+        let product = self.0 as u64 * rhs.0 as u64;
+        let low = product & Self::LOW_MASK;
+        let high = product >> Self::BIT_DEPTH;
+
+        self.0 = low as u32;
+        Self(high as u32)
     }
 }
 
