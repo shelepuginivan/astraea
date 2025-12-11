@@ -1,5 +1,6 @@
-use crate::error::ParseError;
 use std::str::FromStr;
+
+use crate::error::ParseError;
 
 /// Represents a digit in base-4294967296 (u32) numbering system.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -10,16 +11,21 @@ impl Digit {
     const BIT_DEPTH: u8 = 32;
 
     /// Bit mask for lower u32 of u64 value.
-    const LOW_MASK: u64 = 0x00000000_FFFFFFFF;
+    const LOW_MASK: u64 = 0x00000000_ffffffff;
 
     pub const ZERO: Self = Self(0);
     pub const ONE: Self = Self(1);
 
-    /// Value of the digit.
-    pub fn value(&self) -> u32 {
-        self.0
-    }
-
+    /// Splits u64 into low 32 bits and high 32 bits, producing two digits. The first returned
+    /// value is low 32-bit digit, the second is high 32-bit digit.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let (lo, hi) = Digit::low_high(0x12345678_87654321);
+    /// assert_eq!(lo, Digit(0x87654321));
+    /// assert_eq!(hi, Digit(0x12345678));
+    /// ```
     pub fn low_high(value: u64) -> (Self, Self) {
         let lo = value & Self::LOW_MASK;
         let hi = value >> Self::BIT_DEPTH;
@@ -27,47 +33,68 @@ impl Digit {
         (Digit(lo as u32), Digit(hi as u32))
     }
 
+    /// Concatenates 32 bits of the first digit with 32 bits of the second digit, producing 64-bit
+    /// unsigned integer.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let lo = Digit(0x87654321);
+    /// let hi = Digit(0x12345678);
+    ///
+    /// assert_eq!(hi.concat(lo), 0x12345678_87654321);
+    /// ```
+    pub fn concat(self, other: Self) -> u64 {
+        (self.0 as u64) << 32 | other.0 as u64
+    }
+
     /// Add two digits. The first returned value is the digit in the same position, and the second
     /// is the carry digit.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let (result, carry) = Digit(u32::MAX).carrying_add(Digit(1));
+    /// assert_eq!(result, Digit(0));
+    /// assert_eq!(carry, Digit(1));
+    /// ```
     pub fn carrying_add(self, rhs: Self) -> (Self, Self) {
         let sum = self.0 as u64 + rhs.0 as u64;
-        let low = sum & Self::LOW_MASK;
-        let high = sum >> Self::BIT_DEPTH;
-
-        (Self(low as u32), Self(high as u32))
+        Self::low_high(sum)
     }
 
     /// Subtract second digit from first. The first returned value is the digit in the same
     /// position, and the second is the carry digit.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let (result, carry) = Digit(0).carrying_sub(Digit(1));
+    /// assert_eq!(result, Digit(u32::MAX));
+    /// assert_eq!(carry, Digit(1));
+    /// ```
     pub fn carrying_sub(self, rhs: Self) -> (Self, Self) {
         if self.0 >= rhs.0 {
-            return (Self(self.0 - rhs.0), Self(0));
+            return (Self(self.0 - rhs.0), Self::ZERO);
         }
 
         let result = self.0.wrapping_sub(rhs.0);
-        (Self(result), Self(1))
+        (Self(result), Self::ONE)
     }
 
     /// Multiply two digits. The first returned value is the digit in the same position, and the
     /// second is the carry digit.
+    ///
+    /// ```
+    /// use astraea::natural::Digit;
+    ///
+    /// let (result, carry) = Digit(u32::MAX).carrying_mul(Digit(2));
+    /// assert_eq!(result, Digit(u32::MAX - 1));
+    /// assert_eq!(carry, Digit(1));
+    /// ```
     pub fn carrying_mul(self, rhs: Self) -> (Self, Self) {
         let product = self.0 as u64 * rhs.0 as u64;
-        let low = product & Self::LOW_MASK;
-        let high = product >> Self::BIT_DEPTH;
-
-        (Self(low as u32), Self(high as u32))
-    }
-
-    /// Divides second digit from first. The first returned value is the digit in the same
-    /// position, and the second is the carry digit.
-    pub fn carrying_div(self, rhs: Self) -> (Self, Self) {
-        let dividend = self.0 as u64;
-        let divisor = rhs.0 as u64;
-
-        let quotient = dividend / divisor;
-        let remainder = dividend % divisor;
-
-        (Self(quotient as u32), Self(remainder as u32))
+        Self::low_high(product)
     }
 }
 
