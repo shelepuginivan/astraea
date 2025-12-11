@@ -261,6 +261,36 @@ mod tests {
     }
 
     #[test]
+    fn test_digit_carrying_add_mut() {
+        let mut rng = rand::rng();
+
+        for _ in 0..RANDOM_TEST_COUNT {
+            let a: u32 = rng.random();
+            let b: u32 = rng.random();
+
+            let mut digit = Digit(a);
+            let carry = digit.carrying_add_mut(Digit(b));
+
+            let expected_sum = a as u64 + b as u64;
+            let expected_digit = (expected_sum & 0xFFFFFFFF) as u32;
+            let expected_carry = (expected_sum >> 32) as u32;
+
+            assert_eq!(digit, Digit(expected_digit));
+            assert_eq!(carry, Digit(expected_carry));
+        }
+
+        let mut digit = Digit(u32::MAX);
+        let carry = digit.carrying_add_mut(Digit(1));
+        assert_eq!(digit, Digit(0));
+        assert_eq!(carry, Digit(1));
+
+        let mut digit = Digit(0);
+        let carry = digit.carrying_add_mut(Digit(0));
+        assert_eq!(digit, Digit(0));
+        assert_eq!(carry, Digit(0));
+    }
+
+    #[test]
     fn test_digit_carrying_sub() {
         let mut rng = rand::rng();
 
@@ -294,6 +324,43 @@ mod tests {
     }
 
     #[test]
+    fn test_digit_carrying_sub_mut() {
+        let mut rng = rand::rng();
+
+        for _ in 0..RANDOM_TEST_COUNT {
+            let a: u32 = rng.random();
+            let b: u32 = rng.random();
+
+            let mut digit = Digit(a);
+            let borrow = digit.carrying_sub_mut(Digit(b));
+
+            if a >= b {
+                assert_eq!(digit, Digit(a - b));
+                assert_eq!(borrow, Digit::ZERO);
+            } else {
+                let expected_digit = a.wrapping_sub(b);
+                assert_eq!(digit, Digit(expected_digit));
+                assert_eq!(borrow, Digit::ONE);
+            }
+        }
+
+        let mut digit = Digit(0);
+        let borrow = digit.carrying_sub_mut(Digit(1));
+        assert_eq!(digit, Digit(u32::MAX));
+        assert_eq!(borrow, Digit::ONE);
+
+        let mut digit = Digit(100);
+        let borrow = digit.carrying_sub_mut(Digit(100));
+        assert_eq!(digit, Digit(0));
+        assert_eq!(borrow, Digit::ZERO);
+
+        let mut digit = Digit(u32::MAX);
+        let borrow = digit.carrying_sub_mut(Digit(u32::MAX));
+        assert_eq!(digit, Digit(0));
+        assert_eq!(borrow, Digit::ZERO);
+    }
+
+    #[test]
     fn test_digit_carrying_mul() {
         let mut rng = rand::rng();
 
@@ -322,5 +389,40 @@ mod tests {
         let (result, carry) = Digit(0).carrying_mul(Digit(u32::MAX));
         assert_eq!(result, Digit(0));
         assert_eq!(carry, Digit(0));
+    }
+
+    #[test]
+    fn test_digit_carrying_mul_mut() {
+        let mut rng = rand::rng();
+
+        for _ in 0..RANDOM_TEST_COUNT {
+            let a: u32 = rng.random();
+            let b: u32 = rng.random();
+
+            let mut digit = Digit(a);
+            let carry = digit.carrying_mul_mut(Digit(b));
+
+            let expected_product = a as u64 * b as u64;
+            let expected_digit = (expected_product & 0xFFFFFFFF) as u32;
+            let expected_carry = (expected_product >> 32) as u32;
+
+            assert_eq!(digit, Digit(expected_digit));
+            assert_eq!(carry, Digit(expected_carry));
+        }
+
+        let mut digit = Digit(u32::MAX);
+        let carry = digit.carrying_mul_mut(Digit(1));
+        assert_eq!(digit, Digit(u32::MAX));
+        assert_eq!(carry, Digit(0));
+
+        let mut digit = Digit(0);
+        let carry = digit.carrying_mul_mut(Digit(u32::MAX));
+        assert_eq!(digit, Digit(0));
+        assert_eq!(carry, Digit(0));
+
+        let mut digit = Digit(0x80000000); // 2^31
+        let carry = digit.carrying_mul_mut(Digit(2));
+        assert_eq!(digit, Digit(0));
+        assert_eq!(carry, Digit(1));
     }
 }
