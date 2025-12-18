@@ -3,8 +3,7 @@ use criterion::Criterion;
 use criterion::Throughput;
 use criterion::{criterion_group, criterion_main};
 
-use astraea::digit::Digit;
-use astraea::natural::Natural;
+use astraea::prelude::*;
 
 pub fn natural_add(c: &mut Criterion) {
     let mut group = c.benchmark_group("Natural Add");

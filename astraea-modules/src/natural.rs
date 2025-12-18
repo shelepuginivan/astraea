@@ -1,8 +1,5 @@
-use astraea::algebra::AddWithIdentity;
 use astraea::digit;
-use astraea::digit::Digit;
-use astraea::formatting::Pretty;
-use astraea::natural::Natural;
+use astraea::prelude::*;
 use std::collections::HashSet;
 
 use crate::instruction::Instruction;

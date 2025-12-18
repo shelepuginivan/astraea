@@ -237,8 +237,7 @@ impl<T: Field> Polynomial<T> {
         self.coefficients
             .last()
             .and_then(|v| Some(v.clone()))
-            .or_else(|| Some(T::zero()))
-            .unwrap()
+            .unwrap_or_else(T::zero)
     }
 
     /// Multiplies polynomial by x<sup>k</sup>.
@@ -308,19 +307,7 @@ impl<T: Field> Polynomial<T> {
     /// assert_eq!(gcd.prettify(), "x - 1");
     /// ```
     pub fn gcd(self, other: Self) -> Self {
-        self.gcd_raw(other).monic()
-    }
-
-    fn gcd_raw(self, other: Self) -> Self {
-        if other.is_zero() {
-            return self;
-        } else if self.is_zero() {
-            return other;
-        }
-
-        let r = (self % other.clone()).unwrap();
-
-        other.gcd(r)
+        Gcd::gcd(self, other).monic()
     }
 
     /// Converts polynomial into monic polynomial.

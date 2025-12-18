@@ -44,6 +44,57 @@ pub trait IntegerDivision:
     fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError>;
 }
 
+/// Gcd is a trait that defines greatest common divisor.
+pub trait Gcd {
+    type Output;
+
+    /// Greatest common divisor.
+    fn gcd(self, other: Self) -> Self::Output;
+}
+
+/// Lcm is a trait that defines least common multiple.
+pub trait Lcm {
+    type Output;
+
+    /// Least common multiple.
+    fn lcm(self, other: Self) -> Self::Output;
+}
+
+impl<T: IntegerDivision> Gcd for T {
+    type Output = Self;
+
+    fn gcd(self, other: Self) -> Self::Output {
+        if self.is_zero() {
+            return other;
+        } else if other.is_zero() {
+            return self;
+        }
+
+        return other.clone().gcd(
+            self.rem(other)
+                .expect("should return remainder for non-zero divisor"),
+        );
+    }
+}
+
+impl<T: IntegerDivision> Lcm for T {
+    type Output = Self;
+
+    fn lcm(self, other: Self) -> Self::Output {
+        if self.is_zero() || other.is_zero() {
+            return Self::zero();
+        }
+
+        let prod = self.clone() * other.clone();
+        let gcd = self.gcd(other);
+
+        match prod / gcd {
+            Ok(v) => v,
+            Err(_) => Self::zero(),
+        }
+    }
+}
+
 /// Pow provides the exponentiation operation.
 pub trait Pow {
     fn pow(self, power: usize) -> Self;
