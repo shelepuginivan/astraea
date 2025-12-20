@@ -1,8 +1,8 @@
-use astraea::algebra::Field;
 use astraea::digit::Digit;
 use astraea::natural::Natural;
 use astraea::polynomial::Polynomial;
 use astraea::rational::Rational;
+use astraea::{algebra::Field, prelude::Integer};
 use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug)]
@@ -118,6 +118,12 @@ pub fn get_digit(args: &Vec<String>, arg_index: usize) -> Result<Digit, Instruct
 /// Parses argument at the specified index as Natural.
 pub fn get_natural(args: &Vec<String>, arg_index: usize) -> Result<Natural, InstructionError> {
     Natural::from_str(&args[arg_index])
+        .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
+}
+
+/// Parses argument at the specified index as Integer.
+pub fn get_integer(args: &Vec<String>, arg_index: usize) -> Result<Integer, InstructionError> {
+    Integer::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 

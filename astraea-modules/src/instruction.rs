@@ -173,6 +173,18 @@ pub enum Instruction {
     )]
     NaturalLCM,
 
+    /// Calculates n-th root of the natural number.
+    ///
+    /// - Index: N-15
+    /// - Opcode: ROOT_NN_N
+    #[strum(
+        props(opcode = "ROOT_NN_N", index = "N-15"),
+        serialize = "ROOT_NN_N",
+        serialize = "N-15",
+        serialize = "NaturalRoot"
+    )]
+    NaturalRoot,
+
     /// Returns absolute value of the integer.
     ///
     /// - Index: Z-1
@@ -292,6 +304,18 @@ pub enum Instruction {
         serialize = "IntegerRemainder"
     )]
     IntegerRemainder,
+
+    /// Calculates n-th root of the integer.
+    ///
+    /// - Index: Z-15
+    /// - Opcode: ROOT_ZN_Z
+    #[strum(
+        props(opcode = "ROOT_ZN_N", index = "Z-15"),
+        serialize = "ROOT_ZN_Z",
+        serialize = "Z-15",
+        serialize = "IntegerRoot"
+    )]
+    IntegerRoot,
 
     /// Reduces rational number.
     ///

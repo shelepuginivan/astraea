@@ -1,7 +1,4 @@
-use astraea::algebra::Signed;
-use astraea::formatting::Pretty;
-use astraea::integer::Integer;
-use astraea::natural::Natural;
+use astraea::prelude::*;
 use std::collections::HashSet;
 
 use crate::instruction::Instruction;
@@ -92,6 +89,18 @@ impl Module for IntegerModule {
                 }
             }
 
+            Instruction::IntegerRoot => {
+                validate::ensure_args_count(&args, 2)?;
+
+                let n = validate::get_integer(&args, 0)?;
+                let p = validate::get_usize(&args, 1)?;
+
+                match n.root(p) {
+                    Ok(res) => Ok(Box::new(res)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
+                }
+            }
+
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
     }
@@ -112,6 +121,7 @@ impl Module for IntegerModule {
             Instruction::IntegerMultiply,
             Instruction::IntegerQuotient,
             Instruction::IntegerRemainder,
+            Instruction::IntegerRoot,
         ]
         .into_iter()
         .collect()

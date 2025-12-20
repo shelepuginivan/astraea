@@ -131,6 +131,18 @@ impl Module for NaturalModule {
                 Ok(Box::new(lhs.lcm(rhs)))
             }
 
+            Instruction::NaturalRoot => {
+                validate::ensure_args_count(&args, 2)?;
+
+                let n = validate::get_natural(&args, 0)?;
+                let p = validate::get_usize(&args, 1)?;
+
+                match n.root(p) {
+                    Ok(res) => Ok(Box::new(res)),
+                    Err(e) => Err(InstructionError::calculation(1, e.message)),
+                }
+            }
+
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
     }
@@ -155,6 +167,7 @@ impl Module for NaturalModule {
             Instruction::NaturalRemainder,
             Instruction::NaturalGCD,
             Instruction::NaturalLCM,
+            Instruction::NaturalRoot,
         ]
         .into_iter()
         .collect()
