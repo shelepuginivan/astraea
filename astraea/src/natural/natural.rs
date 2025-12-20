@@ -424,6 +424,39 @@ impl Rem for Natural {
     }
 }
 
+impl Root for Natural {
+    type Output = Self;
+
+    fn root(self, power: usize) -> Result<Self::Output, ValueError> {
+        if power == 0 {
+            return Err(ValueError::new("root power should not be 0"));
+        }
+
+        if power == 1 {
+            return Ok(self);
+        }
+
+        let power_der = power - 1;
+        let mut x = Natural::one().times_pow10(self.len() / power + 1);
+        let a = self;
+
+        loop {
+            let numerator = Natural::from(power_der) * x.clone().pow(power) + a.clone();
+            let denominator = Natural::from(power) * x.clone().pow(power_der);
+
+            let x_next = numerator
+                .div(denominator)
+                .expect("should divide by non-zero value");
+
+            if x_next >= x {
+                return Ok(x);
+            }
+
+            x = x_next
+        }
+    }
+}
+
 impl Display for Natural {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s: String = self.digits.iter().rev().map(|digit| digit.char()).collect();
@@ -618,7 +651,7 @@ mod tests {
 
     use super::*;
     use crate::digit;
-    use std::{cmp::Ordering, u32};
+    use std::cmp::Ordering;
 
     #[test]
     fn test_natural_number_cmp() {
@@ -773,6 +806,35 @@ mod tests {
             let actual = lhs % rhs;
 
             assert_eq!(expected.to_string(), actual.unwrap().to_string());
+        }
+    }
+
+    #[test]
+    fn test_natural_number_root() {
+        let mut rng = rand::rng();
+
+        for _ in 0..100 {
+            let v: u16 = rng.random();
+            let p = rng.random_range(1..10_usize);
+
+            let expected = Natural::from(v);
+            let power = expected.clone().pow(p);
+
+            let actual = power.root(p).expect("should calculate n-th root");
+
+            assert_eq!(expected, actual);
+        }
+
+        for _ in 0..100 {
+            let v: u64 = rng.random();
+            let sqrt = (v as f64).sqrt().floor() as u64;
+
+            let expected = Natural::from(sqrt);
+            let actual = Natural::from(v)
+                .sqrt()
+                .expect("should calculate square root");
+
+            assert_eq!(expected, actual);
         }
     }
 
