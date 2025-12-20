@@ -9,11 +9,16 @@ members = [
 
 [workspace.package]
 authors = ["Ivan Shelepugin <shelepuginivanm@gmail.com>"]
-version = "0.1.0"
+version = "0.1.0-alpha.0"
 edition = "2024"
 repository = "https://github.com/shelepuginivan/astraea"
 categories = ["mathematics"]
-keywords = ["astraea", "discrete-mathematics", "arbitrary-precision-arithmetic"]
+keywords = [
+    "astraea",
+    "abstract-algebra",
+    "discrete-mathematics",
+    "arbitrary-precision-arithmetic",
+]
 
 [workspace.dependencies]
 astraea = { path = "astraea" }
