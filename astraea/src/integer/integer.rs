@@ -284,6 +284,27 @@ impl Neg for Integer {
     }
 }
 
+impl Root for Integer {
+    type Output = Self;
+
+    fn root(self, power: usize) -> Result<Self::Output, ValueError> {
+        if power == 0 {
+            return Err(ValueError::new("root power should not be 0"));
+        }
+
+        if power % 2 == 0 && self.is_negative() {
+            return Err(ValueError::new(
+                "cannot take even root from a negative integer",
+            ));
+        }
+
+        self.value.root(power).map(|root| Self {
+            sign: self.sign,
+            value: root,
+        })
+    }
+}
+
 impl PartialEq for Integer {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value && self.sign == other.sign
