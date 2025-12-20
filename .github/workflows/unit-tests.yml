@@ -1,0 +1,21 @@
+name: Run Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'astraea/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'astraea/**' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
