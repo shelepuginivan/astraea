@@ -79,6 +79,11 @@ impl Module for CombinatoricsModule {
                 Ok(Box::new(combinatorics::catalan(&n)))
             }
 
+            Instruction::CombinatoricsSimplex => {
+                let (k, n) = validate::two_args::<Natural>(args)?;
+                Ok(Box::new(combinatorics::simplex(&k, &n)))
+            }
+
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
     }
@@ -99,6 +104,7 @@ impl Module for CombinatoricsModule {
             Instruction::CombinatoricsFibonacci,
             Instruction::CombinatoricsLucas,
             Instruction::CombinatoricsCatalan,
+            Instruction::CombinatoricsSimplex,
         ]
         .into_iter()
         .collect()

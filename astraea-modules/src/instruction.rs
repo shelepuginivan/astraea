@@ -690,6 +690,18 @@ pub enum Instruction {
         serialize = "CombinatoricsCatalan"
     )]
     CombinatoricsCatalan,
+
+    /// Calculates nth k-simplex number.
+    ///
+    /// - Index: CMB-11
+    /// - Opcode: SPX_NN_N
+    #[strum(
+        props(opcode = "CPX_NN_N", index = "CMB-11"),
+        serialize = "CPX_NN_N",
+        serialize = "CMB-11",
+        serialize = "CombinatoricsSimplex"
+    )]
+    CombinatoricsSimplex,
 }
 
 impl Instruction {
