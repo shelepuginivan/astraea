@@ -97,10 +97,14 @@ impl<T: IntegerDivision> Lcm for T {
 
 /// Pow provides the exponentiation operation.
 pub trait Pow {
-    fn pow(self, power: usize) -> Self;
+    type Output;
+
+    fn pow(self, power: usize) -> Self::Output;
 }
 
 impl<T: MulClosed + MulWithIdentity<Self> + MulAssociative<Self>> Pow for T {
+    type Output = Self;
+
     fn pow(self, power: usize) -> Self {
         let mut a = self;
         let mut res = Self::one();
@@ -116,5 +120,20 @@ impl<T: MulClosed + MulWithIdentity<Self> + MulAssociative<Self>> Pow for T {
         }
 
         res
+    }
+}
+
+/// Root provides the n-th root operation.
+pub trait Root: MathObject {
+    type Output;
+
+    fn root(self, power: usize) -> Result<Self::Output, ValueError>;
+
+    fn sqrt(self) -> Result<Self::Output, ValueError> {
+        self.root(2)
+    }
+
+    fn cbrt(self) -> Result<Self::Output, ValueError> {
+        self.root(3)
     }
 }
