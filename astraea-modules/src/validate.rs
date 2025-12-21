@@ -1,9 +1,7 @@
-use astraea::digit::Digit;
-use astraea::natural::Natural;
-use astraea::polynomial::Polynomial;
-use astraea::rational::Rational;
-use astraea::{algebra::Field, prelude::Integer};
-use std::{fmt::Display, str::FromStr};
+use std::fmt::Display;
+use std::str::FromStr;
+
+use astraea::prelude::*;
 
 #[derive(Debug)]
 pub enum InstructionErrorReason {
@@ -148,11 +146,7 @@ where
     T: FromStr,
     T::Err: Display,
 {
-    let args = ensure_args(args, 1)?;
-    let mut args_iter = args.into_iter();
-    let first = args_iter.next().unwrap();
-
-    Ok(first)
+    Ok(ensure_args(args, 1)?.remove(0))
 }
 
 /// Ensures 2 arguments was provided and parses them to the corresponding type.
@@ -161,10 +155,9 @@ where
     T: FromStr,
     T::Err: Display,
 {
-    let args = ensure_args(args, 2)?;
-    let mut args_iter = args.into_iter();
-    let first = args_iter.next().unwrap();
-    let second = args_iter.next().unwrap();
+    let mut args = ensure_args(args, 2)?;
+    let second = args.remove(1);
+    let first = args.remove(0);
 
     Ok((first, second))
 }
@@ -198,7 +191,8 @@ mod tests {
 
     #[test]
     fn test_ensure_args() {
-        let args = ensure_args::<Integer>(vec!["234".to_string(), "-5653".to_string()], 2).unwrap();
+        let args = ensure_args::<Integer>(vec!["234".to_string(), "-5653".to_string()], 2)
+            .expect("should return valid args");
         assert_eq!(args[0], Integer::from(234));
         assert_eq!(args[1], Integer::from(-5653));
 
@@ -208,21 +202,21 @@ mod tests {
 
     #[test]
     fn test_get_usize() {
-        let actual = get_usize(&vec!["34".to_string()], 0).unwrap();
+        let actual = get_usize(&vec!["34".to_string()], 0).expect("should return valid args");
         assert_eq!(actual, 34usize);
         assert!(get_usize(&vec!["34".to_string(), "a".to_string()], 1).is_err());
     }
 
     #[test]
     fn test_get_digit() {
-        let actual = get_digit(&vec!["9".to_string()], 0).unwrap();
+        let actual = get_digit(&vec!["9".to_string()], 0).expect("should return valid args");
         assert_eq!(actual, Digit::Nine);
         assert!(get_digit(&vec!["99".to_string()], 0).is_err());
     }
 
     #[test]
     fn test_get_natural() {
-        let actual = get_natural(&vec!["51".to_string()], 0).unwrap();
+        let actual = get_natural(&vec!["51".to_string()], 0).expect("should return valid args");
         assert_eq!(actual, Natural::from(51u8));
         assert!(get_natural(&vec!["-11".to_string()], 0).is_err());
         assert!(get_natural(&vec!["a".to_string()], 0).is_err());
@@ -230,10 +224,10 @@ mod tests {
 
     #[test]
     fn test_get_rational() {
-        let actual = get_rational(&vec!["7/5".to_string()], 0).unwrap();
+        let actual = get_rational(&vec!["7/5".to_string()], 0).expect("should return valid args");
         assert_eq!(
             actual,
-            Rational::new(Integer::from(7), Natural::from(5u8)).unwrap()
+            Rational::new(Integer::from(7), Natural::from(5u8)).expect("should build a rational"),
         );
         assert!(get_rational(&vec!["8/0".to_string()], 0).is_err());
         assert!(get_rational(&vec!["sadkfsjafokdjh".to_string()], 0).is_err());
@@ -241,14 +235,15 @@ mod tests {
 
     #[test]
     fn test_get_polynomial() {
-        let actual: Polynomial<Rational> = get_polynomial(&vec!["7x+1".to_string()], 0).unwrap();
+        let actual: Polynomial<Rational> =
+            get_polynomial(&vec!["7x+1".to_string()], 0).expect("should return valid args");
         assert_eq!(actual.prettify(), "7x + 1");
         assert!(get_rational(&vec!["x^hfjwhf".to_string()], 0).is_err());
     }
 
     #[test]
     fn test_one_arg() {
-        let actual: Natural = one_arg(vec!["12321".into()]).unwrap();
+        let actual: Natural = one_arg(vec!["12321".into()]).expect("should return valid args");
         assert_eq!(actual, Natural::from(12321u16));
         assert!(one_arg::<Rational>(vec![]).is_err());
         assert!(one_arg::<Rational>(vec!["24".into(), "11".into()]).is_err());
@@ -257,7 +252,9 @@ mod tests {
     #[test]
     fn test_two_args() {
         let (actual_first, actual_second) =
-            two_args::<Integer>(vec!["-1234".into(), "5678".into()]).unwrap();
+            two_args::<Integer>(vec!["-1234".into(), "5678".into()])
+                .expect("should return valid args");
+
         assert_eq!(actual_first, Integer::from(-1234));
         assert_eq!(actual_second, Integer::from(5678));
         assert!(two_args::<Integer>(vec![]).is_err());

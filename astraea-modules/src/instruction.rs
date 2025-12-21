@@ -707,12 +707,12 @@ pub enum Instruction {
 impl Instruction {
     /// Returns opcode of the instruction.
     pub fn opcode(&self) -> &str {
-        self.get_str("opcode").unwrap()
+        self.get_str("opcode").expect("opcode should be set")
     }
 
     /// Returns index of the instruction.
     pub fn index(&self) -> &str {
-        self.get_str("index").unwrap()
+        self.get_str("index").expect("index should be set")
     }
 }
 
