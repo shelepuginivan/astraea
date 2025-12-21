@@ -27,7 +27,7 @@ impl Digit {
     /// ```
     /// use astraea::digit::Digit;
     ///
-    /// let d = Digit::new(9).unwrap();
+    /// let d = Digit::new(9).expect("should convert a valid digit");
     /// assert_eq!(d, Digit::Nine);
     /// ```
     pub fn new(value: u8) -> Result<Self, ValueError> {
@@ -70,7 +70,7 @@ impl Digit {
     /// ```
     /// use astraea::digit::Digit;
     ///
-    /// let d = Digit::from_char('7').unwrap();
+    /// let d = Digit::from_char('7').expect("should convert a valid digit");
     /// assert_eq!(d, Digit::Seven);
     /// ```
     pub fn from_char(char: char) -> Result<Self, ParseError> {
@@ -230,7 +230,7 @@ impl FromStr for Digit {
             return Err(Self::Err::new("expected string of length 1".to_string()));
         }
 
-        Self::from_char(s.chars().next().unwrap())
+        Self::from_char(s.chars().next().expect("string should contain 1 character"))
     }
 }
 
@@ -304,48 +304,48 @@ mod tests {
 
     #[test]
     fn test_digit_new() {
-        assert_eq!(Digit::new(0).unwrap(), Digit::Zero);
-        assert_eq!(Digit::new(1).unwrap(), Digit::One);
-        assert_eq!(Digit::new(2).unwrap(), Digit::Two);
-        assert_eq!(Digit::new(3).unwrap(), Digit::Three);
-        assert_eq!(Digit::new(4).unwrap(), Digit::Four);
-        assert_eq!(Digit::new(5).unwrap(), Digit::Five);
-        assert_eq!(Digit::new(6).unwrap(), Digit::Six);
-        assert_eq!(Digit::new(7).unwrap(), Digit::Seven);
-        assert_eq!(Digit::new(8).unwrap(), Digit::Eight);
-        assert_eq!(Digit::new(9).unwrap(), Digit::Nine);
+        assert!(Digit::new(0).is_ok_and(|d| d == Digit::Zero));
+        assert!(Digit::new(1).is_ok_and(|d| d == Digit::One));
+        assert!(Digit::new(2).is_ok_and(|d| d == Digit::Two));
+        assert!(Digit::new(3).is_ok_and(|d| d == Digit::Three));
+        assert!(Digit::new(4).is_ok_and(|d| d == Digit::Four));
+        assert!(Digit::new(5).is_ok_and(|d| d == Digit::Five));
+        assert!(Digit::new(6).is_ok_and(|d| d == Digit::Six));
+        assert!(Digit::new(7).is_ok_and(|d| d == Digit::Seven));
+        assert!(Digit::new(8).is_ok_and(|d| d == Digit::Eight));
+        assert!(Digit::new(9).is_ok_and(|d| d == Digit::Nine));
 
         assert!(Digit::new(28).is_err());
     }
 
     #[test]
     fn test_digit_from_char() {
-        assert_eq!(Digit::from_char('0').unwrap(), Digit::Zero);
-        assert_eq!(Digit::from_char('1').unwrap(), Digit::One);
-        assert_eq!(Digit::from_char('2').unwrap(), Digit::Two);
-        assert_eq!(Digit::from_char('3').unwrap(), Digit::Three);
-        assert_eq!(Digit::from_char('4').unwrap(), Digit::Four);
-        assert_eq!(Digit::from_char('5').unwrap(), Digit::Five);
-        assert_eq!(Digit::from_char('6').unwrap(), Digit::Six);
-        assert_eq!(Digit::from_char('7').unwrap(), Digit::Seven);
-        assert_eq!(Digit::from_char('8').unwrap(), Digit::Eight);
-        assert_eq!(Digit::from_char('9').unwrap(), Digit::Nine);
+        assert!(Digit::from_char('0').is_ok_and(|d| d == Digit::Zero));
+        assert!(Digit::from_char('1').is_ok_and(|d| d == Digit::One));
+        assert!(Digit::from_char('2').is_ok_and(|d| d == Digit::Two));
+        assert!(Digit::from_char('3').is_ok_and(|d| d == Digit::Three));
+        assert!(Digit::from_char('4').is_ok_and(|d| d == Digit::Four));
+        assert!(Digit::from_char('5').is_ok_and(|d| d == Digit::Five));
+        assert!(Digit::from_char('6').is_ok_and(|d| d == Digit::Six));
+        assert!(Digit::from_char('7').is_ok_and(|d| d == Digit::Seven));
+        assert!(Digit::from_char('8').is_ok_and(|d| d == Digit::Eight));
+        assert!(Digit::from_char('9').is_ok_and(|d| d == Digit::Nine));
 
         assert!(Digit::from_char('a').is_err());
     }
 
     #[test]
     fn test_digit_cmp() {
-        let lhs = Digit::new(9).unwrap();
-        let rhs = Digit::new(8).unwrap();
+        let lhs = Digit::new(9).expect("should convert a valid digit");
+        let rhs = Digit::new(8).expect("should convert a valid digit");
         assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
 
-        let lhs = Digit::new(3).unwrap();
-        let rhs = Digit::new(4).unwrap();
+        let lhs = Digit::new(3).expect("should convert a valid digit");
+        let rhs = Digit::new(4).expect("should convert a valid digit");
         assert_eq!(lhs.cmp(&rhs), Ordering::Less);
 
-        let lhs = Digit::new(6).unwrap();
-        let rhs = Digit::new(6).unwrap();
+        let lhs = Digit::new(6).expect("should convert a valid digit");
+        let rhs = Digit::new(6).expect("should convert a valid digit");
         assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
     }
 
@@ -353,11 +353,16 @@ mod tests {
     fn test_digit_add() {
         for lhs in 0..10 {
             for rhs in 0..10 {
-                let expected_res: Digit = ((lhs + rhs) % 10).try_into().unwrap();
-                let expected_carry: Digit = ((lhs + rhs) / 10).try_into().unwrap();
+                let expected_res: Digit = ((lhs + rhs) % 10)
+                    .try_into()
+                    .expect("should convert a valid digit");
 
-                let lhs: Digit = lhs.try_into().unwrap();
-                let rhs: Digit = rhs.try_into().unwrap();
+                let expected_carry: Digit = ((lhs + rhs) / 10)
+                    .try_into()
+                    .expect("should convert a valid digit");
+
+                let lhs: Digit = lhs.try_into().expect("should convert a valid digit");
+                let rhs: Digit = rhs.try_into().expect("should convert a valid digit");
 
                 let (actual_res, actual_carry) = lhs + rhs;
 
@@ -371,10 +376,12 @@ mod tests {
     fn test_digit_div() {
         for lhs in 0..10 {
             for rhs in 1..10 {
-                let expected: Digit = (lhs / rhs).try_into().unwrap();
+                let expected: Digit = (lhs / rhs)
+                    .try_into()
+                    .expect("should convert a valid digit");
 
-                let lhs: Digit = lhs.try_into().unwrap();
-                let rhs: Digit = rhs.try_into().unwrap();
+                let lhs: Digit = lhs.try_into().expect("should convert a valid digit");
+                let rhs: Digit = rhs.try_into().expect("should convert a valid digit");
 
                 let actual = lhs / rhs;
 
@@ -410,16 +417,16 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        assert_eq!(Digit::from_str("0").unwrap(), Digit::Zero);
-        assert_eq!(Digit::from_str("1").unwrap(), Digit::One);
-        assert_eq!(Digit::from_str("2").unwrap(), Digit::Two);
-        assert_eq!(Digit::from_str("3").unwrap(), Digit::Three);
-        assert_eq!(Digit::from_str("4").unwrap(), Digit::Four);
-        assert_eq!(Digit::from_str("5").unwrap(), Digit::Five);
-        assert_eq!(Digit::from_str("6").unwrap(), Digit::Six);
-        assert_eq!(Digit::from_str("7").unwrap(), Digit::Seven);
-        assert_eq!(Digit::from_str("8").unwrap(), Digit::Eight);
-        assert_eq!(Digit::from_str("9").unwrap(), Digit::Nine);
+        assert!(Digit::from_str("0").is_ok_and(|d| d == Digit::Zero));
+        assert!(Digit::from_str("1").is_ok_and(|d| d == Digit::One));
+        assert!(Digit::from_str("2").is_ok_and(|d| d == Digit::Two));
+        assert!(Digit::from_str("3").is_ok_and(|d| d == Digit::Three));
+        assert!(Digit::from_str("4").is_ok_and(|d| d == Digit::Four));
+        assert!(Digit::from_str("5").is_ok_and(|d| d == Digit::Five));
+        assert!(Digit::from_str("6").is_ok_and(|d| d == Digit::Six));
+        assert!(Digit::from_str("7").is_ok_and(|d| d == Digit::Seven));
+        assert!(Digit::from_str("8").is_ok_and(|d| d == Digit::Eight));
+        assert!(Digit::from_str("9").is_ok_and(|d| d == Digit::Nine));
 
         assert!(Digit::from_str("").is_err());
         assert!(Digit::from_str("123").is_err());
