@@ -159,7 +159,7 @@ impl Rational {
     /// use std::str::FromStr;
     ///
     /// // This automatically reduces the rational number.
-    /// let r = Rational::from_str("6/9").unwrap();
+    /// let r = Rational::from_str("6/9").expect("should parse rational");
     ///
     /// assert_eq!(r.prettify(), "2/3");
     /// ```
@@ -179,8 +179,11 @@ impl Rational {
 
         let gcd = numerator.clone().gcd(Integer::from(denominator.clone()));
 
-        let numerator = (numerator / gcd.clone()).unwrap();
-        let denominator = (denominator / gcd.into_natural()).unwrap();
+        let numerator =
+            (numerator / gcd.clone()).expect("should divide integer by another non-zero integer");
+
+        let denominator = (denominator / gcd.into_natural())
+            .expect("should divide natural by another non-zero natural");
 
         Self {
             numerator,
@@ -202,9 +205,9 @@ impl Rational {
     /// assert!(!r.is_integer());
     /// ```
     pub fn is_integer(&self) -> bool {
-        let rem = self.numerator.clone() % Integer::from_natural(self.denominator.clone());
+        let rem = self.numerator.clone() % Integer::from(self.denominator.clone());
 
-        rem.unwrap().is_zero()
+        rem.is_ok_and(|rem| rem.is_zero())
     }
 
     /// Converts rational number to integer, if possible.
@@ -214,11 +217,11 @@ impl Rational {
     /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let r = Rational::from_str("22/11").unwrap();
-    /// let i = r.to_integer().unwrap();
+    /// let r = Rational::from_str("22/11").expect("should parse rational");
+    /// let i = r.to_integer().expect("should convert to integer");
     /// assert_eq!(i, Integer::from(2));
     ///
-    /// let r = Rational::from_str("23/11").unwrap();
+    /// let r = Rational::from_str("23/11").expect("should parse rational");
     /// assert!(r.to_integer().is_err());
     /// ```
     pub fn to_integer(self) -> Result<Integer, ValueError> {
@@ -239,7 +242,7 @@ impl Rational {
     /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let r = Rational::from_str("-34 / 23").unwrap();
+    /// let r = Rational::from_str("-34 / 23").expect("should parse rational");
     ///
     /// let (numerator, denominator) = r.as_values();
     ///
@@ -322,8 +325,10 @@ impl Add for Rational {
         let rhs_denominator = Integer::from(rhs.denominator.clone());
 
         let lcm = lhs_denominator.clone().lcm(rhs_denominator.clone());
-        let lhs_factor = (lcm.clone() / lhs_denominator).unwrap();
-        let rhs_factor = (lcm.clone() / rhs_denominator).unwrap();
+        let lhs_factor = (lcm.clone() / lhs_denominator)
+            .expect("should divide integer by another non-zero integer");
+        let rhs_factor = (lcm.clone() / rhs_denominator)
+            .expect("should divide integer by another non-zero integer");
         let lhs_numerator = self.numerator * lhs_factor;
         let rhs_numerator = rhs.numerator * rhs_factor;
         let numerator = lhs_numerator + rhs_numerator;
@@ -394,16 +399,16 @@ impl Eq for Rational {}
 
 impl PartialOrd for Rational {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let lhs = self.numerator.clone() * Integer::from_natural(other.denominator.clone());
-        let rhs = other.numerator.clone() * Integer::from_natural(self.denominator.clone());
-
-        Some(lhs.cmp(&rhs))
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Rational {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(&other).unwrap()
+        let lhs = self.numerator.clone() * Integer::from(other.denominator.clone());
+        let rhs = other.numerator.clone() * Integer::from(self.denominator.clone());
+
+        lhs.cmp(&rhs)
     }
 }
 
@@ -415,11 +420,9 @@ impl Display for Rational {
 
 impl Pretty for Rational {
     fn prettify(&self) -> String {
-        let r = self.clone().reduce();
-
-        match r.is_integer() {
-            true => r.to_integer().unwrap().prettify(),
-            false => r.to_string(),
+        match self.clone().to_integer() {
+            Ok(int) => int.to_string(),
+            Err(..) => self.to_string(),
         }
     }
 }
