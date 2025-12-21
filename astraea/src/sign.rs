@@ -78,23 +78,23 @@ impl Mul for Sign {
 
 impl PartialOrd for Sign {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (self, other) {
-            (Sign::Negative, Sign::Negative) => Some(Ordering::Equal),
-            (Sign::Negative, Sign::Zero) => Some(Ordering::Less),
-            (Sign::Negative, Sign::Positive) => Some(Ordering::Less),
-            (Sign::Zero, Sign::Negative) => Some(Ordering::Greater),
-            (Sign::Zero, Sign::Zero) => Some(Ordering::Equal),
-            (Sign::Zero, Sign::Positive) => Some(Ordering::Less),
-            (Sign::Positive, Sign::Negative) => Some(Ordering::Greater),
-            (Sign::Positive, Sign::Zero) => Some(Ordering::Greater),
-            (Sign::Positive, Sign::Positive) => Some(Ordering::Equal),
-        }
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Sign {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        match (self, other) {
+            (Sign::Negative, Sign::Negative) => Ordering::Equal,
+            (Sign::Negative, Sign::Zero) => Ordering::Less,
+            (Sign::Negative, Sign::Positive) => Ordering::Less,
+            (Sign::Zero, Sign::Negative) => Ordering::Greater,
+            (Sign::Zero, Sign::Zero) => Ordering::Equal,
+            (Sign::Zero, Sign::Positive) => Ordering::Less,
+            (Sign::Positive, Sign::Negative) => Ordering::Greater,
+            (Sign::Positive, Sign::Zero) => Ordering::Greater,
+            (Sign::Positive, Sign::Positive) => Ordering::Equal,
+        }
     }
 }
 
@@ -152,8 +152,8 @@ mod tests {
 
     #[test]
     fn test_sign_from_char() {
-        assert_eq!(Sign::from_char('+').unwrap(), Sign::Positive);
-        assert_eq!(Sign::from_char('-').unwrap(), Sign::Negative);
+        assert!(Sign::from_char('+').is_ok_and(|s| s == Sign::Positive));
+        assert!(Sign::from_char('-').is_ok_and(|s| s == Sign::Negative));
 
         assert!(Sign::from_char('9').is_err())
     }
