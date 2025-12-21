@@ -647,11 +647,11 @@ impl_natural_try_into!(
 
 #[cfg(test)]
 mod tests {
+    use std::cmp::Ordering;
+
     use rand::Rng;
 
     use super::*;
-    use crate::digit;
-    use std::cmp::Ordering;
 
     #[test]
     fn test_natural_number_cmp() {
@@ -659,8 +659,8 @@ mod tests {
         let rhs = Natural::from_str("5678").unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Less);
 
-        let lhs = Natural::new(vec![digit!(1); 1_000_000]);
-        let rhs = Natural::new(vec![digit!(1); 1_000_000]);
+        let lhs = Natural::new(vec![Digit::One; 1_000_000]);
+        let rhs = Natural::new(vec![Digit::One; 1_000_000]);
         assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
 
         let lhs_str = "2".to_owned() + "0".repeat(999_999).as_str();
@@ -748,7 +748,7 @@ mod tests {
             let expected = lhs * rhs;
 
             let lhs = Natural::from_str(&lhs.to_string()).unwrap();
-            let rhs = digit!(rhs as u8);
+            let rhs = Digit::try_from(rhs).expect("should convert a valid digit");
             let actual = lhs * rhs;
 
             assert_eq!(expected.to_string(), actual.to_string());
@@ -882,15 +882,15 @@ mod tests {
         let digits = n.as_digits();
 
         assert_eq!(digits.len(), 12);
-        assert_eq!(digits[0], digit!(4));
+        assert_eq!(digits[0], Digit::Four);
     }
 
     #[test]
     fn test_natural_number_is_zero() {
         assert!(Natural::new(vec![]).is_zero());
-        assert!(Natural::new(vec![digit!(0)]).is_zero());
-        assert!(!Natural::new(vec![digit!(1)]).is_zero());
-        assert!(Natural::new(vec![digit!(0); 2]).is_zero());
+        assert!(Natural::new(vec![Digit::Zero]).is_zero());
+        assert!(!Natural::new(vec![Digit::One]).is_zero());
+        assert!(Natural::new(vec![Digit::Zero; 2]).is_zero());
     }
 
     #[test]
@@ -904,7 +904,7 @@ mod tests {
 
     #[test]
     fn test_natural_number_to_string() {
-        let digits = vec![digit!(9); 999];
+        let digits = vec![Digit::Nine; 999];
         let n = Natural::new(digits);
         assert_eq!(n.to_string(), "9".repeat(999));
 

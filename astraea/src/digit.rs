@@ -1,21 +1,10 @@
+use std::cmp::Ordering;
 use std::fmt::Display;
-use std::i16;
 use std::ops::{Add, Div, Mul, Sub};
 use std::str::FromStr;
 
 use crate::error::{ParseError, ValueError};
 use crate::formatting::Pretty;
-
-/// Creates a Digit from the argument.
-#[macro_export]
-macro_rules! digit {
-    ($v:literal) => {
-        Digit::try_from($v).unwrap()
-    };
-    ($v:expr) => {
-        Digit::try_from($v).unwrap()
-    };
-}
 
 /// Represents a single decimal digit of a natural number.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -130,22 +119,24 @@ impl Add for Digit {
     /// the second is the carry digit.
     ///
     /// ```
-    /// use astraea::digit;
     /// use astraea::digit::Digit;
     ///
-    /// let lhs = digit!(6);
-    /// let rhs = digit!(7);
+    /// let lhs = Digit::Six;
+    /// let rhs = Digit::Seven;
     /// let (sum, carry) = lhs + rhs;
     ///
-    /// assert_eq!(sum, digit!(3));
-    /// assert_eq!(carry, digit!(1));
+    /// assert_eq!(sum, Digit::Three);
+    /// assert_eq!(carry, Digit::One);
     /// ```
     fn add(self, rhs: Self) -> Self::Output {
         let sum = self.value() + rhs.value();
         let result = sum % 10;
         let carry = sum / 10;
 
-        (digit!(result), digit!(carry))
+        (
+            Digit::new(result).expect("result should be a valid digit"),
+            Digit::new(carry).expect("carry should be a valid digit"),
+        )
     }
 }
 
@@ -156,23 +147,29 @@ impl Sub for Digit {
     /// position, and the second is the carry digit.
     ///
     /// ```
-    /// use astraea::digit;
     /// use astraea::digit::Digit;
     ///
-    /// let lhs = digit!(6);
-    /// let rhs = digit!(9);
+    /// let lhs = Digit::Six;
+    /// let rhs = Digit::Nine;
     /// let (diff, carry) = lhs - rhs;
     ///
-    /// assert_eq!(diff, digit!(7));
-    /// assert_eq!(carry, digit!(1));
+    /// assert_eq!(diff, Digit::Seven);
+    /// assert_eq!(carry, Digit::One);
     /// ```
     fn sub(self, rhs: Self) -> Self::Output {
-        let diff = (self.value() as i16) - (rhs.value() as i16);
-        let res = (diff + 10) % 10;
-        let result = digit!(res as u8);
-        let carry = if diff >= 0 { digit!(0) } else { digit!(1) };
+        let lhs = self.value();
+        let rhs = rhs.value();
 
-        (result, carry)
+        match lhs.cmp(&rhs) {
+            Ordering::Less => (
+                Digit::new(lhs + 10 - rhs).expect("result should be a valid digit"),
+                Digit::One,
+            ),
+            _ => (
+                Digit::new(lhs - rhs).expect("result should be a valid digit"),
+                Digit::Zero,
+            ),
+        }
     }
 }
 
@@ -183,22 +180,24 @@ impl Mul for Digit {
     /// and the second is the carry digit.
     ///
     /// ```
-    /// use astraea::digit;
     /// use astraea::digit::Digit;
     ///
-    /// let lhs = digit!(6);
-    /// let rhs = digit!(7);
-    /// let (sum, carry) = lhs * rhs;
+    /// let lhs = Digit::Six;
+    /// let rhs = Digit::Seven;
+    /// let (prod, carry) = lhs * rhs;
     ///
-    /// assert_eq!(sum, digit!(2));
-    /// assert_eq!(carry, digit!(4));
+    /// assert_eq!(prod, Digit::Two);
+    /// assert_eq!(carry, Digit::Four);
     /// ```
     fn mul(self, rhs: Self) -> Self::Output {
         let product = self.value() * rhs.value();
         let result = product % 10;
         let carry = product / 10;
 
-        (digit!(result), digit!(carry))
+        (
+            Digit::new(result).expect("result should be a valid digit"),
+            Digit::new(carry).expect("carry should be a valid digit"),
+        )
     }
 }
 
@@ -207,7 +206,7 @@ impl Div for Digit {
 
     fn div(self, rhs: Self) -> Self::Output {
         let value = self.value() / rhs.value();
-        Self::new(value).unwrap()
+        Self::new(value).expect("result should be a valid digit")
     }
 }
 
@@ -299,8 +298,9 @@ impl_digit_try_from!(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::cmp::Ordering;
+
+    use super::*;
 
     #[test]
     fn test_digit_new() {
@@ -347,24 +347,6 @@ mod tests {
         let lhs = Digit::new(6).unwrap();
         let rhs = Digit::new(6).unwrap();
         assert_eq!(lhs.cmp(&rhs), Ordering::Equal);
-    }
-
-    #[test]
-    fn test_digit_macro() {
-        for v in 0..10 {
-            assert_eq!(digit!(v), Digit::new(v).unwrap())
-        }
-
-        assert_eq!(digit!(0), Digit::Zero);
-        assert_eq!(digit!(1), Digit::One);
-        assert_eq!(digit!(2), Digit::Two);
-        assert_eq!(digit!(3), Digit::Three);
-        assert_eq!(digit!(4), Digit::Four);
-        assert_eq!(digit!(5), Digit::Five);
-        assert_eq!(digit!(6), Digit::Six);
-        assert_eq!(digit!(7), Digit::Seven);
-        assert_eq!(digit!(8), Digit::Eight);
-        assert_eq!(digit!(9), Digit::Nine);
     }
 
     #[test]

@@ -1,4 +1,3 @@
-use astraea::digit;
 use astraea::prelude::*;
 use std::collections::HashSet;
 
@@ -94,7 +93,7 @@ impl Module for NaturalModule {
                 let k = validate::get_usize(&args, 2)?;
 
                 if k + rhs.len() > lhs.len() {
-                    return Ok(Box::new(digit!(0)));
+                    return Ok(Box::new(Digit::Zero));
                 }
 
                 let lhs_digit = lhs.lsd_at(k + rhs.len() - 1);
