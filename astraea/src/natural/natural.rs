@@ -408,7 +408,7 @@ impl Div for Natural {
     type Output = Result<Self, ValueError>;
 
     fn div(self, rhs: Self) -> Self::Output {
-        self.div_rem(rhs).and_then(|res| Ok(res.0))
+        Ok(self.div_rem(rhs)?.0)
     }
 }
 
@@ -416,7 +416,7 @@ impl Rem for Natural {
     type Output = Result<Self, ValueError>;
 
     fn rem(self, rhs: Self) -> Self::Output {
-        self.div_rem(rhs).and_then(|res| Ok(res.1))
+        Ok(self.div_rem(rhs)?.1)
     }
 }
 
@@ -440,9 +440,7 @@ impl Root for Natural {
             let numerator = Natural::from(power_der) * x.clone().pow(power) + a.clone();
             let denominator = Natural::from(power) * x.clone().pow(power_der);
 
-            let x_next = numerator
-                .div(denominator)
-                .expect("should divide by non-zero value");
+            let x_next = numerator.div(denominator)?;
 
             if x_next >= x {
                 return Ok(x);
