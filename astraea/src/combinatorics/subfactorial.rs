@@ -39,8 +39,9 @@ pub fn subfactorial(n: &Natural) -> Natural {
 
 #[cfg(test)]
 mod tests {
-    use super::subfactorial;
     use crate::natural::Natural;
+
+    use super::subfactorial;
 
     #[test]
     fn test_subfactorial() {

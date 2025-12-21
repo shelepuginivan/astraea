@@ -21,7 +21,9 @@ pub fn catalan(n: &Natural) -> Natural {
 
     while denominator <= *n {
         denominator = denominator.inc();
-        res = (res * numerator.clone()).div(denominator.clone()).unwrap();
+        res = (res * numerator.clone())
+            .div(denominator.clone())
+            .expect("should divide natural by another non-zero natural");
         numerator = numerator + Natural::from(4_u8);
     }
 
@@ -30,9 +32,9 @@ pub fn catalan(n: &Natural) -> Natural {
 
 #[cfg(test)]
 mod tests {
-    use super::catalan;
-
     use crate::natural::Natural;
+
+    use super::catalan;
 
     #[test]
     fn test_catalan() {

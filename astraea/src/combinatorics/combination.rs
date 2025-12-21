@@ -32,9 +32,15 @@ pub fn combinations(n: &Natural, k: &Natural) -> Natural {
     let mut denominator = Natural::one();
 
     while denominator <= k {
-        res = (res * numerator.clone()).div(denominator.clone()).unwrap();
+        res = (res * numerator.clone())
+            .div(denominator.clone())
+            .expect("should divide natural by another non-zero natural");
+
         denominator = denominator.inc();
-        numerator = numerator.sub(Natural::one()).unwrap();
+
+        numerator = numerator
+            .sub(Natural::one())
+            .expect("should subtract natural from another larger natural");
     }
 
     res
@@ -42,11 +48,10 @@ pub fn combinations(n: &Natural, k: &Natural) -> Natural {
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Div;
-
-    use super::combinations;
     use crate::combinatorics::factorial;
     use crate::natural::Natural;
+
+    use super::combinations;
 
     #[test]
     fn test_combinations() {
@@ -87,13 +92,13 @@ mod tests {
 
                 let fact_n = factorial(&n_val);
                 let fact_k = factorial(&k_val);
-                let n_minus_k = n_val.clone() - k_val.clone();
-                let fact_n_minus_k = factorial(&n_minus_k.unwrap());
+                let n_minus_k = (n_val.clone() - k_val.clone()).expect("should subtract");
+                let fact_n_minus_k = factorial(&n_minus_k);
 
                 let denom = fact_k * fact_n_minus_k;
-                let expected = fact_n.div(denom).unwrap();
+                let expected = (fact_n / denom).expect("should divide");
 
-                assert_eq!(actual, expected,);
+                assert_eq!(actual, expected);
             }
         }
     }

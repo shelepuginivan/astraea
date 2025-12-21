@@ -28,8 +28,9 @@ pub fn factorial(n: &Natural) -> Natural {
 
 #[cfg(test)]
 mod tests {
-    use super::factorial;
     use crate::natural::Natural;
+
+    use super::factorial;
 
     #[test]
     fn test_factorial() {

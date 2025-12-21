@@ -19,7 +19,10 @@ pub fn placements(n: &Natural, k: &Natural) -> Natural {
         return Natural::zero();
     }
 
-    let mut multiplier = (n.clone() - k.clone()).unwrap() + Natural::one();
+    let mut multiplier = (n.clone() - k.clone())
+        .expect("should subtract natural from another larger natural")
+        + Natural::one();
+
     let mut res = Natural::one();
 
     while multiplier <= *n {
@@ -32,10 +35,9 @@ pub fn placements(n: &Natural, k: &Natural) -> Natural {
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Div;
+    use crate::combinatorics::factorial;
 
     use super::*;
-    use crate::combinatorics::factorial;
 
     #[test]
     fn test_placements() {
@@ -74,12 +76,10 @@ mod tests {
                 let actual = placements(&n_val.clone(), &k_val.clone());
 
                 let fact_n = factorial(&n_val);
-                let n_minus_k = n_val.clone() - k_val.clone();
-                let fact_n_minus_k = factorial(&n_minus_k.unwrap());
+                let n_minus_k = (n_val.clone() - k_val.clone()).expect("should subtract");
+                let fact_n_minus_k = factorial(&n_minus_k);
 
-                let expected = fact_n.div(fact_n_minus_k).unwrap();
-
-                assert_eq!(actual, expected);
+                assert!((fact_n / fact_n_minus_k).is_ok_and(|e| actual == e));
             }
         }
     }
