@@ -9,12 +9,12 @@
 //!
 //! use astraea::prelude::*;
 //!
-//! let a = Natural::from_str(&"9".repeat(1_000_000)).unwrap();
+//! let a = Natural::from_str(&"9".repeat(1_000_000)).expect("should parse a valid natural number");
 //! let b = Natural::one();
 //!
 //! let sum = a + b;
 //!
-//! println!("The result contains {} digits!", sum.len());
+//! println!("The result contains {} digits", sum.len());
 //! ```
 //!
 //! See: [`natural::Natural`].
@@ -41,9 +41,12 @@
 //!
 //! use astraea::prelude::*;
 //!
-//! let a = Rational::from_str("1111111111111111/6666666666666666").unwrap();
-//! let b = Rational::from_str("1111111111111111/3333333333333333").unwrap();
-//! let c = Rational::from_str("1111111111111111/2222222222222222").unwrap();
+//! let a = Rational::from_str("1111111111111111/6666666666666666")
+//!     .expect("should parse a valid rational");
+//! let b = Rational::from_str("1111111111111111/3333333333333333")
+//!     .expect("should parse a valid rational");
+//! let c = Rational::from_str("1111111111111111/2222222222222222")
+//!     .expect("should parse a valid rational");
 //!
 //! let sum = a + b + c;
 //!
@@ -59,10 +62,12 @@
 //!
 //! use astraea::prelude::*;
 //!
-//! let lhs = Polynomial::<Rational>::from_str("x^100 + 1").unwrap();
-//! let rhs = Polynomial::<Rational>::from_str("100x + 1").unwrap();
+//! let lhs = Polynomial::<Rational>::from_str("x^100 + 1")
+//!     .expect("should parse a valid polynomial");
+//! let rhs = Polynomial::<Rational>::from_str("100x + 1")
+//!     .expect("should parse a valid polynomial");
 //!
-//! let quotient = (lhs / rhs).unwrap();
+//! let quotient = (lhs / rhs).expect("should calculate quotient");
 //!
 //! println!("Quotient degree: {}", quotient.degree());
 //! println!("Quotient leading coefficient: {}", quotient.leading_coefficient());
