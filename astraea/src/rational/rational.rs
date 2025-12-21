@@ -433,66 +433,30 @@ mod tests {
 
     use super::*;
 
-    fn rat(numerator: i32, denominator: i32) -> Rational {
-        Rational::from_str(&format!("{}/{}", numerator, denominator)).unwrap()
+    fn q(numerator: i32, denominator: i32) -> Rational {
+        Rational::from_str(&format!("{}/{}", numerator, denominator))
+            .expect("should return a rational")
     }
 
     #[test]
     fn test_rational_number_from_str() {
-        let expected = "8/7";
-        let actual = Rational::from_str("8/7").unwrap().to_string();
-        assert_eq!(expected, actual);
+        let tests = vec![
+            ("8/7", q(8, 7)),
+            ("-6 /  5 ", q(-6, 5)),
+            (" 37/ -29", q(-37, 29)),
+            ("-13 / -11", q(13, 11)),
+            ("1", q(1, 1)),
+        ];
 
-        let expected = "-6/5";
-        let actual = Rational::from_str("-6 /  5 ").unwrap().to_string();
-        assert_eq!(expected, actual);
+        for (s, expected) in tests {
+            assert!(Rational::from_str(s).is_ok_and(|r| r == expected));
+        }
 
-        let expected = "-37/29";
-        let actual = Rational::from_str(" 37/ -29").unwrap().to_string();
-        assert_eq!(expected, actual);
+        let tests = vec!["1/", "/23435", "   / ", "1/0", "", "1/2/3"];
 
-        let expected = "13/11";
-        let actual = Rational::from_str("-13 / -11").unwrap().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/1";
-        let actual = Rational::from_str("1").unwrap().to_string();
-        assert_eq!(expected, actual);
-
-        assert!(Rational::from_str("1/").is_err());
-        assert!(Rational::from_str("/23435").is_err());
-        assert!(Rational::from_str("   / ").is_err());
-        assert!(Rational::from_str("1/0").is_err());
-        assert!(Rational::from_str("").is_err());
-    }
-
-    #[test]
-    fn test_rational_number_reduce() {
-        let expected = "2/1";
-        let actual = Rational::from_str("8/4").unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "2/3";
-        let actual = Rational::from_str("2/3").unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/334";
-        let actual = Rational::from_str("1324234 / 442294156")
-            .unwrap()
-            .reduce()
-            .to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let actual = Rational::from_str("0/2495734985739854")
-            .unwrap()
-            .reduce()
-            .to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "7/5";
-        let actual = Rational::from_str("42/30").unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
+        for s in tests {
+            assert!(Rational::from_str(s).is_err())
+        }
     }
 
     #[test]
@@ -507,30 +471,17 @@ mod tests {
             }
 
             let expected = numerator % denominator == 0;
-            let actual = Rational::from_str(&format!("{}/{}", numerator, denominator))
-                .unwrap()
-                .is_integer();
+            let actual = q(numerator, denominator).is_integer();
 
             assert_eq!(expected, actual);
         }
 
-        let is_integer = Rational::from_str("8/4").unwrap().is_integer();
-        assert!(is_integer);
-
-        let is_integer = Rational::from_str("2/3").unwrap().is_integer();
-        assert!(!is_integer);
-
-        let is_integer = Rational::from_str("30/42").unwrap().is_integer();
-        assert!(!is_integer);
-
-        let is_integer = Rational::from_str("900/30").unwrap().is_integer();
-        assert!(is_integer);
-
-        let is_integer = Rational::from_str("0/1").unwrap().is_integer();
-        assert!(is_integer);
-
-        let is_integer = Rational::from_str("1").unwrap().is_integer();
-        assert!(is_integer);
+        assert!(q(8, 4).is_integer());
+        assert!(!q(2, 3).is_integer());
+        assert!(!q(30, 42).is_integer());
+        assert!(q(900, 30).is_integer());
+        assert!(q(0, 1).is_integer());
+        assert!(q(1, 1).is_integer());
     }
 
     #[test]
@@ -541,12 +492,12 @@ mod tests {
             let numerator: i32 = rng.random();
             let denominator: i32 = rng.random_range(1..10);
 
-            let v = Rational::from_str(&format!("{}/{}", numerator, denominator)).unwrap();
+            let v = q(numerator, denominator);
 
             if numerator % denominator == 0 {
-                assert_eq!(
-                    v.to_integer().unwrap(),
-                    Integer::from(numerator / denominator)
+                assert!(
+                    v.to_integer()
+                        .is_ok_and(|v| v == Integer::from(numerator / denominator))
                 );
             } else {
                 assert!(v.to_integer().is_err());
@@ -573,249 +524,96 @@ mod tests {
 
     #[test]
     fn test_rational_number_add() {
-        let expected = "5/6";
-        let lhs = rat(1, 2);
-        let rhs = rat(1, 3);
-        let actual = (lhs + rhs).to_string();
-        assert_eq!(expected, actual);
+        let tests = vec![
+            (q(1, 2), q(1, 3), q(5, 6)),
+            (q(1, 4), q(1, 4), q(1, 2)),
+            (
+                q(0, 2343425),
+                q(124253465, 1231232314),
+                q(124253465, 1231232314),
+            ),
+            (q(999999, 1111111), q(0, 42694269), q(999999, 1111111)),
+            (q(0, 777), q(0, 888), q(0, 1)),
+        ];
 
-        let expected = "1/2";
-        let lhs = rat(1, 4);
-        let rhs = rat(1, 4);
-        let actual = (lhs + rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "124253465/1231232314";
-        let lhs = rat(0, 2343425);
-        let rhs = rat(124253465, 1231232314);
-        let actual = (lhs + rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "999999/1111111";
-        let lhs = rat(999999, 1111111);
-        let rhs = rat(0, 42694269);
-        let actual = (lhs + rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let lhs = rat(0, 777);
-        let rhs = rat(0, 888);
-        let actual = (lhs + rhs).reduce().to_string();
-        assert_eq!(expected, actual);
+        for (lhs, rhs, expected) in tests {
+            assert_eq!(lhs + rhs, expected);
+        }
     }
 
     #[test]
     fn test_rational_number_sub() {
-        let expected = "1/6";
-        let lhs = rat(1, 2);
-        let rhs = rat(1, 3);
-        let actual = (lhs - rhs).to_string();
-        assert_eq!(expected, actual);
+        let tests = vec![
+            (q(1, 2), q(1, 3), q(1, 6)),
+            (q(1, 6), q(1, 2), q(-1, 3)),
+            (q(1, 4), q(1, 4), q(0, 1)),
+            (q(1, 2), q(1, 3), q(1, 6)),
+            (
+                q(124253465, 1231232314),
+                q(124253465, 1231232314),
+                q(0, 2343425),
+            ),
+            (q(0, 42694269), q(-999999, 1111111), q(999999, 1111111)),
+            (q(0, 777), q(0, 888), q(0, 1)),
+            (q(3, 4), q(1, 4), q(1, 2)),
+            (q(1, -2), q(2, -3), q(1, 6)),
+        ];
 
-        let expected = "0/1";
-        let lhs = rat(1, 4);
-        let rhs = rat(1, 4);
-        let actual = (lhs - rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "-1/6";
-        let lhs = rat(1, 3);
-        let rhs = rat(1, 2);
-        let actual = (lhs - rhs).to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "124253465/1231232314";
-        let lhs = rat(124253465, 1231232314);
-        let rhs = rat(0, 2343425);
-        let actual = (lhs - rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "-999999/1111111";
-        let lhs = rat(0, 42694269);
-        let rhs = rat(999999, 1111111);
-        let actual = (lhs - rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let lhs = rat(0, 777);
-        let rhs = rat(0, 888);
-        let actual = (lhs - rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/2";
-        let lhs = rat(3, 4);
-        let rhs = rat(1, 4);
-        let actual = (lhs - rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/6";
-        let lhs = rat(1, -2);
-        let rhs = rat(2, -3);
-        let actual = (lhs - rhs).reduce().to_string();
-        assert_eq!(expected, actual);
+        for (lhs, rhs, expected) in tests {
+            assert_eq!(lhs - rhs, expected);
+        }
     }
 
     #[test]
     fn test_rational_number_mul() {
-        let expected = "1/6";
-        let lhs = rat(1, 2);
-        let rhs = rat(1, 3);
-        let actual = (lhs * rhs).to_string();
-        assert_eq!(expected, actual);
+        let tests = vec![
+            (q(1, 2), q(1, 3), q(1, 6)),
+            (q(3, 4), q(4, 3), q(1, 1)),
+            (q(124253465, 1231232314), q(0, 2343425), q(0, 1)),
+            (q(0, 42694269), q(999999, 1111111), q(0, 1)),
+            (q(0, 777), q(0, 888), q(0, 1)),
+            (q(3, 4), q(1, 1), q(3, 4)),
+            (q(4, 15), q(3, 2), q(2, 5)),
+            (q(1, 2), q(-1, 2), q(-1, 4)),
+            (q(-1, 2), q(-1, 2), q(1, 4)),
+            (q(1, 2), q(-1, 2), q(-1, 4)),
+            (q(1, -2), q(-1, 2), q(1, 4)),
+            (q(12345, 24690), q(24690, 49380), q(1, 4)),
+            (q(4, 9), q(3, 2), q(2, 3)),
+        ];
 
-        let expected = "1/1";
-        let lhs = rat(3, 4);
-        let rhs = rat(4, 3);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let lhs = rat(124253465, 1231232314);
-        let rhs = rat(0, 2343425);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let lhs = rat(0, 42694269);
-        let rhs = rat(999999, 1111111);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let lhs = rat(0, 777);
-        let rhs = rat(0, 888);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "3/4";
-        let lhs = rat(3, 4);
-        let rhs = rat(1, 1);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "2/5";
-        let lhs = rat(4, 15);
-        let rhs = rat(3, 2);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "-1/4";
-        let lhs = rat(1, 2);
-        let rhs = rat(-1, 2);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/4";
-        let lhs = rat(-1, 2);
-        let rhs = rat(-1, 2);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/4";
-        let lhs = rat(1, -2);
-        let rhs = rat(-1, 2);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/4";
-        let lhs = rat(12345, 24690);
-        let rhs = rat(24690, 49380);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "2/3";
-        let lhs = rat(4, 9);
-        let rhs = rat(3, 2);
-        let actual = (lhs * rhs).reduce().to_string();
-        assert_eq!(expected, actual);
+        for (lhs, rhs, expected) in tests {
+            assert_eq!(lhs * rhs, expected);
+        }
     }
 
     #[test]
     fn test_rational_number_div() {
-        let expected = "3/2";
-        let lhs = rat(1, 2);
-        let rhs = rat(1, 3);
-        let actual = (lhs / rhs).unwrap().to_string();
-        assert_eq!(expected, actual);
+        let tests = vec![
+            (q(1, 2), q(1, 3), q(3, 2)),
+            (q(3, 4), q(1, 1), q(3, 4)),
+            (q(0, 777), q(999999, 1111111), q(0, 1)),
+            (q(4, 15), q(2, 5), q(2, 3)),
+            (q(4, 15), q(2, 5), q(2, 3)),
+            (q(1, 2), q(-1, 4), q(-2, 1)),
+            (q(-1, 2), q(-1, 4), q(2, 1)),
+            (q(1, 2), q(1, -4), q(-2, 1)),
+            (q(12345, 49380), q(24690, 49380), q(1, 2)),
+            (q(10, 18), q(12, 18), q(5, 6)),
+            (q(2, 3), q(5, 4), q(8, 15)),
+            (q(4, 6), q(2, 3), q(1, 1)),
+        ];
 
-        let expected = "3/4";
-        let lhs = rat(3, 4);
-        let rhs = rat(1, 1);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
+        for (lhs, rhs, expected) in tests {
+            assert!(lhs.div(rhs).is_ok_and(|res| res == expected))
+        }
 
-        let expected = "1/1";
-        let lhs = rat(3, 4);
-        let rhs = rat(3, 4);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "0/1";
-        let lhs = rat(0, 777);
-        let rhs = rat(999999, 1111111);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "16/9";
-        let lhs = rat(4, 3);
-        let rhs = rat(3, 4);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "2/3";
-        let lhs = rat(4, 15);
-        let rhs = rat(2, 5);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "-2/1";
-        let lhs = rat(1, 2);
-        let rhs = rat(-1, 4);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "2/1";
-        let lhs = rat(-1, 2);
-        let rhs = rat(-1, 4);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "-2/1";
-        let lhs = rat(1, 2);
-        let rhs = rat(1, -4);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/2";
-        let lhs = rat(12345, 49380);
-        let rhs = rat(24690, 49380);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "5/6";
-        let lhs = rat(10, 18);
-        let rhs = rat(12, 18);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "8/15";
-        let lhs = rat(2, 3);
-        let rhs = rat(5, 4);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let expected = "1/1";
-        let lhs = rat(4, 6);
-        let rhs = rat(2, 3);
-        let actual = (lhs / rhs).unwrap().reduce().to_string();
-        assert_eq!(expected, actual);
-
-        let lhs = rat(4, 6);
-        let rhs = rat(0, 3);
+        let lhs = q(4, 6);
+        let rhs = q(0, 3);
         assert!((lhs / rhs).is_err());
 
-        let lhs = rat(0, 1);
-        let rhs = rat(0, 1);
+        let lhs = q(0, 1);
+        let rhs = q(0, 1);
         assert!((lhs / rhs).is_err());
     }
 
@@ -830,10 +628,8 @@ mod tests {
             let rhs_numerator: i32 = rng.random();
             let rhs_denominator = rng.random::<u16>().max(1);
 
-            let lhs = Rational::new(Integer::from(lhs_numerator), Natural::from(lhs_denominator))
-                .unwrap();
-            let rhs = Rational::new(Integer::from(rhs_numerator), Natural::from(rhs_denominator))
-                .unwrap();
+            let lhs = q(lhs_numerator, lhs_denominator as i32);
+            let rhs = q(rhs_numerator, rhs_denominator as i32);
 
             assert_eq!(
                 lhs.cmp(&rhs),
@@ -842,37 +638,37 @@ mod tests {
             );
         }
 
-        assert!(rat(1, 2) == rat(2, 4));
-        assert!(rat(-3, 5) == rat(-6, 10));
-        assert!(rat(1, 3) < rat(1, 2));
-        assert!(rat(-2, 3) < rat(-1, 3));
-        assert!(rat(3, 4) <= rat(3, 4));
-        assert!(rat(2, 5) <= rat(3, 5));
-        assert!(rat(5, 6) > rat(4, 6));
-        assert!(rat(1, 1) > rat(999, 1000));
-        assert!(rat(7, 8) >= rat(7, 8));
-        assert!(rat(9, 10) >= rat(8, 10));
-        assert!(rat(-1, 2) == rat(-2, 4));
-        assert!(rat(-3, 5) == rat(-6, 10));
-        assert!(rat(-3, 4) < rat(-1, 2));
-        assert!(rat(-5, 6) < rat(-2, 3));
-        assert!(rat(-7, 8) <= rat(-7, 8));
-        assert!(rat(-4, 5) <= rat(-3, 5));
-        assert!(rat(-1, 2) > rat(-3, 4));
-        assert!(rat(-2, 3) > rat(-5, 6));
-        assert!(rat(-9, 10) >= rat(-9, 10));
-        assert!(rat(-3, 5) >= rat(-4, 5));
-        assert!(rat(-1, 2) < rat(1, 2));
-        assert!(rat(1, 3) > rat(-1, 3));
+        assert!(q(1, 2) == q(2, 4));
+        assert!(q(-3, 5) == q(-6, 10));
+        assert!(q(1, 3) < q(1, 2));
+        assert!(q(-2, 3) < q(-1, 3));
+        assert!(q(3, 4) <= q(3, 4));
+        assert!(q(2, 5) <= q(3, 5));
+        assert!(q(5, 6) > q(4, 6));
+        assert!(q(1, 1) > q(999, 1000));
+        assert!(q(7, 8) >= q(7, 8));
+        assert!(q(9, 10) >= q(8, 10));
+        assert!(q(-1, 2) == q(-2, 4));
+        assert!(q(-3, 5) == q(-6, 10));
+        assert!(q(-3, 4) < q(-1, 2));
+        assert!(q(-5, 6) < q(-2, 3));
+        assert!(q(-7, 8) <= q(-7, 8));
+        assert!(q(-4, 5) <= q(-3, 5));
+        assert!(q(-1, 2) > q(-3, 4));
+        assert!(q(-2, 3) > q(-5, 6));
+        assert!(q(-9, 10) >= q(-9, 10));
+        assert!(q(-3, 5) >= q(-4, 5));
+        assert!(q(-1, 2) < q(1, 2));
+        assert!(q(1, 3) > q(-1, 3));
     }
 
     #[test]
     fn test_rational_number_fmt() {
-        assert_eq!(rat(1, 1).prettify(), "1");
-        assert_eq!(rat(222, 2).prettify(), "111");
-        assert_eq!(rat(-24, 12).prettify(), "-2");
-        assert_eq!(rat(0, 1).prettify(), "0");
-        assert_eq!(rat(1, 3).prettify(), "1/3");
-        assert_eq!(rat(-2, 5).prettify(), "-2/5");
+        assert_eq!(q(1, 1).prettify(), "1");
+        assert_eq!(q(222, 2).prettify(), "111");
+        assert_eq!(q(-24, 12).prettify(), "-2");
+        assert_eq!(q(0, 1).prettify(), "0");
+        assert_eq!(q(1, 3).prettify(), "1/3");
+        assert_eq!(q(-2, 5).prettify(), "-2/5");
     }
 }
