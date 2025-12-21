@@ -118,11 +118,28 @@ impl Error {
             return chars_count - offset..chars_count;
         }
 
-        let needle = self.needle(&args);
-        let start_index = cli.find(&needle).unwrap();
-        let end_index = start_index + needle.chars().count();
+        match self {
+            Self::Calculation(index, ..) | Self::InvalidArgument(index, ..) => {
+                let words: Vec<&str> = cli.split_whitespace().collect();
+                let cli_arg_index = *index + 4;
 
-        start_index..end_index
+                let offset = words
+                    .iter()
+                    .take(cli_arg_index)
+                    .fold(0, |acc, token| acc + token.len() + 1);
+
+                let length = words[cli_arg_index].len();
+
+                offset..offset + length
+            }
+            _ => {
+                let needle = self.needle(&args);
+                let start_index = cli.find(&needle).unwrap();
+                let end_index = start_index + needle.chars().count();
+
+                start_index..end_index
+            }
+        }
     }
 
     pub fn print(&self, args: &Args) -> ! {
@@ -130,7 +147,7 @@ impl Error {
         let cli_args = cli_args.join(" ");
         let source_name = "Command line arguments";
 
-        Report::build(ReportKind::Error, (source_name, 0..0))
+        let _ = Report::build(ReportKind::Error, (source_name, 0..0))
             .with_code(self.code())
             .with_message(self.title())
             .with_label(
@@ -139,8 +156,7 @@ impl Error {
                     .with_color(Color::BrightRed),
             )
             .finish()
-            .print((source_name, Source::from(cli_args)))
-            .unwrap();
+            .print((source_name, Source::from(cli_args)));
 
         process::exit(self.code());
     }
