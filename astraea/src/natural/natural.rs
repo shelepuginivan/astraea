@@ -650,9 +650,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_natural_number_cmp() {
-        let lhs = Natural::from_str("1234").unwrap();
-        let rhs = Natural::from_str("5678").unwrap();
+    fn test_natural_cmp() {
+        let lhs = Natural::from(1234_u16);
+        let rhs = Natural::from(5678_u16);
         assert_eq!(lhs.cmp(&rhs), Ordering::Less);
 
         let lhs = Natural::new(vec![Digit::One; 1_000_000]);
@@ -662,18 +662,18 @@ mod tests {
         let lhs_str = "2".to_owned() + "0".repeat(999_999).as_str();
         let rhs_str = "1".to_owned() + "9".repeat(999_999).as_str();
 
-        let lhs = Natural::from_str(lhs_str.as_str()).unwrap();
-        let rhs = Natural::from_str(rhs_str.as_str()).unwrap();
+        let lhs = Natural::from_str(lhs_str.as_str()).expect("should parse a valid natural");
+        let rhs = Natural::from_str(rhs_str.as_str()).expect("should parse a valid natural");
         assert_eq!(lhs.cmp(&rhs), Ordering::Greater);
     }
 
     #[test]
-    fn test_natural_number_inc() {
+    fn test_natural_inc() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
             let v: u32 = rng.random_range(..u32::MAX - 1);
-            let n = Natural::from_str(&v.to_string()).unwrap();
+            let n = Natural::from(v);
             let expected = (v + 1).to_string();
             let actual = n.inc().to_string();
 
@@ -682,7 +682,7 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_add() {
+    fn test_natural_add() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -690,13 +690,13 @@ mod tests {
             let rhs: u32 = rng.random_range(..2u32.pow(31));
             let expected = lhs + rhs;
 
-            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
-            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from(lhs);
+            let rhs = Natural::from(rhs);
             assert_eq!((lhs + rhs).to_string(), expected.to_string());
         }
 
-        let lhs = Natural::from_str(&"9".repeat(999_999)).unwrap();
-        let rhs = Natural::from_str("1").unwrap();
+        let lhs = Natural::from_str(&"9".repeat(999_999)).expect("should parse a valid natural");
+        let rhs = Natural::from(1_u8);
 
         let expected = "1".to_owned() + &"0".repeat(999_999);
         let actual = (lhs + rhs).to_string();
@@ -705,7 +705,7 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_sub() {
+    fn test_natural_sub() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -713,29 +713,31 @@ mod tests {
             let lhs: u32 = rng.random_range(rhs..=u32::MAX);
             let expected = lhs - rhs;
 
-            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
-            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
-            assert_eq!((lhs - rhs).unwrap().to_string(), expected.to_string());
+            let lhs = Natural::from(lhs);
+            let rhs = Natural::from(rhs);
+            let actual = (lhs - rhs).expect("should subtract");
+
+            assert_eq!(actual.to_string(), expected.to_string());
         }
 
         let lhs_value = "1".to_owned() + &"0".repeat(999_999);
-        let lhs = Natural::from_str(&lhs_value).unwrap();
-        let rhs = Natural::from_str("1").unwrap();
+        let lhs = Natural::from_str(&lhs_value).expect("should parse a valid natural");
+        let rhs = Natural::from(1_u8);
 
         let expected = "9".repeat(999_999);
-        let actual = (lhs - rhs).unwrap().to_string();
+        let actual = (lhs - rhs).expect("should subtract").to_string();
 
         assert_eq!(expected, actual);
 
-        let rhs_gt_lhs = Natural::from(123u8) - Natural::from(3234672789346usize);
+        let rhs_gt_lhs = Natural::from(123_u8) - Natural::from(3234672789346_usize);
         assert!(rhs_gt_lhs.is_err());
 
-        let rhs_gt_lhs = Natural::from(123u8) - Natural::from(124u16);
+        let rhs_gt_lhs = Natural::from(123_u8) - Natural::from(124_u16);
         assert!(rhs_gt_lhs.is_err());
     }
 
     #[test]
-    fn test_natural_number_mul_digit() {
+    fn test_natural_mul_digit() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -743,7 +745,7 @@ mod tests {
             let rhs = rng.random_range(0..9);
             let expected = lhs * rhs;
 
-            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
+            let lhs = Natural::from(lhs);
             let rhs = Digit::try_from(rhs).expect("should convert a valid digit");
             let actual = lhs * rhs;
 
@@ -752,7 +754,7 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_mul() {
+    fn test_natural_mul() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -760,8 +762,8 @@ mod tests {
             let rhs = rng.random_range(..2u32.pow(16));
             let expected = lhs * rhs;
 
-            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
-            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
+            let lhs = Natural::from(lhs);
+            let rhs = Natural::from(rhs);
             let actual = lhs * rhs;
 
             assert_eq!(expected.to_string(), actual.to_string());
@@ -769,7 +771,7 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_div() {
+    fn test_natural_div() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -777,11 +779,11 @@ mod tests {
             let rhs = rng.random_range(1..u32::MAX);
             let expected = lhs / rhs;
 
-            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
-            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
-            let actual = lhs / rhs;
+            let lhs = Natural::from(lhs);
+            let rhs = Natural::from(rhs);
+            let actual = (lhs / rhs).expect("should divide");
 
-            assert_eq!(expected.to_string(), actual.unwrap().to_string());
+            assert_eq!(expected.to_string(), actual.to_string());
         }
 
         let zero_division = Natural::from(9u8) / Natural::from(0u8);
@@ -789,7 +791,7 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_rem() {
+    fn test_natural_rem() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -797,16 +799,16 @@ mod tests {
             let rhs = rng.random_range(1..u32::MAX);
             let expected = lhs % rhs;
 
-            let lhs = Natural::from_str(&lhs.to_string()).unwrap();
-            let rhs = Natural::from_str(&rhs.to_string()).unwrap();
-            let actual = lhs % rhs;
+            let lhs = Natural::from(lhs);
+            let rhs = Natural::from(rhs);
+            let actual = (lhs % rhs).expect("should divide");
 
-            assert_eq!(expected.to_string(), actual.unwrap().to_string());
+            assert_eq!(expected.to_string(), actual.to_string());
         }
     }
 
     #[test]
-    fn test_natural_number_root() {
+    fn test_natural_root() {
         let mut rng = rand::rng();
 
         for _ in 0..100 {
@@ -835,46 +837,46 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_gcd() {
-        let lhs = Natural::from_str("21").unwrap();
-        let rhs = Natural::from_str("6").unwrap();
+    fn test_natural_gcd() {
+        let lhs = Natural::from(21_u8);
+        let rhs = Natural::from(6_u8);
         assert_eq!("3", lhs.gcd(rhs).to_string());
 
-        let lhs = Natural::from_str("8").unwrap();
-        let rhs = Natural::from_str("0").unwrap();
+        let lhs = Natural::from(8_u8);
+        let rhs = Natural::from(0_u8);
         assert_eq!("8", lhs.gcd(rhs).to_string());
 
-        let lhs = Natural::from_str("0").unwrap();
-        let rhs = Natural::from_str("6").unwrap();
+        let lhs = Natural::from(0_u8);
+        let rhs = Natural::from(6_u8);
         assert_eq!("6", lhs.gcd(rhs).to_string());
 
-        let lhs = Natural::from_str("0").unwrap();
-        let rhs = Natural::from_str("0").unwrap();
+        let lhs = Natural::from(0_u8);
+        let rhs = Natural::from(0_u8);
         assert_eq!("0", lhs.gcd(rhs).to_string());
     }
 
     #[test]
-    fn test_natural_number_lcm() {
-        let lhs = Natural::from_str("21").unwrap();
-        let rhs = Natural::from_str("14").unwrap();
+    fn test_natural_lcm() {
+        let lhs = Natural::from(21_u8);
+        let rhs = Natural::from(14_u8);
         assert_eq!("42", lhs.lcm(rhs).to_string());
 
-        let lhs = Natural::from_str("8").unwrap();
-        let rhs = Natural::from_str("0").unwrap();
+        let lhs = Natural::from(8_u8);
+        let rhs = Natural::from(0_u8);
         assert_eq!("0", lhs.lcm(rhs).to_string());
 
-        let lhs = Natural::from_str("0").unwrap();
-        let rhs = Natural::from_str("6").unwrap();
+        let lhs = Natural::from(0_u8);
+        let rhs = Natural::from(6_u8);
         assert_eq!("0", lhs.lcm(rhs).to_string());
 
-        let lhs = Natural::from_str("0").unwrap();
-        let rhs = Natural::from_str("0").unwrap();
+        let lhs = Natural::from(0_u8);
+        let rhs = Natural::from(0_u8);
         assert_eq!("0", lhs.lcm(rhs).to_string());
     }
 
     #[test]
-    fn test_natural_number_as_digits() {
-        let n = Natural::from_str("123412341234").unwrap();
+    fn test_natural_as_digits() {
+        let n = Natural::from(123412341234_u64);
         let digits = n.as_digits();
 
         assert_eq!(digits.len(), 12);
@@ -882,7 +884,7 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_is_zero() {
+    fn test_natural_is_zero() {
         assert!(Natural::new(vec![]).is_zero());
         assert!(Natural::new(vec![Digit::Zero]).is_zero());
         assert!(!Natural::new(vec![Digit::One]).is_zero());
@@ -890,8 +892,8 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_times_pow10() {
-        let n = Natural::from_str("123").unwrap();
+    fn test_natural_times_pow10() {
+        let n = Natural::from(123_u8);
         let expected = "12300000000000000";
         let actual = n.times_pow10(14).to_string();
 
@@ -899,12 +901,12 @@ mod tests {
     }
 
     #[test]
-    fn test_natural_number_to_string() {
+    fn test_natural_to_string() {
         let digits = vec![Digit::Nine; 999];
         let n = Natural::new(digits);
         assert_eq!(n.to_string(), "9".repeat(999));
 
-        let n = Natural::from_str("3739847457938742").unwrap();
+        let n = Natural::from(3739847457938742_u64);
         assert_eq!(n.to_string(), "3739847457938742");
     }
 }
