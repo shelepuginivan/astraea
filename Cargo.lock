@@ -79,7 +79,7 @@ dependencies = [
 
 [[package]]
 name = "astraea"
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "astraea-derive",
  "criterion",
@@ -88,7 +88,7 @@ dependencies = [
 
 [[package]]
 name = "astraea-cli"
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "ariadne",
  "astraea",
@@ -98,7 +98,7 @@ dependencies = [
 
 [[package]]
 name = "astraea-derive"
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "quote",
  "syn",
@@ -106,7 +106,7 @@ dependencies = [
 
 [[package]]
 name = "astraea-modules"
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "astraea",
  "strum",
