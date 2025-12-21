@@ -97,7 +97,7 @@ impl IntegerDivision for Integer {
         }
 
         let res_sign = self.sign * rhs.sign;
-        let (quotient, remainder) = self.value.div_rem(rhs.value).unwrap();
+        let (quotient, remainder) = self.value.div_rem(rhs.value)?;
 
         let quotient = Self {
             value: quotient,
@@ -148,7 +148,7 @@ impl Integer {
     /// use astraea::integer::Integer;
     ///
     /// let i = Integer::from(1000);
-    /// let n = i.to_natural().unwrap();
+    /// let n = i.to_natural().expect("should convert to natural");
     /// assert_eq!(n, Natural::from(1000u16));
     ///
     /// let i = Integer::from(-1000);
@@ -229,7 +229,7 @@ impl Add for Integer {
             },
 
             (Sign::Positive, Sign::Negative) | (Sign::Negative, Sign::Positive) => Self {
-                value: (max - min).unwrap(),
+                value: (max - min).expect("should subtract natural from another larger natural"),
                 sign: diff_sign,
             },
 
@@ -315,23 +315,22 @@ impl Eq for Integer {}
 
 impl PartialOrd for Integer {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match self.sign().cmp(&other.sign()) {
-            Ordering::Greater => return Some(Ordering::Greater),
-            Ordering::Equal => {}
-            Ordering::Less => return Some(Ordering::Less),
-        };
-
-        match self.sign {
-            Sign::Negative => Some(other.value.cmp(&self.value)),
-            Sign::Zero => Some(Ordering::Equal),
-            Sign::Positive => Some(self.value.cmp(&other.value)),
-        }
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Integer {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        match self.sign().cmp(&other.sign()) {
+            Ordering::Equal => {}
+            other => return other,
+        };
+
+        match self.sign {
+            Sign::Negative => other.value.cmp(&self.value),
+            Sign::Zero => Ordering::Equal,
+            Sign::Positive => self.value.cmp(&other.value),
+        }
     }
 }
 
@@ -358,18 +357,12 @@ impl FromStr for Integer {
             return Err(ParseError::new("cannot create integer from empty string"));
         }
 
-        let mut minus_count = 0;
+        let mut sign = Sign::Positive;
 
-        while s.starts_with("-") {
-            s = s.strip_prefix('-').unwrap();
-            minus_count += 1;
+        while let Some(stripped) = s.strip_prefix('-') {
+            s = stripped;
+            sign = -sign;
         }
-
-        let mut sign = if minus_count % 2 == 0 {
-            Sign::Positive
-        } else {
-            Sign::Negative
-        };
 
         let value = Natural::from_str(s)?;
         if value.is_zero() {
