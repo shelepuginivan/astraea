@@ -9,7 +9,7 @@ members = [
 
 [workspace.package]
 authors = ["Ivan Shelepugin <shelepuginivanm@gmail.com>"]
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.1"
 license = "MIT"
 edition = "2024"
 repository = "https://github.com/shelepuginivan/astraea"
