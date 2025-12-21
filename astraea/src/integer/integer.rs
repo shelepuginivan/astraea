@@ -421,7 +421,7 @@ mod tests {
         for _ in 0..1000 {
             let i: i64 = rng.random();
             let expected = i.to_string();
-            let actual = Integer::from_str(expected.as_str()).unwrap().to_string();
+            let actual = Integer::from(i).to_string();
 
             assert_eq!(expected, actual);
         }
@@ -440,8 +440,8 @@ mod tests {
                 continue;
             }
 
-            let actual = v.to_natural().unwrap();
-            let expected: Natural = i.try_into().unwrap();
+            let actual = v.to_natural().expect("should convert to natural");
+            let expected: Natural = i.try_into().expect("should convert to natural");
 
             assert_eq!(actual, expected);
         }
@@ -488,8 +488,8 @@ mod tests {
             let rhs = rng.random_range(min_value..max_value);
             let expected = (lhs - rhs).to_string();
 
-            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
-            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let lhs = Integer::from(lhs);
+            let rhs = Integer::from(rhs);
             let actual = (lhs - rhs).to_string();
 
             assert_eq!(expected, actual);
@@ -508,8 +508,8 @@ mod tests {
             let rhs = rng.random_range(min_value..max_value);
             let expected = (lhs * rhs).to_string();
 
-            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
-            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
+            let lhs = Integer::from(lhs);
+            let rhs = Integer::from(rhs);
             let actual = (lhs * rhs).to_string();
 
             assert_eq!(expected, actual);
@@ -532,9 +532,9 @@ mod tests {
 
             let expected = (lhs / rhs).to_string();
 
-            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
-            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
-            let actual = (lhs / rhs).unwrap().to_string();
+            let lhs = Integer::from(lhs);
+            let rhs = Integer::from(rhs);
+            let actual = (lhs / rhs).expect("should divide").to_string();
 
             assert_eq!(expected, actual);
         }
@@ -559,9 +559,9 @@ mod tests {
 
             let expected = (lhs % rhs).to_string();
 
-            let lhs = Integer::from_str(&lhs.to_string()).unwrap();
-            let rhs = Integer::from_str(&rhs.to_string()).unwrap();
-            let actual = (lhs % rhs).unwrap().to_string();
+            let lhs = Integer::from(lhs);
+            let rhs = Integer::from(rhs);
+            let actual = (lhs % rhs).expect("should divide").to_string();
 
             assert_eq!(expected, actual);
         }
