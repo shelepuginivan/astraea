@@ -20,6 +20,7 @@ package-linux: \
 package-linux-prepare:
     mkdir -p dist/astraea-linux-x86_64/
     cp target/release/astraea dist/astraea-linux-x86_64/
+    cp LICENSE dist/astraea-linux-x86_64/
 
 [working-directory: 'dist']
 package-linux-tarball:
@@ -38,6 +39,7 @@ package-windows: \
 package-windows-prepare:
     mkdir -p dist/astraea-win-x86_64/
     cp target/release/astraea dist/astraea-win-x86_64/
+    cp LICENSE dist/astraea-win-x86_64/
 
 [working-directory: 'dist']
 package-windows-zip:
