@@ -41,13 +41,13 @@ impl Module for IntegerModule {
             Instruction::IntegerFromNatural => {
                 let v: Natural = validate::one_arg(args)?;
 
-                Ok(Box::new(Integer::from_natural(v)))
+                Ok(Box::new(Integer::from(v)))
             }
 
             Instruction::IntegerToNatural => {
                 let v: Integer = validate::one_arg(args)?;
 
-                match v.to_natural() {
+                match TryInto::<Natural>::try_into(v) {
                     Ok(v) => Ok(Box::new(v)),
                     Err(e) => Err(InstructionError::calculation(0, e.message)),
                 }

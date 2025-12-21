@@ -123,44 +123,18 @@ impl Integer {
         Self { value, sign }
     }
 
-    /// Creates a positive Integer from natural number.
-    ///
-    /// ```
-    /// use astraea::natural::Natural;
-    /// use astraea::integer::Integer;
-    ///
-    /// let n = Natural::from(123u8);
-    /// let i = Integer::from_natural(n);
-    ///
-    /// assert_eq!(i, Integer::from(123));
-    /// ```
-    pub fn from_natural(n: Natural) -> Self {
-        Self {
-            value: n,
-            sign: Sign::Positive,
-        }
-    }
-
-    /// Converts integer to natural. Returns error for negative integers.
+    /// Converts integer to natural.
     ///
     /// ```
     /// use astraea::natural::Natural;
     /// use astraea::integer::Integer;
     ///
     /// let i = Integer::from(1000);
-    /// let n = i.to_natural().expect("should convert to natural");
+    /// let n = i.into_natural();
     /// assert_eq!(n, Natural::from(1000u16));
-    ///
-    /// let i = Integer::from(-1000);
-    /// assert!(i.to_natural().is_err());
     /// ```
-    pub fn to_natural(self) -> Result<Natural, ValueError> {
-        match self.sign {
-            Sign::Negative => Err(ValueError::new(
-                "cannot convert negative integer to natural",
-            )),
-            _ => Ok(self.value),
-        }
+    pub fn into_natural(self) -> Natural {
+        self.value
     }
 
     /// Calculates GCD (greatest common divisor) of two integers. The returned value is a
@@ -177,10 +151,7 @@ impl Integer {
     /// assert_eq!(gcd, Integer::from(4));
     /// ```
     pub fn gcd(self, other: Self) -> Self {
-        Self {
-            value: self.value.gcd(other.value),
-            sign: Sign::Positive,
-        }
+        self.value.gcd(other.value).into()
     }
 
     /// Calculates LCM (least common multiple) of two natural numbers. The returned value is a
@@ -198,10 +169,7 @@ impl Integer {
     /// assert_eq!(lcm, Integer::from(18));
     /// ```
     pub fn lcm(self, other: Self) -> Self {
-        Self {
-            value: self.value.lcm(other.value),
-            sign: Sign::Positive,
-        }
+        self.value.lcm(other.value).into()
     }
 }
 
@@ -373,6 +341,31 @@ impl FromStr for Integer {
     }
 }
 
+impl From<Natural> for Integer {
+    fn from(value: Natural) -> Self {
+        let sign = if value.is_zero() {
+            Sign::Zero
+        } else {
+            Sign::Positive
+        };
+
+        Self { value, sign }
+    }
+}
+
+impl TryInto<Natural> for Integer {
+    type Error = ValueError;
+
+    fn try_into(self) -> Result<Natural, Self::Error> {
+        match self.sign {
+            Sign::Negative => Err(ValueError::new(
+                "cannot convert negative integer to natural",
+            )),
+            _ => Ok(self.value),
+        }
+    }
+}
+
 /// Implements From<T> for Integer for every signed integer type.
 macro_rules! impl_integer_from_signed {
     ($($t:ty),*) => {
@@ -428,7 +421,7 @@ mod tests {
     }
 
     #[test]
-    fn test_integer_to_natural() {
+    fn test_integer_natural() {
         let mut rng = rand::rng();
 
         for _ in 0..1000 {
@@ -436,11 +429,11 @@ mod tests {
             let v: Integer = i.into();
 
             if i < 0 {
-                assert!(v.to_natural().is_err());
+                assert!(TryInto::<Natural>::try_into(v).is_err());
                 continue;
             }
 
-            let actual = v.to_natural().expect("should convert to natural");
+            let actual = v.into_natural();
             let expected: Natural = i.try_into().expect("should convert to natural");
 
             assert_eq!(actual, expected);

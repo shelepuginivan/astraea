@@ -77,8 +77,8 @@ impl MulInvertible<Self> for Rational {
             return Err(ValueError::new("cannot invert zero element"));
         }
 
-        let new_numerator = Integer::from_natural(denominator).with_sign(numerator.sign());
-        let new_denominator = numerator.abs().to_natural().unwrap();
+        let new_numerator = Integer::from(denominator).with_sign(numerator.sign());
+        let new_denominator = numerator.into_natural();
 
         Self::new(new_numerator, new_denominator)
     }
@@ -177,12 +177,10 @@ impl Rational {
             denominator,
         } = self;
 
-        let gcd = numerator
-            .clone()
-            .gcd(Integer::from_natural(denominator.clone()));
+        let gcd = numerator.clone().gcd(Integer::from(denominator.clone()));
 
         let numerator = (numerator / gcd.clone()).unwrap();
-        let denominator = (denominator / gcd.to_natural().unwrap()).unwrap();
+        let denominator = (denominator / gcd.into_natural()).unwrap();
 
         Self {
             numerator,
@@ -197,10 +195,10 @@ impl Rational {
     /// use astraea::rational::Rational;
     /// use std::str::FromStr;
     ///
-    /// let r = Rational::from_str("22/11").unwrap();
+    /// let r = Rational::from_str("22/11").expect("should parse rational");
     /// assert!(r.is_integer());
     ///
-    /// let r = Rational::from_str("23/11").unwrap();
+    /// let r = Rational::from_str("23/11").expect("should parse rational");
     /// assert!(!r.is_integer());
     /// ```
     pub fn is_integer(&self) -> bool {
@@ -282,8 +280,9 @@ impl FromStr for Rational {
         }
 
         let sign = numerator.sign() * denominator.sign();
-        let numerator = Integer::new(numerator.abs().to_natural().unwrap(), sign);
-        let denominator = denominator.abs().to_natural().unwrap();
+
+        let numerator = numerator.abs().with_sign(sign);
+        let denominator = denominator.into_natural();
 
         match Self::new(numerator, denominator) {
             Ok(v) => Ok(v),
@@ -319,8 +318,8 @@ impl Add for Rational {
             return self;
         }
 
-        let lhs_denominator = Integer::from_natural(self.denominator.clone());
-        let rhs_denominator = Integer::from_natural(rhs.denominator.clone());
+        let lhs_denominator = Integer::from(self.denominator.clone());
+        let rhs_denominator = Integer::from(rhs.denominator.clone());
 
         let lcm = lhs_denominator.clone().lcm(rhs_denominator.clone());
         let lhs_factor = (lcm.clone() / lhs_denominator).unwrap();
@@ -328,7 +327,7 @@ impl Add for Rational {
         let lhs_numerator = self.numerator * lhs_factor;
         let rhs_numerator = rhs.numerator * rhs_factor;
         let numerator = lhs_numerator + rhs_numerator;
-        let denominator = lcm.to_natural().unwrap();
+        let denominator = lcm.into_natural();
 
         Self {
             numerator,
@@ -368,8 +367,8 @@ impl Div for Rational {
 
         let sign = self.sign() * rhs.sign();
 
-        let lhs_numerator = self.numerator.abs().to_natural().unwrap();
-        let rhs_numerator = rhs.numerator.abs().to_natural().unwrap();
+        let lhs_numerator = self.numerator.into_natural();
+        let rhs_numerator = rhs.numerator.into_natural();
 
         let lhs_denominator = self.denominator;
         let rhs_denominator = rhs.denominator;
@@ -427,8 +426,6 @@ impl Pretty for Rational {
 
 #[cfg(test)]
 mod tests {
-    use std::i64;
-
     use rand::Rng;
 
     use super::*;
