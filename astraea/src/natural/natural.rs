@@ -89,7 +89,7 @@ impl IntegerDivision for Natural {
                 q_digit += 1;
             }
 
-            quotient = quotient.append(Digit::try_from(q_digit).unwrap());
+            quotient = quotient.append(Digit::try_from(q_digit)?);
         }
 
         Ok((quotient, remainder))
@@ -178,7 +178,7 @@ impl Natural {
     /// use astraea::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// let n = Natural::from_str("12345689").unwrap();
+    /// let n = Natural::from_str("12345689").expect("should parse a valid natural");
     /// let n = n.append(Digit::Zero);
     ///
     /// assert_eq!(n.prettify(), "123456890");
@@ -344,10 +344,6 @@ impl Sub for Natural {
             ));
         }
 
-        while digits.len() > 1 && *digits.last().unwrap() == Digit::Zero {
-            digits.pop();
-        }
-
         Ok(Self::from_reversed(digits))
     }
 }
@@ -481,10 +477,16 @@ impl Eq for Natural {}
 
 impl PartialOrd for Natural {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Natural {
+    fn cmp(&self, other: &Self) -> Ordering {
         let cmp_radix = self.digits.len().cmp(&other.digits.len());
 
         if cmp_radix != Ordering::Equal {
-            return Some(cmp_radix);
+            return cmp_radix;
         }
 
         let self_digits = self.digits.iter().rev();
@@ -494,17 +496,11 @@ impl PartialOrd for Natural {
             let cmp_digit = lhs.cmp(rhs);
 
             if cmp_digit != Ordering::Equal {
-                return Some(cmp_digit);
+                return cmp_digit;
             }
         }
 
-        Some(Ordering::Equal)
-    }
-}
-
-impl Ord for Natural {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        Ordering::Equal
     }
 }
 
