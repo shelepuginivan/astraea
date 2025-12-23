@@ -1024,8 +1024,6 @@ pub fn derive_ring(input: TokenStream) -> TokenStream {
         impl astraea::algebra::MulUnitalMagma for #name {}
         impl astraea::algebra::MulMonoid for #name {}
 
-        impl astraea::algebra::Semiring for #name {}
-        impl astraea::algebra::Rng for #name {}
         impl astraea::algebra::Ring for #name {}
     }
     .into()
@@ -1116,8 +1114,6 @@ pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
         impl astraea::algebra::MulUnitalMagma for #name {}
         impl astraea::algebra::MulMonoid for #name {}
 
-        impl astraea::algebra::Semiring for #name {}
-        impl astraea::algebra::Rng for #name {}
         impl astraea::algebra::Ring for #name {}
     }
     .into()
@@ -1220,9 +1216,6 @@ pub fn derive_field(input: TokenStream) -> TokenStream {
         impl astraea::algebra::MulGroup for #name {}
         impl astraea::algebra::MulAbelianGroup for #name {}
 
-        impl astraea::algebra::Semiring for #name {}
-        impl astraea::algebra::Rng for #name {}
-        impl astraea::algebra::Ring for #name {}
         impl astraea::algebra::Field for #name {}
     }
     .into()

@@ -110,10 +110,6 @@ impl MulInvertibleSemigroup for Rational {}
 impl MulGroup for Rational {}
 impl MulAbelianGroup for Rational {}
 
-impl Semiring for Rational {}
-impl Rng for Rational {}
-impl Ring for Rational {}
-impl CommutativeRing for Rational {}
 impl Field for Rational {}
 
 impl Rational {

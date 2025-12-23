@@ -3,6 +3,8 @@ use crate::algebra::{
     MulAssociative, MulClosed, MulCommutative, MulInvertible, MulWithIdentity,
 };
 
+use super::class_inclusion::inclusion_chain;
+
 /// Semiring is an algebraic structure, where
 ///
 /// 1. Addition is a **commutative monoid**: closed, associative, with identity, commutative.
@@ -104,3 +106,12 @@ pub trait Field:
     + Distributive
 {
 }
+
+// Semiring ⊃ Ring
+inclusion_chain!(Semiring, Ring);
+
+// Rng ⊃ Ring
+inclusion_chain!(Rng, Ring);
+
+// Ring ⊃ CommutativeRing ⊃ Field
+inclusion_chain!(Ring, CommutativeRing, Field);

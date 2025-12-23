@@ -81,9 +81,6 @@ impl MulSemigroup for Integer {}
 impl MulUnitalMagma for Integer {}
 impl MulMonoid for Integer {}
 
-impl Semiring for Integer {}
-impl Rng for Integer {}
-impl Ring for Integer {}
 impl CommutativeRing for Integer {}
 
 impl IntegerDivision for Integer {

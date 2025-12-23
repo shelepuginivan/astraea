@@ -75,9 +75,6 @@ impl<T: Field> MulSemigroup for Polynomial<T> {}
 impl<T: Field> MulUnitalMagma for Polynomial<T> {}
 impl<T: Field> MulMonoid for Polynomial<T> {}
 
-impl<T: Field> Semiring for Polynomial<T> {}
-impl<T: Field> Rng for Polynomial<T> {}
-impl<T: Field> Ring for Polynomial<T> {}
 impl<T: Field> CommutativeRing for Polynomial<T> {}
 
 impl<T: Field> IntegerDivision for Polynomial<T> {
