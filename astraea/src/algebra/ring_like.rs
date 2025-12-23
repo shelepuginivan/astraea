@@ -85,6 +85,29 @@ pub trait CommutativeRing:
 {
 }
 
+/// IntegralDomain is an algebraic structure, where
+///
+/// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
+///    commutative.
+/// 2. Multiplication is a **commutative monoid**: closed, associative, with identity, commutative.
+/// 3. Multiplication distributes over addition.
+/// 4. There are no zero divisors.
+///
+/// Integral domain is a commutative ring with no zero divisors.
+pub trait IntegralDomain:
+    AddClosed
+    + AddAssociative<Self>
+    + AddWithIdentity<Self>
+    + AddInvertible<Self>
+    + AddCommutative<Self>
+    + MulClosed
+    + MulAssociative<Self>
+    + MulWithIdentity<Self>
+    + MulCommutative<Self>
+    + Distributive
+{
+}
+
 /// Field is an algebraic structure, where
 ///
 /// 1. Addition is an **abelian group**: closed, associative, with identity, invertible,
@@ -92,6 +115,8 @@ pub trait CommutativeRing:
 /// 2. Multiplication is an **abelian group**: closed, associative, with identity, invertible,
 ///    commutative.
 /// 3. Multiplication distributes over addition.
+///
+/// Field is an integral domain in which every nonzero element is invertible.
 pub trait Field:
     AddClosed
     + AddAssociative<Self>
@@ -113,5 +138,5 @@ inclusion_chain!(Semiring, Ring);
 // Rng ⊃ Ring
 inclusion_chain!(Rng, Ring);
 
-// Ring ⊃ CommutativeRing ⊃ Field
-inclusion_chain!(Ring, CommutativeRing, Field);
+// Ring ⊃ CommutativeRing ⊃ IntegralDomain ⊃ Field
+inclusion_chain!(Ring, CommutativeRing, IntegralDomain, Field);

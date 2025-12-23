@@ -88,8 +88,6 @@ impl MulCommutative<Self> for Rational {}
 
 impl Distributive for Rational {}
 
-impl NoZeroDivisors for Rational {}
-
 impl AddMagma for Rational {}
 impl AddSemigroup for Rational {}
 impl AddQuasigroup for Rational {}

@@ -74,8 +74,3 @@ pub trait MulCommutative<T>: MathObject + Mul<T> {}
 ///
 /// > a · (b + c) = a · b + a · c
 pub trait Distributive: MathObject {}
-
-/// NoZeroDivisors marks type as a structure with no zero divisors.
-///
-/// > If a · b = 0, then a = 0 or b = 0.
-pub trait NoZeroDivisors: MathObject {}

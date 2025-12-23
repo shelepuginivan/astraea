@@ -81,7 +81,7 @@ impl MulSemigroup for Integer {}
 impl MulUnitalMagma for Integer {}
 impl MulMonoid for Integer {}
 
-impl CommutativeRing for Integer {}
+impl IntegralDomain for Integer {}
 
 impl IntegerDivision for Integer {
     fn div_rem(self, rhs: Self) -> Result<(Self, Self), ValueError> {

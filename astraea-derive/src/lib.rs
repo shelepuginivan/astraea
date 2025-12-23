@@ -1119,6 +1119,108 @@ pub fn derive_commutative_ring(input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Derive macro generating an impl of the `IntegralDomain` trait.
+///
+/// Marks this type as a field, generating implementations for the following traits:
+///
+/// - `AddClosed`
+/// - `AddAssociative<Self>`
+/// - `AddInvertible<Self>`
+/// - `AddCommutative<Self>`
+/// - `AddMagma`
+/// - `AddSemigroup`
+/// - `AddQuasigroup`
+/// - `AddUnitalMagma`
+/// - `AddMonoid`
+/// - `AddLoop`
+/// - `AddInvertibleSemigroup`
+/// - `AddGroup`
+/// - `AddAbelianGroup`
+///
+/// - `MulClosed`
+/// - `MulAssociative<Self>`
+/// - `MulCommutative<Self>`
+/// - `MulMagma`
+/// - `MulSemigroup`
+/// - `MulQuasigroup`
+/// - `MulUnitalMagma`
+/// - `MulMonoid`
+/// - `MulLoop`
+/// - `MulInvertibleSemigroup`
+/// - `MulGroup`
+/// - `MulAbelianGroup`
+///
+/// - `Distributive`
+///
+/// `AddWithIdentity<Self>`, `MulWithIdentity<Self>`, `MulInvertible<Self>` must be implemented
+/// manually.
+///
+/// # Requirements
+///
+/// The following traits must be implemented (or derived):
+///
+/// - [`MathObject`]
+/// - [`std::ops::Add`]
+/// - [`std::ops::Neg`]
+/// - [`std::ops::Sub`]
+/// - [`std::ops::Mul`]
+/// - `AddWithIdentity<Self>`
+/// - `MulWithIdentity<Self>`
+///
+/// Addition (`+`) must be:
+///
+/// - Closed --- sum of elements returns the same type.
+/// - Associative --- `a + (b + c) = (a + b) + c`.
+/// - With identity --- there exists `e = 0`, such that `a + e = a`.
+/// - Invertible --- for all `a` there exists `-a`, such that `a + (-a) = 0`.
+/// - Commutative --- `a + b = b + a`.
+///
+/// Multiplication (`*`) must be:
+///
+/// - Closed --- product of elements returns the same type.
+/// - Associative --- `a * (b * c) = (a * b) * c`.
+/// - With identity --- there exists `e = 1`, such that `a * e = a`.
+/// - Invertible --- for all `a` there exists `a⁻¹`, such that `a * a⁻¹ = 1`.
+/// - Commutative --- `a * b = b * a`.
+#[proc_macro_derive(IntegralDomain)]
+pub fn derive_integral_domain(input: TokenStream) -> TokenStream {
+    let name = parse_macro_input!(input as DeriveInput).ident;
+
+    quote! {
+        impl astraea::algebra::AddClosed for #name {}
+        impl astraea::algebra::AddAssociative<Self> for #name {}
+        impl astraea::algebra::AddInvertible<Self> for #name {}
+        impl astraea::algebra::AddCommutative<Self> for #name {}
+        impl astraea::algebra::MulClosed for #name {}
+        impl astraea::algebra::MulAssociative<Self> for #name {}
+        impl astraea::algebra::MulCommutative<Self> for #name {}
+        impl astraea::algebra::Distributive for #name {}
+
+        impl astraea::algebra::AddMagma for #name {}
+        impl astraea::algebra::AddSemigroup for #name {}
+        impl astraea::algebra::AddQuasigroup for #name {}
+        impl astraea::algebra::AddUnitalMagma for #name {}
+        impl astraea::algebra::AddMonoid for #name {}
+        impl astraea::algebra::AddLoop for #name {}
+        impl astraea::algebra::AddInvertibleSemigroup for #name {}
+        impl astraea::algebra::AddGroup for #name {}
+        impl astraea::algebra::AddAbelianGroup for #name {}
+
+        impl astraea::algebra::MulMagma for #name {}
+        impl astraea::algebra::MulSemigroup for #name {}
+        impl astraea::algebra::MulQuasigroup for #name {}
+        impl astraea::algebra::MulUnitalMagma for #name {}
+        impl astraea::algebra::MulMonoid for #name {}
+        impl astraea::algebra::MulLoop for #name {}
+        impl astraea::algebra::MulInvertibleSemigroup for #name {}
+        impl astraea::algebra::MulGroup for #name {}
+        impl astraea::algebra::MulAbelianGroup for #name {}
+
+        impl astraea::algebra::IntegralDomain for #name {}
+    }
+    .into()
+}
+
 /// Derive macro generating an impl of the `Field` trait.
 ///
 /// Marks this type as a field, generating implementations for the following traits:
