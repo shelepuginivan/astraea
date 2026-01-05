@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::LinkedList;
 use std::fmt::Display;
+use std::mem;
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::str::FromStr;
 
@@ -190,7 +191,8 @@ impl<T: Field> Polynomial<T> {
         let mut coefficients = vec![T::zero(); polynomial_degree + 1];
 
         for monomial in monomials {
-            coefficients[monomial.exponent] = monomial.coefficient;
+            let current_coefficient = mem::replace(&mut coefficients[monomial.exponent], T::zero());
+            coefficients[monomial.exponent] = current_coefficient + monomial.coefficient;
         }
 
         Ok(Self::new(coefficients))
