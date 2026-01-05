@@ -38,7 +38,7 @@ package-windows: \
 
 package-windows-prepare:
     mkdir -p dist/astraea-win-x86_64/
-    cp target/release/astraea dist/astraea-win-x86_64/
+    cp ./target/x86_64-pc-windows-gnu/release/astraea.exe dist/astraea-win-x86_64/
     cp LICENSE dist/astraea-win-x86_64/
 
 [working-directory: 'dist']
