@@ -31,9 +31,7 @@ impl Module for SymbolicModule {
                     }),
                 });
 
-                ast.prefix_notation();
-
-                Err(InstructionError::unknown_instruction(instruction))
+                Ok(Box::new(ast.prefix_notation()))
             }
 
             _ => Err(InstructionError::unknown_instruction(instruction)),
