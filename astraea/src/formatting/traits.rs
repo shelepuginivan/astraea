@@ -26,3 +26,9 @@ impl Pretty for Ordering {
         .to_string()
     }
 }
+
+impl Pretty for String {
+    fn prettify(&self) -> String {
+        self.to_string()
+    }
+}
