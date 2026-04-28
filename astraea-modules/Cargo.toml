@@ -9,4 +9,5 @@ keywords = { workspace = true }
 
 [dependencies]
 astraea = { workspace = true }
+astraea-parser = { workspace = true }
 strum = { version = "0.27", features = ["derive"] }

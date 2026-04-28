@@ -27,3 +27,4 @@ astraea = { path = "astraea" }
 astraea-cli = { path = "astraea-cli" }
 astraea-derive = { path = "astraea-derive" }
 astraea-modules = { path = "astraea-modules" }
+astraea-parser = { path = "astraea-parser" }

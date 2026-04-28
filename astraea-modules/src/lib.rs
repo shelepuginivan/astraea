@@ -5,6 +5,7 @@ pub mod module;
 pub mod natural;
 pub mod polynomial;
 pub mod rational;
+pub mod symbolic;
 pub mod validate;
 
 pub use combinatorics::*;
@@ -14,4 +15,5 @@ pub use module::*;
 pub use natural::*;
 pub use polynomial::*;
 pub use rational::*;
+pub use symbolic::*;
 pub use validate::*;

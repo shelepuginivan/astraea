@@ -702,6 +702,14 @@ pub enum Instruction {
         serialize = "CombinatoricsSimplex"
     )]
     CombinatoricsSimplex,
+
+    #[strum(
+        props(opcode = "SYM_PREFIX", index = "SYM-1"),
+        serialize = "SYM_PREFIX",
+        serialize = "SYM-1",
+        serialize = "SymbolicPrefix"
+    )]
+    SymbolicPrefix,
 }
 
 impl Instruction {
