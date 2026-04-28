@@ -5,6 +5,7 @@ members = [
     "astraea-cli",
     "astraea-derive",
     "astraea-modules",
+    "astraea-parser",
 ]
 
 [workspace.package]
