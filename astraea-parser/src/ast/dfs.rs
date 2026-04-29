@@ -26,8 +26,8 @@ impl<'a> Iterator for PreOrderDFS<'a> {
                 self.stack.push_back(&rhs);
                 self.stack.push_back(&lhs);
             }
-            ASTNode::Function { args, .. } => {
-                self.stack.extend(args.iter().rev());
+            ASTNode::Function(func) => {
+                self.stack.extend(func.args().iter().rev());
             }
             _ => {}
         }
@@ -55,8 +55,8 @@ impl<'a> PostOrderDFS<'a> {
                     stack.push_back(&lhs);
                     stack.push_back(&rhs);
                 }
-                ASTNode::Function { args, .. } => {
-                    stack.extend(args.iter().rev());
+                ASTNode::Function(func) => {
+                    stack.extend(func.args().iter().rev());
                 }
                 _ => {}
             }

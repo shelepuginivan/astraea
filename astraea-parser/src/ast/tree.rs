@@ -27,7 +27,7 @@ impl AST {
             let s = match node {
                 ASTNode::Literal { value } => value,
                 ASTNode::Variable { name } => name,
-                ASTNode::Function { name, .. } => name,
+                ASTNode::Function(func) => &func.name(),
                 ASTNode::BinaryOp { operator, .. } => &operator.to_string(),
             };
 
@@ -53,7 +53,7 @@ impl AST {
             let s = match node {
                 ASTNode::Literal { value } => value,
                 ASTNode::Variable { name } => name,
-                ASTNode::Function { name, .. } => name,
+                ASTNode::Function(func) => &func.name(),
                 ASTNode::BinaryOp { operator, .. } => &operator.to_string(),
             };
 
