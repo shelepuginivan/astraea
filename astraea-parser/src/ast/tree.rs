@@ -62,4 +62,11 @@ impl AST {
 
         result
     }
+
+    pub fn full_notation(&self) -> String {
+        self.root
+            .as_ref()
+            .map(|n| n.full_notation())
+            .unwrap_or_default()
+    }
 }
