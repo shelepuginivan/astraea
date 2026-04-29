@@ -2,7 +2,7 @@ mod cli;
 
 use astraea_modules::{
     CombinatoricsModule, Instruction, InstructionErrorReason, IntegerModule, Module, ModuleGroup,
-    NaturalModule, PolynomialModule, RationalModule, SymbolicModule,
+    NaturalModule, PolynomialModule, RationalModule, SymbolModule,
 };
 use clap::Parser;
 use std::str::FromStr;
@@ -17,7 +17,7 @@ fn main() {
         Box::new(RationalModule),
         Box::new(PolynomialModule),
         Box::new(CombinatoricsModule),
-        Box::new(SymbolicModule),
+        Box::new(SymbolModule),
     ]);
 
     let instruction = match Instruction::from_str(&args.instruction) {

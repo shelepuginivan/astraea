@@ -5,7 +5,7 @@ members = [
     "astraea-cli",
     "astraea-derive",
     "astraea-modules",
-    "astraea-parser",
+    "astraea-symbol",
 ]
 
 [workspace.package]
@@ -27,4 +27,4 @@ astraea = { path = "astraea" }
 astraea-cli = { path = "astraea-cli" }
 astraea-derive = { path = "astraea-derive" }
 astraea-modules = { path = "astraea-modules" }
-astraea-parser = { path = "astraea-parser" }
+astraea-symbol = { path = "astraea-symbol" }

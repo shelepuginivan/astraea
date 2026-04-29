@@ -109,12 +109,12 @@ name = "astraea-modules"
 version = "0.1.0-alpha.1"
 dependencies = [
  "astraea",
- "astraea-parser",
+ "astraea-symbol",
  "strum",
 ]
 
 [[package]]
-name = "astraea-parser"
+name = "astraea-symbol"
 version = "0.1.0-alpha.1"
 
 [[package]]

@@ -1,5 +1,5 @@
 [package]
-name = "astraea-parser"
+name = "astraea-symbol"
 authors.workspace = true
 version.workspace = true
 license.workspace = true

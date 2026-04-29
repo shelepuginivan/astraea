@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
 use astraea::prelude::*;
-use astraea_parser::ast::{AST, ASTNode, BinaryOp, Function};
+use astraea_symbol::{AST, ASTNode, BinaryOp, Function};
 
 use crate::{Instruction, InstructionError, Module};
 
-pub struct SymbolicModule;
+pub struct SymbolModule;
 
-impl Module for SymbolicModule {
+impl Module for SymbolModule {
     fn process_instruction(
         &self,
         instruction: Instruction,
