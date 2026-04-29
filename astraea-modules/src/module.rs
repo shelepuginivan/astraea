@@ -13,11 +13,13 @@ pub trait Module {
         args: Vec<String>,
     ) -> Result<Box<dyn Pretty>, InstructionError>;
 
-    /// Reports whether module implements the given instruction.
-    fn implements(&self, instruction: Instruction) -> bool;
-
     /// Returns all instructions implemented by the module.
     fn instructions(&self) -> HashSet<Instruction>;
+
+    /// Reports whether module implements the given instruction.
+    fn implements(&self, instruction: Instruction) -> bool {
+        self.instructions().contains(&instruction)
+    }
 }
 
 pub struct ModuleGroup {

@@ -7,13 +7,7 @@ use crate::instruction::Instruction;
 use crate::module::Module;
 use crate::validate::{self, InstructionError};
 
-pub struct PolynomialModule {}
-
-impl PolynomialModule {
-    pub fn new() -> Self {
-        PolynomialModule {}
-    }
-}
+pub struct PolynomialModule;
 
 impl Module for PolynomialModule {
     fn process_instruction(
@@ -114,10 +108,6 @@ impl Module for PolynomialModule {
 
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
-    }
-
-    fn implements(&self, instruction: Instruction) -> bool {
-        self.instructions().contains(&instruction)
     }
 
     fn instructions(&self) -> HashSet<Instruction> {

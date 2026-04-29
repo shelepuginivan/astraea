@@ -12,12 +12,12 @@ use crate::cli::{Args, Error};
 fn main() {
     let args = Args::parse();
     let modules = ModuleGroup::new(vec![
-        Box::new(NaturalModule::new()),
-        Box::new(IntegerModule::new()),
-        Box::new(RationalModule::new()),
-        Box::new(PolynomialModule::new()),
-        Box::new(CombinatoricsModule::new()),
-        Box::new(SymbolicModule::new()),
+        Box::new(NaturalModule),
+        Box::new(IntegerModule),
+        Box::new(RationalModule),
+        Box::new(PolynomialModule),
+        Box::new(CombinatoricsModule),
+        Box::new(SymbolicModule),
     ]);
 
     let instruction = match Instruction::from_str(&args.instruction) {

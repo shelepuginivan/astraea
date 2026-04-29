@@ -5,13 +5,7 @@ use crate::instruction::Instruction;
 use crate::module::Module;
 use crate::validate::{self, InstructionError};
 
-pub struct IntegerModule {}
-
-impl IntegerModule {
-    pub fn new() -> Self {
-        IntegerModule {}
-    }
-}
+pub struct IntegerModule;
 
 impl Module for IntegerModule {
     fn process_instruction(
@@ -103,10 +97,6 @@ impl Module for IntegerModule {
 
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
-    }
-
-    fn implements(&self, instruction: Instruction) -> bool {
-        self.instructions().contains(&instruction)
     }
 
     fn instructions(&self) -> HashSet<Instruction> {
