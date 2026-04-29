@@ -35,3 +35,41 @@ impl<'a> Iterator for PreOrderDFS<'a> {
         Some(current)
     }
 }
+
+pub struct PostOrderDFS<'a> {
+    output: VecDeque<&'a ASTNode>,
+}
+
+impl<'a> PostOrderDFS<'a> {
+    pub fn new(root: &'a ASTNode) -> Self {
+        let mut stack = VecDeque::new();
+        let mut output = VecDeque::new();
+
+        stack.push_back(root);
+
+        while let Some(cur) = stack.pop_back() {
+            output.push_back(cur);
+
+            match cur {
+                ASTNode::BinaryOp { lhs, rhs, .. } => {
+                    stack.push_back(&lhs);
+                    stack.push_back(&rhs);
+                }
+                ASTNode::Function { args, .. } => {
+                    stack.extend(args.iter().rev());
+                }
+                _ => {}
+            }
+        }
+
+        Self { output }
+    }
+}
+
+impl<'a> Iterator for PostOrderDFS<'a> {
+    type Item = &'a ASTNode;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.output.pop_back()
+    }
+}

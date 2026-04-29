@@ -34,6 +34,20 @@ impl Module for SymbolicModule {
                 Ok(Box::new(ast.prefix_notation()))
             }
 
+            Instruction::SymbolicPostfix => {
+                let ast = AST::new(ASTNode::BinaryOp {
+                    operator: BinaryOp::Add,
+                    lhs: Box::new(ASTNode::Literal {
+                        value: "6".to_string(),
+                    }),
+                    rhs: Box::new(ASTNode::Literal {
+                        value: "7".to_string(),
+                    }),
+                });
+
+                Ok(Box::new(ast.postfix_notation()))
+            }
+
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
     }
@@ -43,6 +57,8 @@ impl Module for SymbolicModule {
     }
 
     fn instructions(&self) -> HashSet<Instruction> {
-        [Instruction::SymbolicPrefix].into_iter().collect()
+        [Instruction::SymbolicPrefix, Instruction::SymbolicPostfix]
+            .into_iter()
+            .collect()
     }
 }

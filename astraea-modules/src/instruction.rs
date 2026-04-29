@@ -703,6 +703,7 @@ pub enum Instruction {
     )]
     CombinatoricsSimplex,
 
+    /// Transforms symbolic formula into prefix notation.
     #[strum(
         props(opcode = "SYM_PREFIX", index = "SYM-1"),
         serialize = "SYM_PREFIX",
@@ -710,6 +711,15 @@ pub enum Instruction {
         serialize = "SymbolicPrefix"
     )]
     SymbolicPrefix,
+
+    /// Transforms symbolic formula into postfix notation.
+    #[strum(
+        props(opcode = "SYM_POSTFIX", index = "SYM-2"),
+        serialize = "SYM_POSTFIX",
+        serialize = "SYM-2",
+        serialize = "SymbolicPostfix"
+    )]
+    SymbolicPostfix,
 }
 
 impl Instruction {
