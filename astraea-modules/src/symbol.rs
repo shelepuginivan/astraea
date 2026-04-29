@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use astraea::prelude::*;
-use astraea_symbol::{AST, ASTNode, BinaryOp, Function};
+use astraea_symbol::{AST, Node};
 
 use crate::{Instruction, InstructionError, Module};
 
@@ -15,37 +15,19 @@ impl Module for SymbolModule {
     ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::SymbolicPrefix => {
-                let ast = AST::new(ASTNode::BinaryOp {
-                    operator: BinaryOp::Add,
-                    lhs: Box::new(ASTNode::Literal(6.0)),
-                    rhs: Box::new(ASTNode::Literal(9.0)),
-                });
+                let ast = AST::new(Node::add(Node::literal(6.0), Node::literal(9.0)));
 
                 Ok(Box::new(ast.prefix_notation()))
             }
 
             Instruction::SymbolicPostfix => {
-                let ast = AST::new(ASTNode::BinaryOp {
-                    operator: BinaryOp::Mul,
-                    lhs: Box::new(ASTNode::Literal(2.0)),
-                    rhs: Box::new(ASTNode::Function(Function::Sin(Box::new(
-                        ASTNode::BinaryOp {
-                            operator: BinaryOp::Div,
-                            lhs: Box::new(ASTNode::Variable("pi".to_string())),
-                            rhs: Box::new(ASTNode::Literal(2.0)),
-                        },
-                    )))),
-                });
+                let ast = AST::new(Node::add(Node::literal(6.0), Node::sin(Node::var("x"))));
 
                 Ok(Box::new(ast.full_notation()))
             }
 
             Instruction::SymbolicDerivative => {
-                let ast = AST::new(ASTNode::BinaryOp {
-                    operator: BinaryOp::Mul,
-                    lhs: Box::new(ASTNode::Literal(2.0)),
-                    rhs: Box::new(ASTNode::Variable("x".to_string())),
-                });
+                let ast = AST::new(Node::add(Node::literal(6.0), Node::cos(Node::var("x"))));
 
                 Ok(Box::new(ast.derivative("x").full_notation()))
             }

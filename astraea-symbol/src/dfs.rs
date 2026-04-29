@@ -1,13 +1,13 @@
 use std::collections::VecDeque;
 
-use super::node::ASTNode;
+use super::node::Node;
 
 pub struct PreOrderDFS<'a> {
-    stack: VecDeque<&'a ASTNode>,
+    stack: VecDeque<&'a Node>,
 }
 
 impl<'a> PreOrderDFS<'a> {
-    pub fn new(root: &'a ASTNode) -> Self {
+    pub fn new(root: &'a Node) -> Self {
         let mut stack = VecDeque::new();
         stack.push_back(root);
 
@@ -16,17 +16,17 @@ impl<'a> PreOrderDFS<'a> {
 }
 
 impl<'a> Iterator for PreOrderDFS<'a> {
-    type Item = &'a ASTNode;
+    type Item = &'a Node;
 
     fn next(&mut self) -> Option<Self::Item> {
         let current = self.stack.pop_back()?;
 
         match current {
-            ASTNode::BinaryOp { lhs, rhs, .. } => {
+            Node::BinaryOp { lhs, rhs, .. } => {
                 self.stack.push_back(&rhs);
                 self.stack.push_back(&lhs);
             }
-            ASTNode::Function(func) => {
+            Node::Function(func) => {
                 self.stack.extend(func.args().iter().rev());
             }
             _ => {}
@@ -37,11 +37,11 @@ impl<'a> Iterator for PreOrderDFS<'a> {
 }
 
 pub struct PostOrderDFS<'a> {
-    output: VecDeque<&'a ASTNode>,
+    output: VecDeque<&'a Node>,
 }
 
 impl<'a> PostOrderDFS<'a> {
-    pub fn new(root: &'a ASTNode) -> Self {
+    pub fn new(root: &'a Node) -> Self {
         let mut stack = VecDeque::new();
         let mut output = VecDeque::new();
 
@@ -51,11 +51,11 @@ impl<'a> PostOrderDFS<'a> {
             output.push_back(cur);
 
             match cur {
-                ASTNode::BinaryOp { lhs, rhs, .. } => {
+                Node::BinaryOp { lhs, rhs, .. } => {
                     stack.push_back(&lhs);
                     stack.push_back(&rhs);
                 }
-                ASTNode::Function(func) => {
+                Node::Function(func) => {
                     stack.extend(func.args().iter().rev());
                 }
                 _ => {}
@@ -67,7 +67,7 @@ impl<'a> PostOrderDFS<'a> {
 }
 
 impl<'a> Iterator for PostOrderDFS<'a> {
-    type Item = &'a ASTNode;
+    type Item = &'a Node;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.output.pop_back()

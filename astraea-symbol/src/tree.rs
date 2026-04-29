@@ -1,13 +1,13 @@
 use super::dfs::{PostOrderDFS, PreOrderDFS};
-use super::node::ASTNode;
+use super::node::Node;
 
 #[derive(Default)]
 pub struct AST {
-    root: Option<ASTNode>,
+    root: Option<Box<Node>>,
 }
 
 impl AST {
-    pub fn new(root: ASTNode) -> Self {
+    pub fn new(root: Box<Node>) -> Self {
         Self { root: Some(root) }
     }
 
@@ -25,10 +25,10 @@ impl AST {
             }
 
             let s = match node {
-                ASTNode::Literal(value) => &value.to_string(),
-                ASTNode::Variable(name) => name,
-                ASTNode::Function(func) => &func.name(),
-                ASTNode::BinaryOp { operator, .. } => &operator.to_string(),
+                Node::Literal(value) => &value.to_string(),
+                Node::Variable(name) => name,
+                Node::Function(func) => &func.name(),
+                Node::BinaryOp { operator, .. } => &operator.to_string(),
             };
 
             result.push_str(s);
@@ -51,10 +51,10 @@ impl AST {
             }
 
             let s = match node {
-                ASTNode::Literal(value) => &value.to_string(),
-                ASTNode::Variable(name) => name,
-                ASTNode::Function(func) => &func.name(),
-                ASTNode::BinaryOp { operator, .. } => &operator.to_string(),
+                Node::Literal(value) => &value.to_string(),
+                Node::Variable(name) => name,
+                Node::Function(func) => &func.name(),
+                Node::BinaryOp { operator, .. } => &operator.to_string(),
             };
 
             result.push_str(s);
