@@ -17,12 +17,8 @@ impl Module for SymbolicModule {
             Instruction::SymbolicPrefix => {
                 let ast = AST::new(ASTNode::BinaryOp {
                     operator: BinaryOp::Add,
-                    lhs: Box::new(ASTNode::Literal {
-                        value: "6".to_string(),
-                    }),
-                    rhs: Box::new(ASTNode::Literal {
-                        value: "7".to_string(),
-                    }),
+                    lhs: Box::new(ASTNode::Literal(6.0)),
+                    rhs: Box::new(ASTNode::Literal(9.0)),
                 });
 
                 Ok(Box::new(ast.prefix_notation()))
@@ -31,18 +27,12 @@ impl Module for SymbolicModule {
             Instruction::SymbolicPostfix => {
                 let ast = AST::new(ASTNode::BinaryOp {
                     operator: BinaryOp::Mul,
-                    lhs: Box::new(ASTNode::Literal {
-                        value: "6".to_string(),
-                    }),
+                    lhs: Box::new(ASTNode::Literal(2.0)),
                     rhs: Box::new(ASTNode::Function(Function::Sin(Box::new(
                         ASTNode::BinaryOp {
                             operator: BinaryOp::Div,
-                            lhs: Box::new(ASTNode::Literal {
-                                value: "pi".to_string(),
-                            }),
-                            rhs: Box::new(ASTNode::Literal {
-                                value: "2".to_string(),
-                            }),
+                            lhs: Box::new(ASTNode::Variable("pi".to_string())),
+                            rhs: Box::new(ASTNode::Literal(2.0)),
                         },
                     )))),
                 });

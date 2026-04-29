@@ -81,12 +81,8 @@ impl Function {
 }
 
 pub enum ASTNode {
-    Literal {
-        value: String,
-    },
-    Variable {
-        name: String,
-    },
+    Literal(f64),
+    Variable(String),
     BinaryOp {
         operator: BinaryOp,
         lhs: Box<ASTNode>,
@@ -98,8 +94,8 @@ pub enum ASTNode {
 impl ASTNode {
     pub fn full_notation(&self) -> String {
         match self {
-            ASTNode::Literal { value } => value.to_string(),
-            ASTNode::Variable { name } => name.to_string(),
+            ASTNode::Literal(value) => value.to_string(),
+            ASTNode::Variable(name) => name.to_string(),
             ASTNode::BinaryOp { operator, lhs, rhs } => {
                 format!(
                     "({} {operator} {})",
