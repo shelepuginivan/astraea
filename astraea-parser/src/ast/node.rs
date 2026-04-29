@@ -1,10 +1,12 @@
 use std::fmt::{self, Display};
 
+#[derive(Clone, Copy)]
 pub enum BinaryOp {
     Add,
     Sub,
     Mul,
     Div,
+    Pow,
 }
 
 impl Display for BinaryOp {
@@ -14,17 +16,14 @@ impl Display for BinaryOp {
             Self::Sub => "-",
             Self::Mul => "*",
             Self::Div => "/",
+            Self::Pow => "^",
         };
         write!(f, "{s}")
     }
 }
 
+#[derive(Clone)]
 pub enum Function {
-    Root {
-        index: Box<ASTNode>,
-        radicand: Box<ASTNode>,
-    },
-
     Log {
         base: Box<ASTNode>,
         arg: Box<ASTNode>,
@@ -40,7 +39,6 @@ pub enum Function {
 impl Function {
     pub fn name(&self) -> String {
         match self {
-            Function::Root { .. } => String::from("root"),
             Function::Log { .. } => String::from("log"),
             Function::Sin(..) => String::from("sin"),
             Function::Cos(..) => String::from("cos"),
@@ -51,13 +49,6 @@ impl Function {
 
     pub fn full_notation(&self) -> String {
         match self {
-            Function::Root { index, radicand } => {
-                format!(
-                    "root({}, {})",
-                    index.full_notation(),
-                    radicand.full_notation()
-                )
-            }
             Function::Log { base, arg } => {
                 format!("log({}, {})", base.full_notation(), arg.full_notation())
             }
@@ -70,7 +61,6 @@ impl Function {
 
     pub fn args(&self) -> Vec<&ASTNode> {
         match self {
-            Function::Root { index, radicand } => vec![index, radicand],
             Function::Log { base, arg } => vec![base, arg],
             Function::Sin(arg) => vec![arg],
             Function::Cos(arg) => vec![arg],
@@ -78,8 +68,13 @@ impl Function {
             Function::Cot(arg) => vec![arg],
         }
     }
+
+    pub fn derivative(&self, var: &str) -> ASTNode {
+        todo!()
+    }
 }
 
+#[derive(Clone)]
 pub enum ASTNode {
     Literal(f64),
     Variable(String),
@@ -104,6 +99,88 @@ impl ASTNode {
                 )
             }
             ASTNode::Function(func) => func.full_notation(),
+        }
+    }
+
+    /// Symbolic derivative with respect to `var`.
+    pub fn derivative(&self, var: &str) -> Self {
+        match self {
+            Self::Literal(_) => Self::Literal(0.0),
+            Self::Variable(name) => {
+                if var == name {
+                    Self::Literal(1.0)
+                } else {
+                    Self::Literal(0.0)
+                }
+            }
+            Self::BinaryOp { operator, lhs, rhs } => match operator {
+                BinaryOp::Add => Self::BinaryOp {
+                    operator: BinaryOp::Add,
+                    lhs: Box::new(lhs.derivative(var)),
+                    rhs: Box::new(rhs.derivative(var)),
+                },
+                BinaryOp::Sub => Self::BinaryOp {
+                    operator: BinaryOp::Sub,
+                    lhs: Box::new(lhs.derivative(var)),
+                    rhs: Box::new(rhs.derivative(var)),
+                },
+                BinaryOp::Mul => Self::BinaryOp {
+                    operator: BinaryOp::Add,
+                    lhs: Box::new(Self::BinaryOp {
+                        operator: BinaryOp::Mul,
+                        lhs: Box::new(lhs.derivative(var)),
+                        rhs: rhs.clone(),
+                    }),
+                    rhs: Box::new(Self::BinaryOp {
+                        operator: BinaryOp::Mul,
+                        lhs: lhs.clone(),
+                        rhs: Box::new(rhs.derivative(var)),
+                    }),
+                },
+                BinaryOp::Div => Self::BinaryOp {
+                    operator: BinaryOp::Div,
+                    lhs: Box::new(Self::BinaryOp {
+                        operator: BinaryOp::Sub,
+                        lhs: Box::new(Self::BinaryOp {
+                            operator: BinaryOp::Mul,
+                            lhs: Box::new(lhs.derivative(var)),
+                            rhs: rhs.clone(),
+                        }),
+                        rhs: Box::new(Self::BinaryOp {
+                            operator: BinaryOp::Mul,
+                            lhs: lhs.clone(),
+                            rhs: Box::new(rhs.derivative(var)),
+                        }),
+                    }),
+                    rhs: Box::new(Self::BinaryOp {
+                        operator: BinaryOp::Pow,
+                        lhs: rhs.clone(),
+                        rhs: Box::new(ASTNode::Literal(2.0)),
+                    }),
+                },
+                BinaryOp::Pow => {
+                    let pow = Self::BinaryOp {
+                        operator: BinaryOp::Sub,
+                        lhs: rhs.clone(),
+                        rhs: Box::new(Self::Literal(1.0)),
+                    };
+
+                    Self::BinaryOp {
+                        operator: BinaryOp::Mul,
+                        lhs: Box::new(lhs.derivative(var)),
+                        rhs: Box::new(Self::BinaryOp {
+                            operator: BinaryOp::Mul,
+                            lhs: Box::new(pow.clone()),
+                            rhs: Box::new(Self::BinaryOp {
+                                operator: BinaryOp::Pow,
+                                lhs: lhs.clone(),
+                                rhs: Box::new(pow),
+                            }),
+                        }),
+                    }
+                }
+            },
+            Self::Function(func) => func.derivative(var),
         }
     }
 }

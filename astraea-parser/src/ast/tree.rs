@@ -69,4 +69,10 @@ impl AST {
             .map(|n| n.full_notation())
             .unwrap_or_default()
     }
+
+    pub fn derivative(&self, var: &str) -> Self {
+        Self {
+            root: self.root.as_ref().map(|n| n.derivative(var)),
+        }
+    }
 }

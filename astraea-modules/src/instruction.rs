@@ -720,6 +720,15 @@ pub enum Instruction {
         serialize = "SymbolicPostfix"
     )]
     SymbolicPostfix,
+
+    /// Returns symbolic derivative of the formula.
+    #[strum(
+        props(opcode = "SYM_DERIVATIVE", index = "SYM-3"),
+        serialize = "SYM_DERIVATIVE",
+        serialize = "SYM-3",
+        serialize = "SymbolicDerivative"
+    )]
+    SymbolicDerivative,
 }
 
 impl Instruction {

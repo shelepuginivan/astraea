@@ -40,13 +40,27 @@ impl Module for SymbolicModule {
                 Ok(Box::new(ast.full_notation()))
             }
 
+            Instruction::SymbolicDerivative => {
+                let ast = AST::new(ASTNode::BinaryOp {
+                    operator: BinaryOp::Mul,
+                    lhs: Box::new(ASTNode::Literal(2.0)),
+                    rhs: Box::new(ASTNode::Variable("x".to_string())),
+                });
+
+                Ok(Box::new(ast.derivative("x").full_notation()))
+            }
+
             _ => Err(InstructionError::unknown_instruction(instruction)),
         }
     }
 
     fn instructions(&self) -> HashSet<Instruction> {
-        [Instruction::SymbolicPrefix, Instruction::SymbolicPostfix]
-            .into_iter()
-            .collect()
+        [
+            Instruction::SymbolicPrefix,
+            Instruction::SymbolicPostfix,
+            Instruction::SymbolicDerivative,
+        ]
+        .into_iter()
+        .collect()
     }
 }
