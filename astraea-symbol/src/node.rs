@@ -1,5 +1,8 @@
 use std::f64::consts::E;
 use std::fmt::{self, Display};
+use std::str::FromStr;
+
+use astraea::error::ParseError;
 
 #[derive(Clone, Copy)]
 pub enum BinaryOp {
@@ -20,6 +23,21 @@ impl Display for BinaryOp {
             Self::Pow => "^",
         };
         write!(f, "{s}")
+    }
+}
+
+impl FromStr for BinaryOp {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "+" => Ok(Self::Add),
+            "-" => Ok(Self::Sub),
+            "*" => Ok(Self::Mul),
+            "/" => Ok(Self::Div),
+            "^" => Ok(Self::Pow),
+            &_ => Err(ParseError::new(format!("unknown binary operator: '{s}'"))),
+        }
     }
 }
 
