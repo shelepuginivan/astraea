@@ -63,6 +63,20 @@ impl Display for UnaryFunction {
     }
 }
 
+impl FromStr for UnaryFunction {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "sin" => Ok(Self::Sin),
+            "cos" => Ok(Self::Cos),
+            "tan" | "tg" => Ok(Self::Tan),
+            "cot" | "ctg" => Ok(Self::Cot),
+            &_ => Err(ParseError::new(format!("unknown unary function: '{s}'"))),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum Function<T: MathObject + Pretty> {
     Sin(Box<Node<T>>),
