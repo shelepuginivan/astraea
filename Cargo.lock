@@ -116,6 +116,9 @@ dependencies = [
 [[package]]
 name = "astraea-symbol"
 version = "0.1.0-alpha.1"
+dependencies = [
+ "astraea",
+]
 
 [[package]]
 name = "autocfg"
