@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use astraea::prelude::*;
-use astraea_symbol::{AST, parse_prefix_notation};
+use astraea_symbol::{AST, parse_postfix_notation, parse_prefix_notation};
 
 use crate::{Instruction, InstructionError, InstructionErrorReason, Module, validate};
 
@@ -21,18 +21,29 @@ impl Module for SymbolModule {
                     Ok(ast) => ast,
                     Err(err) => {
                         return Err(InstructionError::new(
-                            "shit happens",
+                            "invalid prefix notation",
                             InstructionErrorReason::Symbol { arg: 0, err },
                         ));
                     }
                 };
+
                 Ok(Box::new(ast.prefix_notation()))
             }
 
             Instruction::SymbolicPostfix => {
-                let ast: AST<Rational> = parse_prefix_notation("").unwrap();
+                let s: String = validate::one_arg(args)?;
+                let source = Box::leak(Box::new(s));
+                let ast: AST<Rational> = match parse_postfix_notation(source) {
+                    Ok(ast) => ast,
+                    Err(err) => {
+                        return Err(InstructionError::new(
+                            "invalid postfix notation",
+                            InstructionErrorReason::Symbol { arg: 0, err },
+                        ));
+                    }
+                };
 
-                Ok(Box::new(ast.full_notation()))
+                Ok(Box::new(ast.prefix_notation()))
             }
 
             Instruction::SymbolicDerivative => {
