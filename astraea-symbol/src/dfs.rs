@@ -1,14 +1,14 @@
-use std::collections::VecDeque;
+use std::collections::LinkedList;
 
 use super::node::Node;
 
 pub struct PreOrderDFS<'a> {
-    stack: VecDeque<&'a Node>,
+    stack: LinkedList<&'a Node>,
 }
 
 impl<'a> PreOrderDFS<'a> {
     pub fn new(root: &'a Node) -> Self {
-        let mut stack = VecDeque::new();
+        let mut stack = LinkedList::new();
         stack.push_back(root);
 
         Self { stack }
@@ -37,13 +37,13 @@ impl<'a> Iterator for PreOrderDFS<'a> {
 }
 
 pub struct PostOrderDFS<'a> {
-    output: VecDeque<&'a Node>,
+    output: LinkedList<&'a Node>,
 }
 
 impl<'a> PostOrderDFS<'a> {
     pub fn new(root: &'a Node) -> Self {
-        let mut stack = VecDeque::new();
-        let mut output = VecDeque::new();
+        let mut stack = LinkedList::new();
+        let mut output = LinkedList::new();
 
         stack.push_back(root);
 
