@@ -1,10 +1,14 @@
 use std::str::FromStr;
 
+use astraea::prelude::{MathObject, Pretty};
+
 use crate::node::{BinaryOp, Node};
 use crate::token::{SyntaxError, TokenStream};
 use crate::tree::AST;
 
-pub fn parse_prefix_notation<'a>(s: &'a str) -> Result<AST, SyntaxError<'a>> {
+pub fn parse_prefix_notation<'a, T: MathObject + Pretty>(
+    s: &'a str,
+) -> Result<AST<T>, SyntaxError<'a>> {
     let mut tokens = TokenStream::new(s);
     let root = parse_token_stream_prefix(&mut tokens)?;
 
@@ -15,9 +19,9 @@ pub fn parse_prefix_notation<'a>(s: &'a str) -> Result<AST, SyntaxError<'a>> {
     Ok(AST(root))
 }
 
-fn parse_token_stream_prefix<'a>(
+fn parse_token_stream_prefix<'a, T: MathObject + Pretty>(
     stream: &mut TokenStream<'a>,
-) -> Result<Option<Box<Node>>, SyntaxError<'a>> {
+) -> Result<Option<Box<Node<T>>>, SyntaxError<'a>> {
     let root_token = match stream.next() {
         Some(token) => token,
         None => return Ok(None),
@@ -52,10 +56,16 @@ fn parse_token_stream_prefix<'a>(
                 }
             };
 
-            return Ok(Some(Box::new(Node::BinaryOp { operator, lhs, rhs })));
+            Ok(Some(Box::new(Node::BinaryOp { operator, lhs, rhs })))
         }
 
-        // TODO: functions and literals.
-        _ => return Err(SyntaxError::new("unknown token", root_token)),
+        _ => {
+            let literal: T = match root_token.value.parse() {
+                Ok(v) => v,
+                Err(..) => return Err(SyntaxError::new("unknown token", root_token)),
+            };
+
+            Ok(Some(Box::new(Node::Literal(literal))))
+        }
     }
 }

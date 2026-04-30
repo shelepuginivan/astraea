@@ -1,13 +1,15 @@
 use std::collections::LinkedList;
 
+use astraea::prelude::{MathObject, Pretty};
+
 use super::node::Node;
 
-pub struct PreOrderDFS<'a> {
-    stack: LinkedList<&'a Node>,
+pub struct PreOrderDFS<'a, T: MathObject + Pretty> {
+    stack: LinkedList<&'a Node<T>>,
 }
 
-impl<'a> PreOrderDFS<'a> {
-    pub fn new(root: &'a Node) -> Self {
+impl<'a, T: MathObject + Pretty> PreOrderDFS<'a, T> {
+    pub fn new(root: &'a Node<T>) -> Self {
         let mut stack = LinkedList::new();
         stack.push_back(root);
 
@@ -15,8 +17,8 @@ impl<'a> PreOrderDFS<'a> {
     }
 }
 
-impl<'a> Iterator for PreOrderDFS<'a> {
-    type Item = &'a Node;
+impl<'a, T: MathObject + Pretty> Iterator for PreOrderDFS<'a, T> {
+    type Item = &'a Node<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let current = self.stack.pop_back()?;
@@ -36,12 +38,12 @@ impl<'a> Iterator for PreOrderDFS<'a> {
     }
 }
 
-pub struct PostOrderDFS<'a> {
-    output: LinkedList<&'a Node>,
+pub struct PostOrderDFS<'a, T: MathObject + Pretty> {
+    output: LinkedList<&'a Node<T>>,
 }
 
-impl<'a> PostOrderDFS<'a> {
-    pub fn new(root: &'a Node) -> Self {
+impl<'a, T: MathObject + Pretty> PostOrderDFS<'a, T> {
+    pub fn new(root: &'a Node<T>) -> Self {
         let mut stack = LinkedList::new();
         let mut output = LinkedList::new();
 
@@ -66,8 +68,8 @@ impl<'a> PostOrderDFS<'a> {
     }
 }
 
-impl<'a> Iterator for PostOrderDFS<'a> {
-    type Item = &'a Node;
+impl<'a, T: MathObject + Pretty> Iterator for PostOrderDFS<'a, T> {
+    type Item = &'a Node<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.output.pop_back()

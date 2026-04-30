@@ -1,15 +1,17 @@
+use astraea::prelude::{Field, MathObject, Pretty};
+
 use super::dfs::{PostOrderDFS, PreOrderDFS};
 use super::node::Node;
 
 #[derive(Default)]
-pub struct AST(pub Option<Box<Node>>);
+pub struct AST<T: MathObject + Pretty>(pub Option<Box<Node<T>>>);
 
-impl AST {
+impl<T: MathObject + Pretty> AST<T> {
     pub fn prefix_notation(&self) -> String {
         let mut result = String::new();
 
         let pre_order_dfs = match self.0.as_ref() {
-            Some(root) => PreOrderDFS::new(&root),
+            Some(root) => PreOrderDFS::<T>::new(&root),
             None => return result,
         };
 
@@ -19,7 +21,7 @@ impl AST {
             }
 
             let s = match node {
-                Node::Literal(value) => &value.to_string(),
+                Node::Literal(value) => &value.prettify(),
                 Node::Variable(name) => name,
                 Node::Function(func) => &func.name(),
                 Node::BinaryOp { operator, .. } => &operator.to_string(),
@@ -45,7 +47,7 @@ impl AST {
             }
 
             let s = match node {
-                Node::Literal(value) => &value.to_string(),
+                Node::Literal(value) => &value.prettify(),
                 Node::Variable(name) => name,
                 Node::Function(func) => &func.name(),
                 Node::BinaryOp { operator, .. } => &operator.to_string(),
@@ -63,7 +65,9 @@ impl AST {
             .map(|n| n.full_notation())
             .unwrap_or_default()
     }
+}
 
+impl<T: MathObject + Pretty + Field> AST<T> {
     pub fn derivative(&self, var: &str) -> Self {
         Self(self.0.as_ref().map(|n| n.derivative(var)))
     }
