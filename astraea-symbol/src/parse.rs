@@ -13,7 +13,7 @@ pub fn parse_prefix_notation<'a, T: MathObject + Pretty>(
     let root = parse_token_stream_prefix(&mut tokens)?;
 
     if let Some(token) = tokens.next() {
-        return Err(SyntaxError::new("extra token", token));
+        return Err(SyntaxError::new("Extra value", token));
     }
 
     Ok(AST(root))
@@ -39,20 +39,14 @@ fn parse_token_stream_prefix<'a, T: MathObject + Pretty>(
             let rhs = match parse_token_stream_prefix(stream)? {
                 Some(node) => node,
                 None => {
-                    return Err(SyntaxError::new(
-                        "no matching right-hand side operand",
-                        root_token,
-                    ));
+                    return Err(SyntaxError::new("Expected 2 arguments, got 0", root_token));
                 }
             };
 
             let lhs = match parse_token_stream_prefix(stream)? {
                 Some(node) => node,
                 None => {
-                    return Err(SyntaxError::new(
-                        "no matching left-hand side operand",
-                        root_token,
-                    ));
+                    return Err(SyntaxError::new("Expected 2 arguments, got 1", root_token));
                 }
             };
 

@@ -172,7 +172,7 @@ impl<'a> Error<'a> {
             let _ = Report::build(ReportKind::Error, (&source_name, 0..0))
                 .with_label(
                     Label::new((&source_name, label_range))
-                        .with_message(&err.message)
+                        .with_message(&err.message.clone().fg(Color::BrightRed))
                         .with_color(Color::BrightRed),
                 )
                 .finish()
