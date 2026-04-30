@@ -3,24 +3,27 @@ use std::iter::Peekable;
 use std::str::CharIndices;
 
 #[derive(Debug)]
-pub struct ParseError {
+pub struct SyntaxError<'a> {
     pub message: String,
+    pub token: Token<'a>,
 }
 
-impl ParseError {
-    pub fn new<S: Into<String>>(message: S) -> Self {
-        Self {
-            message: message.into(),
+impl<'a> SyntaxError<'a> {
+    pub fn new<S: Into<String>>(s: S, token: Token<'a>) -> SyntaxError<'a> {
+        SyntaxError {
+            message: s.into(),
+            token,
         }
     }
 }
 
-impl Display for ParseError {
+impl<'a> Display for SyntaxError<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.message)
     }
 }
 
+#[derive(Debug)]
 pub struct Token<'a> {
     pub value: &'a str,
     pub offset: usize,
