@@ -42,6 +42,27 @@ impl FromStr for BinaryOp {
     }
 }
 
+#[derive(Clone, Copy)]
+pub enum UnaryFunction {
+    // Trigonometry.
+    Sin,
+    Cos,
+    Tan,
+    Cot,
+}
+
+impl Display for UnaryFunction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            Self::Sin => "sin",
+            Self::Cos => "cos",
+            Self::Tan => "tan",
+            Self::Cot => "cot",
+        };
+        write!(f, "{s}")
+    }
+}
+
 #[derive(Clone)]
 pub enum Function<T: MathObject + Pretty> {
     Sin(Box<Node<T>>),
@@ -111,7 +132,10 @@ pub enum Node<T: MathObject + Pretty> {
         lhs: Box<Node<T>>,
         rhs: Box<Node<T>>,
     },
-    Function(Function<T>),
+    UnaryFunctionCall {
+        func: UnaryFunction,
+        arg: Box<Node<T>>,
+    },
 }
 
 // Convenient named constructors.
@@ -169,19 +193,31 @@ impl<T: MathObject + Pretty> Node<T> {
     }
 
     pub fn sin(arg: Box<Self>) -> Box<Self> {
-        Box::new(Self::Function(Function::Sin(arg)))
+        Box::new(Self::UnaryFunctionCall {
+            func: UnaryFunction::Sin,
+            arg,
+        })
     }
 
     pub fn cos(arg: Box<Self>) -> Box<Self> {
-        Box::new(Self::Function(Function::Cos(arg)))
+        Box::new(Self::UnaryFunctionCall {
+            func: UnaryFunction::Cos,
+            arg,
+        })
     }
 
     pub fn tan(arg: Box<Self>) -> Box<Self> {
-        Box::new(Self::Function(Function::Tan(arg)))
+        Box::new(Self::UnaryFunctionCall {
+            func: UnaryFunction::Tan,
+            arg,
+        })
     }
 
     pub fn cot(arg: Box<Self>) -> Box<Self> {
-        Box::new(Self::Function(Function::Cot(arg)))
+        Box::new(Self::UnaryFunctionCall {
+            func: UnaryFunction::Cot,
+            arg,
+        })
     }
 }
 
@@ -203,7 +239,9 @@ impl<T: MathObject + Pretty> Node<T> {
                     rhs.full_notation()
                 )
             }
-            Node::Function(func) => func.full_notation(),
+            Node::UnaryFunctionCall { func, arg } => {
+                format!("{}({})", func, arg.full_notation())
+            }
         }
     }
 }
@@ -244,7 +282,26 @@ impl<T: MathObject + Pretty + Field> Node<T> {
                     )
                 }
             },
-            Self::Function(func) => func.derivative(var),
+            Self::UnaryFunctionCall { func, arg } => match func {
+                UnaryFunction::Sin => Node::mul(arg.derivative(var), Node::cos(arg.clone())),
+                UnaryFunction::Cos => {
+                    Node::mul(arg.derivative(var), Node::neg(Node::sin(arg.clone())))
+                }
+                UnaryFunction::Tan => Node::mul(
+                    arg.derivative(var),
+                    Node::div(
+                        Node::literal(T::one()),
+                        Node::square(Node::cos(arg.clone())),
+                    ),
+                ),
+                UnaryFunction::Cot => Node::mul(
+                    arg.derivative(var),
+                    Node::div(
+                        Node::literal(-T::one()),
+                        Node::square(Node::sin(arg.clone())),
+                    ),
+                ),
+            },
         }
     }
 }

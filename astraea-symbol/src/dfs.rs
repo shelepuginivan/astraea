@@ -28,8 +28,8 @@ impl<'a, T: MathObject + Pretty> Iterator for PreOrderDFS<'a, T> {
                 self.stack.push_back(&rhs);
                 self.stack.push_back(&lhs);
             }
-            Node::Function(func) => {
-                self.stack.extend(func.args().iter().rev());
+            Node::UnaryFunctionCall { arg, .. } => {
+                self.stack.push_back(&arg);
             }
             _ => {}
         }
@@ -57,8 +57,8 @@ impl<'a, T: MathObject + Pretty> PostOrderDFS<'a, T> {
                     stack.push_back(&lhs);
                     stack.push_back(&rhs);
                 }
-                Node::Function(func) => {
-                    stack.extend(func.args().iter().rev());
+                Node::UnaryFunctionCall { arg, .. } => {
+                    stack.push_back(&arg);
                 }
                 _ => {}
             }

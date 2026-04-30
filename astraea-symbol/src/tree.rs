@@ -23,7 +23,7 @@ impl<T: MathObject + Pretty> AST<T> {
             let s = match node {
                 Node::Literal(value) => &value.prettify(),
                 Node::Variable(name) => name,
-                Node::Function(func) => &func.name(),
+                Node::UnaryFunctionCall { func, .. } => &func.to_string(),
                 Node::BinaryOp { operator, .. } => &operator.to_string(),
             };
 
@@ -49,7 +49,7 @@ impl<T: MathObject + Pretty> AST<T> {
             let s = match node {
                 Node::Literal(value) => &value.prettify(),
                 Node::Variable(name) => name,
-                Node::Function(func) => &func.name(),
+                Node::UnaryFunctionCall { func, .. } => &func.to_string(),
                 Node::BinaryOp { operator, .. } => &operator.to_string(),
             };
 
