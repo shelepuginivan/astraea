@@ -76,5 +76,5 @@ fn parse_token_stream_prefix<'a, T: MathObject + Pretty>(
         return Ok(Some(Box::new(Node::Literal(literal))));
     }
 
-    Err(SyntaxError::new("unknown token", root_token))
+    Err(SyntaxError::new("Unknown token", root_token))
 }
