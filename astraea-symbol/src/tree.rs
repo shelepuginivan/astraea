@@ -2,19 +2,13 @@ use super::dfs::{PostOrderDFS, PreOrderDFS};
 use super::node::Node;
 
 #[derive(Default)]
-pub struct AST {
-    root: Option<Box<Node>>,
-}
+pub struct AST(pub Option<Box<Node>>);
 
 impl AST {
-    pub fn new(root: Box<Node>) -> Self {
-        Self { root: Some(root) }
-    }
-
     pub fn prefix_notation(&self) -> String {
         let mut result = String::new();
 
-        let pre_order_dfs = match self.root.as_ref() {
+        let pre_order_dfs = match self.0.as_ref() {
             Some(root) => PreOrderDFS::new(&root),
             None => return result,
         };
@@ -40,7 +34,7 @@ impl AST {
     pub fn postfix_notation(&self) -> String {
         let mut result = String::new();
 
-        let post_order_dfs = match self.root.as_ref() {
+        let post_order_dfs = match self.0.as_ref() {
             Some(root) => PostOrderDFS::new(&root),
             None => return result,
         };
@@ -64,15 +58,13 @@ impl AST {
     }
 
     pub fn full_notation(&self) -> String {
-        self.root
+        self.0
             .as_ref()
             .map(|n| n.full_notation())
             .unwrap_or_default()
     }
 
     pub fn derivative(&self, var: &str) -> Self {
-        Self {
-            root: self.root.as_ref().map(|n| n.derivative(var)),
-        }
+        Self(self.0.as_ref().map(|n| n.derivative(var)))
     }
 }

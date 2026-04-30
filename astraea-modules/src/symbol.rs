@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use astraea::prelude::*;
-use astraea_symbol::{AST, Node};
+use astraea_symbol::{AST, Node, parse_prefix_notation};
 
 use crate::{Instruction, InstructionError, Module};
 
@@ -15,19 +15,27 @@ impl Module for SymbolModule {
     ) -> Result<Box<dyn Pretty>, InstructionError> {
         match instruction {
             Instruction::SymbolicPrefix => {
-                let ast = AST::new(Node::add(Node::literal(6.0), Node::literal(9.0)));
+                let ast = AST(Some(Node::add(Node::literal(6.0), Node::literal(9.0))));
 
                 Ok(Box::new(ast.prefix_notation()))
             }
 
             Instruction::SymbolicPostfix => {
-                let ast = AST::new(Node::add(Node::literal(6.0), Node::sin(Node::var("x"))));
+                let ast = AST(Some(Node::add(
+                    Node::literal(6.0),
+                    Node::sin(Node::var("x")),
+                )));
 
                 Ok(Box::new(ast.full_notation()))
             }
 
             Instruction::SymbolicDerivative => {
-                let ast = AST::new(Node::add(Node::literal(6.0), Node::cos(Node::var("x"))));
+                let ast = AST(Some(Node::add(
+                    Node::literal(6.0),
+                    Node::cos(Node::var("x")),
+                )));
+
+                let ast = parse_prefix_notation("+ @x * @x @x").unwrap();
 
                 Ok(Box::new(ast.derivative("x").full_notation()))
             }
