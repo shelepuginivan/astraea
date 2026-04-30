@@ -44,6 +44,8 @@ fn main() {
                 Error::Calculation(caused_by, e.message).print(&args);
             }
 
+            InstructionErrorReason::Symbol { arg, err } => Error::Syntax { arg, err }.print(&args),
+
             InstructionErrorReason::Instruction => unreachable!(),
         },
     };

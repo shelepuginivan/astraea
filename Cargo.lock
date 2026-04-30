@@ -93,6 +93,7 @@ dependencies = [
  "ariadne",
  "astraea",
  "astraea-modules",
+ "astraea-symbol",
  "clap",
 ]
 

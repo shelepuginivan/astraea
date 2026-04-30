@@ -1,18 +1,20 @@
 use ariadne::{Color, Fmt, Label, Report, ReportKind, Source};
+use astraea_symbol::SyntaxError;
 use std::ops::Range;
 use std::{env, process};
 
 use crate::cli::Args;
 
-pub enum Error {
+pub enum Error<'a> {
     UnknownInstruction,
     InstructionNotImplemented,
     InvalidArgument(usize, String),
     InvalidNumberOfArguments(usize, usize),
     Calculation(usize, String),
+    Syntax { arg: usize, err: SyntaxError<'a> },
 }
 
-impl Error {
+impl<'a> Error<'a> {
     fn code(&self) -> i32 {
         match self {
             Self::UnknownInstruction => 1,
@@ -20,6 +22,7 @@ impl Error {
             Self::InvalidArgument(..) => 3,
             Self::InvalidNumberOfArguments(..) => 4,
             Self::Calculation(..) => 5,
+            Self::Syntax { .. } => 6,
         }
     }
 
@@ -33,6 +36,7 @@ impl Error {
                 expected, actual
             ),
             Self::Calculation(.., msg) => msg.to_owned(),
+            Self::Syntax { .. } => "Syntax error".to_string(),
         }
     }
 
@@ -40,6 +44,7 @@ impl Error {
         match self {
             Self::UnknownInstruction => "This instruction is unknown".to_string(),
             Self::InstructionNotImplemented => "Not implemented".to_string(),
+            Self::Syntax { .. } => "Invalid syntax".to_string(),
             Self::InvalidArgument(.., msg) => {
                 let message = msg.to_string();
                 let mut chars: Vec<char> = message.chars().collect();
@@ -90,6 +95,7 @@ impl Error {
                     extra_args.join(" ")
                 }
             }
+            Self::Syntax { arg, .. } => args.args[*arg].clone(),
         }
     }
 
@@ -157,6 +163,21 @@ impl Error {
             )
             .finish()
             .print((source_name, Source::from(cli_args)));
+
+        // For syntax errors, print detailed error below.
+        if let Self::Syntax { arg, err } = self {
+            let source_name = format!("Argument #{}", arg + 1);
+            let label_range = err.token.offset..err.token.offset + err.token.value.len();
+
+            let _ = Report::build(ReportKind::Error, (&source_name, 0..0))
+                .with_label(
+                    Label::new((&source_name, label_range))
+                        .with_message(&err.message)
+                        .with_color(Color::BrightRed),
+                )
+                .finish()
+                .print((&source_name, Source::from(args.args[*arg].clone())));
+        }
 
         process::exit(self.code());
     }

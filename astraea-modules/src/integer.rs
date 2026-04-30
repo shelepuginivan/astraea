@@ -12,7 +12,7 @@ impl Module for IntegerModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
             Instruction::IntegerAbs => {
                 let v: Integer = validate::one_arg(args)?;

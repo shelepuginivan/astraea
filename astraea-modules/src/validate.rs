@@ -2,23 +2,25 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 use astraea::prelude::*;
+use astraea_symbol::SyntaxError;
 
 #[derive(Debug)]
-pub enum InstructionErrorReason {
+pub enum InstructionErrorReason<'a> {
     Instruction,
     Argument(usize),
     ArgumentsCount(usize, usize),
     Calculation(usize),
+    Symbol { arg: usize, err: SyntaxError<'a> },
 }
 
 #[derive(Debug)]
-pub struct InstructionError {
+pub struct InstructionError<'a> {
     pub message: String,
-    pub reason: InstructionErrorReason,
+    pub reason: InstructionErrorReason<'a>,
 }
 
-impl InstructionError {
-    pub fn new<S: Into<String>>(message: S, reason: InstructionErrorReason) -> Self {
+impl<'a> InstructionError<'a> {
+    pub fn new<S: Into<String>>(message: S, reason: InstructionErrorReason<'a>) -> Self {
         Self {
             reason,
             message: message.into(),
@@ -57,14 +59,17 @@ impl InstructionError {
     }
 }
 
-impl Display for InstructionError {
+impl Display for InstructionError<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.message)
     }
 }
 
 /// Ensures number of arguments provided to the instruction call.
-pub fn ensure_args_count(args: &Vec<String>, expected: usize) -> Result<(), InstructionError> {
+pub fn ensure_args_count(
+    args: &Vec<String>,
+    expected: usize,
+) -> Result<(), InstructionError<'static>> {
     if args.len() != expected {
         return Err(InstructionError::count(expected, args.len()));
     }
@@ -73,7 +78,7 @@ pub fn ensure_args_count(args: &Vec<String>, expected: usize) -> Result<(), Inst
 }
 
 /// Parses arguments provided to the particular instruction and ensures their validity.
-pub fn ensure_args<T>(args: Vec<String>, count: usize) -> Result<Vec<T>, InstructionError>
+pub fn ensure_args<T>(args: Vec<String>, count: usize) -> Result<Vec<T>, InstructionError<'static>>
 where
     T: FromStr,
     T::Err: Display,
@@ -97,7 +102,7 @@ where
 }
 
 /// Parses argument at the specified index as usize.
-pub fn get_usize(args: &Vec<String>, arg_index: usize) -> Result<usize, InstructionError> {
+pub fn get_usize(args: &Vec<String>, arg_index: usize) -> Result<usize, InstructionError<'static>> {
     let v = &args[arg_index];
     usize::from_str(v).or_else(|_| {
         Err(InstructionError::invalid_arg(
@@ -108,25 +113,34 @@ pub fn get_usize(args: &Vec<String>, arg_index: usize) -> Result<usize, Instruct
 }
 
 /// Parses argument at the specified index as Digit.
-pub fn get_digit(args: &Vec<String>, arg_index: usize) -> Result<Digit, InstructionError> {
+pub fn get_digit(args: &Vec<String>, arg_index: usize) -> Result<Digit, InstructionError<'static>> {
     Digit::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
 /// Parses argument at the specified index as Natural.
-pub fn get_natural(args: &Vec<String>, arg_index: usize) -> Result<Natural, InstructionError> {
+pub fn get_natural(
+    args: &Vec<String>,
+    arg_index: usize,
+) -> Result<Natural, InstructionError<'static>> {
     Natural::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
 /// Parses argument at the specified index as Integer.
-pub fn get_integer(args: &Vec<String>, arg_index: usize) -> Result<Integer, InstructionError> {
+pub fn get_integer(
+    args: &Vec<String>,
+    arg_index: usize,
+) -> Result<Integer, InstructionError<'static>> {
     Integer::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
 /// Parses argument at the specified index as Rational.
-pub fn get_rational(args: &Vec<String>, arg_index: usize) -> Result<Rational, InstructionError> {
+pub fn get_rational(
+    args: &Vec<String>,
+    arg_index: usize,
+) -> Result<Rational, InstructionError<'static>> {
     Rational::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
@@ -135,13 +149,13 @@ pub fn get_rational(args: &Vec<String>, arg_index: usize) -> Result<Rational, In
 pub fn get_polynomial<T: Field>(
     args: &Vec<String>,
     arg_index: usize,
-) -> Result<Polynomial<T>, InstructionError> {
+) -> Result<Polynomial<T>, InstructionError<'static>> {
     Polynomial::from_str(&args[arg_index])
         .or_else(|e| Err(InstructionError::invalid_arg(e.message, arg_index)))
 }
 
 /// Ensures 1 argument was provided and parses it to the corresponding type.
-pub fn one_arg<T>(args: Vec<String>) -> Result<T, InstructionError>
+pub fn one_arg<T>(args: Vec<String>) -> Result<T, InstructionError<'static>>
 where
     T: FromStr,
     T::Err: Display,
@@ -150,7 +164,7 @@ where
 }
 
 /// Ensures 2 arguments was provided and parses them to the corresponding type.
-pub fn two_args<T>(args: Vec<String>) -> Result<(T, T), InstructionError>
+pub fn two_args<T>(args: Vec<String>) -> Result<(T, T), InstructionError<'static>>
 where
     T: FromStr,
     T::Err: Display,
@@ -166,7 +180,7 @@ where
 pub fn natural_can_cast_to_usize(
     n: Natural,
     arg_index: usize,
-) -> Result<Natural, InstructionError> {
+) -> Result<Natural, InstructionError<'static>> {
     match TryInto::<usize>::try_into(n) {
         Ok(v) => Ok(Natural::from(v)),
         Err(..) => Err(InstructionError::invalid_arg(

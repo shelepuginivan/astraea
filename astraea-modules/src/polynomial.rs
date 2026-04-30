@@ -14,7 +14,7 @@ impl Module for PolynomialModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
             Instruction::PolynomialAdd => {
                 let (lhs, rhs) = validate::two_args::<Polynomial<Rational>>(args)?;

@@ -12,7 +12,7 @@ impl Module for NaturalModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
             Instruction::NaturalCompare => {
                 let (lhs, rhs) = validate::two_args::<Natural>(args)?;

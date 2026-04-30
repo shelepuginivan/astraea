@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 
 use astraea::prelude::*;
-use astraea_symbol::{AST, Node, parse_prefix_notation};
+use astraea_symbol::{AST, parse_prefix_notation};
 
-use crate::{Instruction, InstructionError, Module};
+use crate::{Instruction, InstructionError, InstructionErrorReason, Module, validate};
 
 pub struct SymbolModule;
 
@@ -12,30 +12,31 @@ impl Module for SymbolModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
             Instruction::SymbolicPrefix => {
-                let ast = AST(Some(Node::add(Node::literal(6.0), Node::literal(9.0))));
-
+                let s: String = validate::one_arg(args)?;
+                let source = Box::leak(Box::new(s));
+                let ast: AST<Rational> = match parse_prefix_notation(source) {
+                    Ok(ast) => ast,
+                    Err(err) => {
+                        return Err(InstructionError::new(
+                            "shit happens",
+                            InstructionErrorReason::Symbol { arg: 0, err },
+                        ));
+                    }
+                };
                 Ok(Box::new(ast.prefix_notation()))
             }
 
             Instruction::SymbolicPostfix => {
-                let ast = AST(Some(Node::add(
-                    Node::literal(6.0),
-                    Node::sin(Node::var("x")),
-                )));
+                let ast: AST<Rational> = parse_prefix_notation("").unwrap();
 
                 Ok(Box::new(ast.full_notation()))
             }
 
             Instruction::SymbolicDerivative => {
-                let ast = AST(Some(Node::add(
-                    Node::literal(6.0),
-                    Node::cos(Node::var("x")),
-                )));
-
-                let ast = parse_prefix_notation("+ @x * @x @x").unwrap();
+                let ast: AST<Rational> = parse_prefix_notation("").unwrap();
 
                 Ok(Box::new(ast.derivative("x").full_notation()))
             }

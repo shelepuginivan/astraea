@@ -14,7 +14,7 @@ impl Module for RationalModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
             Instruction::RationalReduce => {
                 let v: Rational = validate::one_arg(args)?;

@@ -14,7 +14,7 @@ impl Module for CombinatoricsModule {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
             Instruction::CombinatoricsFactorial => {
                 let n: Natural = validate::one_arg(args)?;

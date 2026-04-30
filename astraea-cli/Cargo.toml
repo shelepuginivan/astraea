@@ -16,4 +16,5 @@ doc = false
 ariadne = "0.6.0"
 astraea = { workspace = true }
 astraea-modules = { workspace = true }
+astraea-symbol = { workspace = true }
 clap = { version = "4.5.50", features = ["derive"] }

@@ -11,7 +11,7 @@ pub trait Module {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError>;
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>>;
 
     /// Returns all instructions implemented by the module.
     fn instructions(&self) -> HashSet<Instruction>;
@@ -42,7 +42,7 @@ impl Module for ModuleGroup {
         &self,
         instruction: Instruction,
         args: Vec<String>,
-    ) -> Result<Box<dyn Pretty>, InstructionError> {
+    ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         for module in &self.modules {
             if module.implements(instruction) {
                 return module.process_instruction(instruction, args);
