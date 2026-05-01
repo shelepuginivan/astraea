@@ -43,7 +43,7 @@ impl FromStr for BinaryOp {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum UnaryFunction {
     // Trigonometry.
     Sin,
@@ -78,7 +78,7 @@ impl FromStr for UnaryFunction {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum Node<T: MathObject> {
     Literal(T),
     Variable(String),

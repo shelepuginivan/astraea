@@ -207,6 +207,21 @@ where
     }
 }
 
+pub fn reduce_structural_cancellation<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + AddWithIdentity<T> + PartialEq,
+{
+    if let Node::BinaryOp { operator, lhs, rhs } = node {
+        if operator == BinaryOp::Sub && lhs == rhs {
+            Node::Literal(T::zero())
+        } else {
+            Node::BinaryOp { operator, lhs, rhs }
+        }
+    } else {
+        node
+    }
+}
+
 impl<T: MathObject> Node<T> {
     #[must_use]
     pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Box<Self> {

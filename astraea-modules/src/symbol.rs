@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use astraea::prelude::*;
+use astraea_symbol::reduce::*;
 use astraea_symbol::{AST, parse_postfix_notation, parse_prefix_notation};
 
 use crate::{Instruction, InstructionError, InstructionErrorReason, Module, validate};
@@ -58,7 +59,16 @@ impl Module for SymbolModule {
 
             Instruction::SymbolicReduce => {
                 let ast: AST<Rational> = validate::one_arg(args)?;
-                Ok(Box::new(ast.field_reduce()))
+
+                Ok(Box::new(ast.reduce(&[
+                    reduce_literal_add,
+                    reduce_literal_sub,
+                    reduce_literal_mul,
+                    reduce_zero_add,
+                    reduce_one_mul,
+                    reduce_zero_mul,
+                    reduce_structural_cancellation,
+                ])))
             }
 
             Instruction::SymbolicDerivative => {
