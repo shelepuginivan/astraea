@@ -258,6 +258,39 @@ impl<T: MathObject + Pretty> Node<T> {
             }
         }
     }
+
+    fn fmt_with_indent(&self, indent: usize, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let spaces = " ".repeat(indent);
+
+        match self {
+            Node::Literal(value) => {
+                write!(f, "{spaces}{}", value.prettify())
+            }
+            Node::Variable(name) => {
+                write!(f, "{spaces}@{name}")
+            }
+            Node::BinaryOp { operator, lhs, rhs } => {
+                writeln!(f, "{spaces}{operator} {{")?;
+                lhs.fmt_with_indent(indent + 4, f)?;
+                writeln!(f)?;
+                rhs.fmt_with_indent(indent + 4, f)?;
+                writeln!(f)?;
+                write!(f, "{spaces}}}")
+            }
+            Node::UnaryFunctionCall { func, arg } => {
+                writeln!(f, "{spaces}{func} {{")?;
+                arg.fmt_with_indent(indent + 4, f)?;
+                writeln!(f)?;
+                write!(f, "{spaces}}}")
+            }
+        }
+    }
+}
+
+impl<T: MathObject + Pretty> Display for Node<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.fmt_with_indent(0, f)
+    }
 }
 
 impl<T: MathObject + Pretty + Field> Node<T> {

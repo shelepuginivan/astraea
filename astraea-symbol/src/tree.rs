@@ -1,3 +1,5 @@
+use std::fmt::{self, Display};
+
 use astraea::prelude::{Field, MathObject, Pretty};
 
 use super::dfs::{PostOrderDFS, PreOrderDFS};
@@ -70,5 +72,20 @@ impl<T: MathObject + Pretty> AST<T> {
 impl<T: MathObject + Pretty + Field> AST<T> {
     pub fn derivative(&self, var: &str) -> Self {
         Self(self.0.as_ref().map(|n| n.derivative(var)))
+    }
+}
+
+impl<T: MathObject + Pretty> Display for AST<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.0 {
+            Some(root) => root.fmt(f),
+            None => write!(f, ""),
+        }
+    }
+}
+
+impl<T: MathObject + Pretty> Pretty for AST<T> {
+    fn prettify(&self) -> String {
+        self.to_string()
     }
 }

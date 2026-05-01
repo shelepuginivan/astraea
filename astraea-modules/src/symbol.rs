@@ -27,7 +27,7 @@ impl Module for SymbolModule {
                     }
                 };
 
-                Ok(Box::new(ast.prefix_notation()))
+                Ok(Box::new(ast))
             }
 
             Instruction::SymbolicPostfix => {
@@ -43,7 +43,7 @@ impl Module for SymbolModule {
                     }
                 };
 
-                Ok(Box::new(ast.prefix_notation()))
+                Ok(Box::new(ast))
             }
 
             Instruction::SymbolicDerivative => {
