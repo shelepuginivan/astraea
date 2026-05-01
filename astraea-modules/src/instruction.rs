@@ -703,29 +703,56 @@ pub enum Instruction {
     )]
     CombinatoricsSimplex,
 
-    /// Transforms symbolic formula into prefix notation.
+    /// Parses AST from prefix notation.
     #[strum(
-        props(opcode = "SYM_PREFIX", index = "SYM-1"),
-        serialize = "SYM_PREFIX",
+        props(opcode = "SYM_FROM_PREFIX", index = "SYM-1"),
+        serialize = "SYM_FROM_PREFIX",
         serialize = "SYM-1",
-        serialize = "SymbolicPrefix"
+        serialize = "SymbolicFromPrefix"
     )]
-    SymbolicPrefix,
+    SymbolicFromPrefix,
 
-    /// Transforms symbolic formula into postfix notation.
+    /// Parses AST postfix notation.
     #[strum(
-        props(opcode = "SYM_POSTFIX", index = "SYM-2"),
-        serialize = "SYM_POSTFIX",
+        props(opcode = "SYM_FROM_POSTFIX", index = "SYM-2"),
+        serialize = "SYM_FROM_POSTFIX",
         serialize = "SYM-2",
-        serialize = "SymbolicPostfix"
+        serialize = "SymbolicFromPostfix"
     )]
-    SymbolicPostfix,
+    SymbolicFromPostfix,
+
+    /// Dumps AST in prefix notation.
+    #[strum(
+        props(opcode = "SYM_TO_PREFIX", index = "SYM-3"),
+        serialize = "SYM_TO_PREFIX",
+        serialize = "SYM-3",
+        serialize = "SymbolicToPrefix"
+    )]
+    SymbolicToPrefix,
+
+    /// Dumps AST in postfix notation.
+    #[strum(
+        props(opcode = "SYM_TO_POSTFIX", index = "SYM-4"),
+        serialize = "SYM_TO_POSTFIX",
+        serialize = "SYM-4",
+        serialize = "SymbolicToPostfix"
+    )]
+    SymbolicToPostfix,
+
+    /// Applies field normalization.
+    #[strum(
+        props(opcode = "SYM_REDUCE", index = "SYM-5"),
+        serialize = "SYM_REDUCE",
+        serialize = "SYM-5",
+        serialize = "SymbolicReduce"
+    )]
+    SymbolicReduce,
 
     /// Returns symbolic derivative of the formula.
     #[strum(
-        props(opcode = "SYM_DERIVATIVE", index = "SYM-3"),
+        props(opcode = "SYM_DERIVATIVE", index = "SYM-6"),
         serialize = "SYM_DERIVATIVE",
-        serialize = "SYM-3",
+        serialize = "SYM-6",
         serialize = "SymbolicDerivative"
     )]
     SymbolicDerivative,

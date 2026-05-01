@@ -14,7 +14,7 @@ impl Module for SymbolModule {
         args: Vec<String>,
     ) -> Result<Box<dyn Pretty>, InstructionError<'_>> {
         match instruction {
-            Instruction::SymbolicPrefix => {
+            Instruction::SymbolicFromPrefix => {
                 let s: String = validate::one_arg(args)?;
                 let source = Box::leak(Box::new(s));
                 let ast: AST<Rational> = match parse_prefix_notation(source) {
@@ -30,7 +30,7 @@ impl Module for SymbolModule {
                 Ok(Box::new(ast))
             }
 
-            Instruction::SymbolicPostfix => {
+            Instruction::SymbolicFromPostfix => {
                 let s: String = validate::one_arg(args)?;
                 let source = Box::leak(Box::new(s));
                 let ast: AST<Rational> = match parse_postfix_notation(source) {
@@ -46,10 +46,24 @@ impl Module for SymbolModule {
                 Ok(Box::new(ast))
             }
 
-            Instruction::SymbolicDerivative => {
-                let ast: AST<Rational> = parse_prefix_notation("").unwrap();
+            Instruction::SymbolicToPrefix => {
+                let ast: AST<Rational> = validate::one_arg(args)?;
+                Ok(Box::new(ast.prefix_notation()))
+            }
 
-                Ok(Box::new(ast.derivative("x").full_notation()))
+            Instruction::SymbolicToPostfix => {
+                let ast: AST<Rational> = validate::one_arg(args)?;
+                Ok(Box::new(ast.postfix_notation()))
+            }
+
+            Instruction::SymbolicReduce => {
+                let ast: AST<Rational> = validate::one_arg(args)?;
+                Ok(Box::new(ast.field_reduce()))
+            }
+
+            Instruction::SymbolicDerivative => {
+                let ast: AST<Rational> = validate::one_arg(args)?;
+                Ok(Box::new(ast.derivative("x").field_reduce()))
             }
 
             _ => Err(InstructionError::unknown_instruction(instruction)),
@@ -58,9 +72,12 @@ impl Module for SymbolModule {
 
     fn instructions(&self) -> HashSet<Instruction> {
         [
-            Instruction::SymbolicPrefix,
-            Instruction::SymbolicPostfix,
+            Instruction::SymbolicFromPrefix,
+            Instruction::SymbolicFromPostfix,
+            Instruction::SymbolicToPrefix,
+            Instruction::SymbolicToPostfix,
             Instruction::SymbolicDerivative,
+            Instruction::SymbolicReduce,
         ]
         .into_iter()
         .collect()
