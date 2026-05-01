@@ -267,13 +267,30 @@ impl<T: MathObject + Field> Node<T> {
     #[must_use]
     pub fn field_reduce(self) -> Box<Self> {
         self.reduce(&[
+            // Literals.
             reduce_literal_add,
             reduce_literal_sub,
             reduce_literal_mul,
-            // reduce_literal_div, FIXME: refactor MulIntertible to Div<Output = Self>
+            // Identity.
             reduce_zero_add,
             reduce_one_mul,
             reduce_zero_mul,
+            // reduce_literal_div, FIXME: refactor MulIntertible to Div<Output = Self>
+            // Sum.
+            reduce_add_to_sum,
+            reduce_sum_to_flat,
+            reduce_sum_commutative,
+            // Product.
+            reduce_mul_to_product,
+            reduce_empty_sum,
+            reduce_product_to_flat,
+            reduce_product_commutative,
+            // Normalize multi-functions back.
+            reduce_sum_with_one_arg,
+            reduce_sum_with_two_args,
+            reduce_product_with_one_arg,
+            reduce_product_with_two_args,
+            reduce_empty_product,
         ])
     }
 

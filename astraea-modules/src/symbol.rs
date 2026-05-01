@@ -60,15 +60,9 @@ impl Module for SymbolModule {
             Instruction::SymbolicReduce => {
                 let ast: AST<Rational> = validate::one_arg(args)?;
 
-                Ok(Box::new(ast.reduce(&[
-                    reduce_literal_add,
-                    reduce_literal_sub,
-                    reduce_literal_mul,
-                    reduce_zero_add,
-                    reduce_one_mul,
-                    reduce_zero_mul,
-                    reduce_structural_cancellation,
-                ])))
+                Ok(Box::new(
+                    ast.reduce(&[reduce_structural_cancellation]).field_reduce(),
+                ))
             }
 
             Instruction::SymbolicDerivative => {

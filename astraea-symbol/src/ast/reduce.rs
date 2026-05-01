@@ -1,6 +1,11 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    collections::VecDeque,
+    ops::{Add, Div, Mul, Sub},
+};
 
 use astraea::prelude::*;
+
+use crate::MultiFunction;
 
 use super::node::{BinaryOp, Node};
 
@@ -36,6 +41,47 @@ impl<T: MathObject> From<Node<T>> for MaybeLiteralBinop<T> {
 
         return MaybeLiteralBinop::Yes { operator, lhs, rhs };
     }
+}
+
+fn bin_to_multi<T>(node: Node<T>, binop: BinaryOp, multi: MultiFunction) -> Node<T>
+where
+    T: MathObject,
+{
+    if let Node::BinaryOp { operator, lhs, rhs } = node {
+        if operator == binop {
+            Node::MultiFunctionCall {
+                func: multi,
+                args: vec![lhs, rhs],
+            }
+        } else {
+            Node::BinaryOp { operator, lhs, rhs }
+        }
+    } else {
+        node
+    }
+}
+
+fn flat_args_of<T>(node: Node<T>, binop: BinaryOp, multi: MultiFunction) -> Vec<Box<Node<T>>>
+where
+    T: MathObject,
+{
+    let (func, args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        Node::BinaryOp { operator, lhs, rhs } => {
+            if operator == binop {
+                return vec![lhs, rhs];
+            } else {
+                return vec![Box::new(Node::BinaryOp { operator, lhs, rhs })];
+            }
+        }
+        _ => return vec![Box::new(node)],
+    };
+
+    if func != multi {
+        return vec![Box::new(Node::MultiFunctionCall { func, args })];
+    }
+
+    return args;
 }
 
 // Reduces binary addition of literals.
@@ -222,6 +268,338 @@ where
     }
 }
 
+pub fn reduce_add_to_sum<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject,
+{
+    bin_to_multi(node, BinaryOp::Add, MultiFunction::Sum)
+}
+
+pub fn reduce_empty_sum<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + AddWithIdentity<T>,
+{
+    if let Node::MultiFunctionCall { func, ref args } = node {
+        if func == MultiFunction::Sum && args.is_empty() {
+            Node::Literal(T::zero())
+        } else {
+            node
+        }
+    } else {
+        node
+    }
+}
+
+pub fn reduce_sum_with_one_arg<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject,
+{
+    if let Node::MultiFunctionCall { func, mut args } = node {
+        if func == MultiFunction::Sum && args.len() == 1 {
+            *args.pop().take().unwrap()
+        } else {
+            Node::MultiFunctionCall { func, args }
+        }
+    } else {
+        node
+    }
+}
+
+pub fn reduce_sum_with_two_args<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject,
+{
+    if let Node::MultiFunctionCall { func, mut args } = node {
+        if func == MultiFunction::Sum && args.len() == 2 {
+            let rhs = Box::new(*args.pop().take().unwrap());
+            let lhs = Box::new(*args.pop().take().unwrap());
+
+            Node::BinaryOp {
+                operator: BinaryOp::Add,
+                lhs,
+                rhs,
+            }
+        } else {
+            Node::MultiFunctionCall { func, args }
+        }
+    } else {
+        node
+    }
+}
+
+pub fn reduce_sum_to_flat<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + AddAssociative<T>,
+{
+    let (func, mut self_args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        _ => return node,
+    };
+
+    if func != MultiFunction::Sum {
+        return Node::MultiFunctionCall {
+            func,
+            args: self_args,
+        };
+    }
+
+    let mut new_args = VecDeque::with_capacity(self_args.len());
+
+    while let Some(self_arg) = self_args.pop() {
+        for arg in flat_args_of(*self_arg, BinaryOp::Add, MultiFunction::Sum)
+            .into_iter()
+            .rev()
+        {
+            new_args.push_front(arg);
+        }
+    }
+
+    Node::MultiFunctionCall {
+        func,
+        args: new_args.into(),
+    }
+}
+
+pub fn reduce_sum_associative<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + Add<Output = T> + AddAssociative<T> + AddWithIdentity<T>,
+{
+    let (func, mut args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        _ => return node,
+    };
+
+    if func != MultiFunction::Sum {
+        return Node::MultiFunctionCall { func, args };
+    }
+
+    let mut new_args = VecDeque::with_capacity(args.len());
+    let mut acc = T::zero();
+
+    while let Some(arg) = args.pop() {
+        if let Node::Literal(v) = *arg {
+            acc = acc + v
+        } else {
+            if !acc.is_zero() {
+                new_args.push_front(Node::literal(acc));
+                acc = T::zero();
+            }
+            new_args.push_front(arg);
+        }
+    }
+
+    if !acc.is_zero() {
+        new_args.push_front(Node::literal(acc));
+    }
+
+    Node::MultiFunctionCall {
+        func,
+        args: new_args.into(),
+    }
+}
+
+pub fn reduce_sum_commutative<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + Add<Output = T> + AddWithIdentity<T> + AddCommutative<T>,
+{
+    let (func, mut args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        _ => return node,
+    };
+
+    if func != MultiFunction::Sum {
+        return Node::MultiFunctionCall { func, args };
+    }
+
+    let mut new_args = VecDeque::with_capacity(args.len());
+    let mut acc = T::zero();
+
+    while let Some(arg) = args.pop() {
+        if let Node::Literal(v) = *arg {
+            acc = acc + v
+        } else {
+            if !acc.is_zero() {
+                new_args.push_front(Node::literal(acc));
+                acc = T::zero();
+            }
+            new_args.push_front(arg);
+        }
+    }
+
+    if !acc.is_zero() {
+        new_args.push_front(Node::literal(acc));
+    }
+
+    Node::MultiFunctionCall {
+        func,
+        args: new_args.into(),
+    }
+}
+
+pub fn reduce_mul_to_product<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject,
+{
+    bin_to_multi(node, BinaryOp::Mul, MultiFunction::Product)
+}
+
+pub fn reduce_empty_product<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + MulWithIdentity<T>,
+{
+    if let Node::MultiFunctionCall { func, ref args } = node {
+        if func == MultiFunction::Product && args.is_empty() {
+            Node::Literal(T::one())
+        } else {
+            node
+        }
+    } else {
+        node
+    }
+}
+
+pub fn reduce_product_with_one_arg<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject,
+{
+    if let Node::MultiFunctionCall { func, mut args } = node {
+        if func == MultiFunction::Product && args.len() == 1 {
+            *args.pop().take().unwrap()
+        } else {
+            Node::MultiFunctionCall { func, args }
+        }
+    } else {
+        node
+    }
+}
+
+pub fn reduce_product_with_two_args<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject,
+{
+    if let Node::MultiFunctionCall { func, mut args } = node {
+        if func == MultiFunction::Product && args.len() == 2 {
+            let rhs = Box::new(*args.pop().take().unwrap());
+            let lhs = Box::new(*args.pop().take().unwrap());
+
+            Node::BinaryOp {
+                operator: BinaryOp::Mul,
+                lhs,
+                rhs,
+            }
+        } else {
+            Node::MultiFunctionCall { func, args }
+        }
+    } else {
+        node
+    }
+}
+
+pub fn reduce_product_to_flat<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + MulAssociative<T>,
+{
+    let (func, mut self_args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        _ => return node,
+    };
+
+    if func != MultiFunction::Product {
+        return Node::MultiFunctionCall {
+            func,
+            args: self_args,
+        };
+    }
+
+    let mut new_args = VecDeque::with_capacity(self_args.len());
+
+    while let Some(self_arg) = self_args.pop() {
+        for arg in flat_args_of(*self_arg, BinaryOp::Mul, MultiFunction::Product)
+            .into_iter()
+            .rev()
+        {
+            new_args.push_front(arg);
+        }
+    }
+
+    Node::MultiFunctionCall {
+        func,
+        args: new_args.into(),
+    }
+}
+
+pub fn reduce_product_associative<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + Mul<Output = T> + MulAssociative<T> + MulWithIdentity<T>,
+{
+    let (func, mut args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        _ => return node,
+    };
+
+    if func != MultiFunction::Product {
+        return Node::MultiFunctionCall { func, args };
+    }
+
+    let mut new_args = VecDeque::with_capacity(args.len());
+    let mut acc = T::one();
+
+    while let Some(arg) = args.pop() {
+        if let Node::Literal(v) = *arg {
+            acc = acc * v
+        } else {
+            if !acc.is_one() {
+                new_args.push_front(Node::literal(acc));
+                acc = T::one();
+            }
+            new_args.push_front(arg);
+        }
+    }
+
+    if !acc.is_one() {
+        new_args.push_front(Node::literal(acc));
+    }
+
+    Node::MultiFunctionCall {
+        func,
+        args: new_args.into(),
+    }
+}
+
+pub fn reduce_product_commutative<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + Mul<Output = T> + MulWithIdentity<T> + MulCommutative<T>,
+{
+    let (func, mut args) = match node {
+        Node::MultiFunctionCall { func, args } => (func, args),
+        _ => return node,
+    };
+
+    if func != MultiFunction::Product {
+        return Node::MultiFunctionCall { func, args };
+    }
+
+    let mut new_args = VecDeque::with_capacity(args.len());
+    let mut acc = T::one();
+
+    while let Some(arg) = args.pop() {
+        if let Node::Literal(v) = *arg {
+            acc = acc * v
+        } else {
+            new_args.push_front(arg);
+        }
+    }
+
+    if !acc.is_one() {
+        new_args.push_front(Node::literal(acc));
+    }
+
+    Node::MultiFunctionCall {
+        func,
+        args: new_args.into(),
+    }
+}
+
 impl<T: MathObject> Node<T> {
     #[must_use]
     pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Box<Self> {
@@ -234,6 +612,10 @@ impl<T: MathObject> Node<T> {
                 let lhs = lhs.reduce(reducers);
                 let rhs = rhs.reduce(reducers);
                 Box::new(Self::BinaryOp { operator, lhs, rhs }.reduce_self(reducers))
+            }
+            Self::MultiFunctionCall { func, args } => {
+                let args = args.into_iter().map(|arg| arg.reduce(reducers)).collect();
+                Box::new(Self::MultiFunctionCall { func, args }.reduce_self(reducers))
             }
             _ => Box::new(self),
         }
