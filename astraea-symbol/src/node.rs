@@ -1,11 +1,10 @@
 use std::fmt::{self, Display};
 use std::str::FromStr;
 
-use astraea::algebra::{Field, MathObject};
 use astraea::error::ParseError;
-use astraea::prelude::Pretty;
+use astraea::prelude::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOp {
     Add,
     Sub,
@@ -293,7 +292,91 @@ impl<T: MathObject + Pretty> Display for Node<T> {
     }
 }
 
+impl<T: MathObject + Pretty + AddWithIdentity<T>> Node<T> {
+    fn reduce_additive_identity_once(self) -> Self {
+        if let Self::BinaryOp { operator, lhs, rhs } = self {
+            if operator == BinaryOp::Add {
+                if let Self::Literal(v) = lhs.as_ref() {
+                    if v.is_zero() {
+                        return *rhs;
+                    }
+                }
+                if let Self::Literal(v) = rhs.as_ref() {
+                    if v.is_zero() {
+                        return *lhs;
+                    }
+                }
+            }
+            Self::BinaryOp { operator, lhs, rhs }
+        } else {
+            self
+        }
+    }
+
+    #[must_use]
+    pub fn reduce_additive_identity(self) -> Box<Self> {
+        match self {
+            Self::UnaryFunctionCall { func, arg } => Box::new(Self::UnaryFunctionCall {
+                func,
+                arg: arg.reduce_additive_identity(),
+            }),
+            Self::BinaryOp { operator, lhs, rhs } => {
+                let lhs = lhs.reduce_additive_identity();
+                let rhs = rhs.reduce_additive_identity();
+                Box::new(Self::BinaryOp { operator, lhs, rhs }.reduce_additive_identity_once())
+            }
+            _ => Box::new(self),
+        }
+    }
+}
+
+impl<T: MathObject + Pretty + MulWithIdentity<T>> Node<T> {
+    fn reduce_multiplicative_identity_once(self) -> Self {
+        if let Self::BinaryOp { operator, lhs, rhs } = self {
+            if operator == BinaryOp::Mul {
+                if let Self::Literal(v) = lhs.as_ref() {
+                    if v.is_one() {
+                        return *rhs;
+                    }
+                }
+                if let Self::Literal(v) = rhs.as_ref() {
+                    if v.is_one() {
+                        return *lhs;
+                    }
+                }
+            }
+            Self::BinaryOp { operator, lhs, rhs }
+        } else {
+            self
+        }
+    }
+
+    #[must_use]
+    pub fn reduce_multiplicative_identity(self) -> Box<Self> {
+        match self {
+            Self::UnaryFunctionCall { func, arg } => Box::new(Self::UnaryFunctionCall {
+                func,
+                arg: arg.reduce_multiplicative_identity(),
+            }),
+            Self::BinaryOp { operator, lhs, rhs } => {
+                let lhs = lhs.reduce_multiplicative_identity();
+                let rhs = rhs.reduce_multiplicative_identity();
+                Box::new(
+                    Self::BinaryOp { operator, lhs, rhs }.reduce_multiplicative_identity_once(),
+                )
+            }
+            _ => Box::new(self),
+        }
+    }
+}
+
 impl<T: MathObject + Pretty + Field> Node<T> {
+    #[must_use]
+    pub fn normalize(self) -> Box<Self> {
+        self.reduce_additive_identity()
+            .reduce_multiplicative_identity()
+    }
+
     /// Symbolic derivative with respect to `var`.
     pub fn derivative(&self, var: &str) -> Box<Self> {
         match self {
