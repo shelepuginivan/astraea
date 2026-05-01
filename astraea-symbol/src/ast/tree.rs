@@ -1,6 +1,8 @@
 use std::fmt::{self, Display};
 
-use astraea::prelude::{Field, MathObject, MulWithIdentity, Pretty};
+use astraea::prelude::{Field, MathObject, Pretty};
+
+use crate::ReduceFn;
 
 use super::dfs::{PostOrderDFS, PreOrderDFS};
 use super::node::Node;
@@ -70,11 +72,6 @@ impl<T: MathObject + Pretty> AST<T> {
 }
 
 impl<T: MathObject + Pretty + Field> AST<T> {
-    #[must_use]
-    pub fn normalize(self) -> Self {
-        Self(self.0.map(|r| Node::normalize(*r)))
-    }
-
     pub fn derivative(&self, var: &str) -> Self {
         Self(self.0.as_ref().map(|n| n.derivative(var)))
     }
@@ -95,9 +92,9 @@ impl<T: MathObject + Pretty> Pretty for AST<T> {
     }
 }
 
-impl<T: MathObject + Pretty + MulWithIdentity<T>> AST<T> {
+impl<T: MathObject + Pretty> AST<T> {
     #[must_use]
-    pub fn reduce_multiplicative_identity(self) -> Self {
-        Self(self.0.map(|r| Node::reduce_multiplicative_identity(*r)))
+    pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Self {
+        Self(self.0.map(|r| r.reduce(reducers)))
     }
 }
