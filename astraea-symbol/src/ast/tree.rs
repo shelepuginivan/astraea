@@ -1,13 +1,15 @@
 use std::fmt::{self, Display};
+use std::str::FromStr;
 
+use astraea::error::ParseError;
 use astraea::prelude::{Field, MathObject, Pretty};
 
-use crate::ReduceFn;
+use crate::{ReduceFn, parse_postfix_notation, parse_prefix_notation};
 
 use super::dfs::{PostOrderDFS, PreOrderDFS};
 use super::node::Node;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct AST<T: MathObject>(pub Option<Box<Node<T>>>);
 
 impl<T: MathObject> AST<T> {
@@ -18,8 +20,29 @@ impl<T: MathObject> AST<T> {
 }
 
 impl<T: MathObject + Field> AST<T> {
+    #[must_use]
+    pub fn field_reduce(self) -> Self {
+        Self(self.0.map(|r| r.field_reduce()))
+    }
+
     pub fn derivative(&self, var: &str) -> Self {
         Self(self.0.as_ref().map(|n| n.derivative(var)))
+    }
+}
+
+impl<T: MathObject> FromStr for AST<T> {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let Ok(ast) = parse_prefix_notation(s) {
+            return Ok(ast);
+        }
+
+        if let Ok(ast) = parse_postfix_notation(s) {
+            return Ok(ast);
+        }
+
+        Err(ParseError::new("cannot parse AST"))
     }
 }
 

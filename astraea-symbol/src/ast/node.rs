@@ -4,6 +4,8 @@ use std::str::FromStr;
 use astraea::error::ParseError;
 use astraea::prelude::*;
 
+use super::reduce::*;
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOp {
     Add,
@@ -229,6 +231,19 @@ impl<T: MathObject + Pretty> Display for Node<T> {
 impl<T: MathObject + Field> Node<T> {
     pub fn neg(rhs: Box<Self>) -> Box<Self> {
         Self::mul(Self::literal(-T::one()), rhs)
+    }
+
+    /// Applies AST reduction in the given field.
+    #[must_use]
+    pub fn field_reduce(self) -> Box<Self> {
+        self.reduce(&[
+            reduce_literal_add,
+            reduce_literal_sub,
+            reduce_literal_mul,
+            // reduce_literal_div, FIXME: refactor MulIntertible to Div<Output = Self>
+            reduce_zero_add,
+            reduce_one_mul,
+        ])
     }
 
     /// Symbolic derivative with respect to `var`.
