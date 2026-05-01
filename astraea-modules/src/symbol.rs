@@ -67,7 +67,11 @@ impl Module for SymbolModule {
 
             Instruction::SymbolicDerivative => {
                 let ast: AST<Rational> = validate::one_arg(args)?;
-                Ok(Box::new(ast.derivative("x").field_reduce()))
+                Ok(Box::new(
+                    ast.derivative("x")
+                        .reduce(&[reduce_structural_cancellation])
+                        .field_reduce(),
+                ))
             }
 
             _ => Err(InstructionError::unknown_instruction(instruction)),

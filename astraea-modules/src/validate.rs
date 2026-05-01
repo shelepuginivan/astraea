@@ -101,7 +101,6 @@ where
     Ok(res)
 }
 
-
 /// Parses argument at the specified index as usize.
 pub fn get_usize(args: &Vec<String>, arg_index: usize) -> Result<usize, InstructionError<'static>> {
     let v = &args[arg_index];
