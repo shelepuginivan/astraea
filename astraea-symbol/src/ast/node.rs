@@ -45,6 +45,9 @@ impl FromStr for BinaryOp {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum UnaryFunction {
+    Sqrt,
+    Ln,
+
     // Trigonometry.
     Sin,
     Cos,
@@ -55,6 +58,8 @@ pub enum UnaryFunction {
 impl Display for UnaryFunction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let s = match self {
+            Self::Sqrt => "sqrt",
+            Self::Ln => "ln",
             Self::Sin => "sin",
             Self::Cos => "cos",
             Self::Tan => "tan",
@@ -69,6 +74,8 @@ impl FromStr for UnaryFunction {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "sqrt" => Ok(Self::Sqrt),
+            "ln" => Ok(Self::Ln),
             "sin" => Ok(Self::Sin),
             "cos" => Ok(Self::Cos),
             "tan" | "tg" => Ok(Self::Tan),
@@ -283,6 +290,17 @@ impl<T: MathObject + Field> Node<T> {
                 }
             },
             Self::UnaryFunctionCall { func, arg } => match func {
+                UnaryFunction::Sqrt => Node::mul(
+                    arg.derivative(var),
+                    Node::div(
+                        Node::literal(T::one()),
+                        Node::add(Box::new(self.clone()), Box::new(self.clone())),
+                    ),
+                ),
+                UnaryFunction::Ln => Node::mul(
+                    arg.derivative(var),
+                    Node::div(Node::literal(T::one()), arg.clone()),
+                ),
                 UnaryFunction::Sin => Node::mul(arg.derivative(var), Node::cos(arg.clone())),
                 UnaryFunction::Cos => {
                     Node::mul(arg.derivative(var), Node::neg(Node::sin(arg.clone())))
