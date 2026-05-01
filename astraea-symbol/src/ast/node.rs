@@ -77,66 +77,6 @@ impl FromStr for UnaryFunction {
 }
 
 #[derive(Clone)]
-pub enum Function<T: MathObject + Pretty> {
-    Sin(Box<Node<T>>),
-    Cos(Box<Node<T>>),
-    Tan(Box<Node<T>>),
-    Cot(Box<Node<T>>),
-}
-
-impl<T: MathObject + Pretty> Function<T> {
-    pub fn name(&self) -> String {
-        match self {
-            Function::Sin(..) => String::from("sin"),
-            Function::Cos(..) => String::from("cos"),
-            Function::Tan(..) => String::from("tan"),
-            Function::Cot(..) => String::from("cot"),
-        }
-    }
-
-    pub fn full_notation(&self) -> String {
-        match self {
-            Function::Sin(arg) => format!("sin({})", arg.full_notation()),
-            Function::Cos(arg) => format!("cos({})", arg.full_notation()),
-            Function::Tan(arg) => format!("tan({})", arg.full_notation()),
-            Function::Cot(arg) => format!("cot({})", arg.full_notation()),
-        }
-    }
-
-    pub fn args(&self) -> Vec<&Node<T>> {
-        match self {
-            Function::Sin(arg) => vec![arg],
-            Function::Cos(arg) => vec![arg],
-            Function::Tan(arg) => vec![arg],
-            Function::Cot(arg) => vec![arg],
-        }
-    }
-}
-
-impl<T: MathObject + Pretty + Field> Function<T> {
-    pub fn derivative(&self, var: &str) -> Box<Node<T>> {
-        match self {
-            Function::Sin(arg) => Node::mul(arg.derivative(var), Node::cos(arg.clone())),
-            Function::Cos(arg) => Node::mul(arg.derivative(var), Node::neg(Node::sin(arg.clone()))),
-            Function::Tan(arg) => Node::mul(
-                arg.derivative(var),
-                Node::div(
-                    Node::literal(T::one()),
-                    Node::square(Node::cos(arg.clone())),
-                ),
-            ),
-            Function::Cot(arg) => Node::mul(
-                arg.derivative(var),
-                Node::div(
-                    Node::literal(-T::one()),
-                    Node::square(Node::sin(arg.clone())),
-                ),
-            ),
-        }
-    }
-}
-
-#[derive(Clone)]
 pub enum Node<T: MathObject + Pretty> {
     Literal(T),
     Variable(String),
