@@ -8,7 +8,20 @@ use super::dfs::{PostOrderDFS, PreOrderDFS};
 use super::node::Node;
 
 #[derive(Default)]
-pub struct AST<T: MathObject + Pretty>(pub Option<Box<Node<T>>>);
+pub struct AST<T: MathObject>(pub Option<Box<Node<T>>>);
+
+impl<T: MathObject> AST<T> {
+    #[must_use]
+    pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Self {
+        Self(self.0.map(|r| r.reduce(reducers)))
+    }
+}
+
+impl<T: MathObject + Field> AST<T> {
+    pub fn derivative(&self, var: &str) -> Self {
+        Self(self.0.as_ref().map(|n| n.derivative(var)))
+    }
+}
 
 impl<T: MathObject + Pretty> AST<T> {
     pub fn prefix_notation(&self) -> String {
@@ -71,12 +84,6 @@ impl<T: MathObject + Pretty> AST<T> {
     }
 }
 
-impl<T: MathObject + Pretty + Field> AST<T> {
-    pub fn derivative(&self, var: &str) -> Self {
-        Self(self.0.as_ref().map(|n| n.derivative(var)))
-    }
-}
-
 impl<T: MathObject + Pretty> Display for AST<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.0 {
@@ -89,12 +96,5 @@ impl<T: MathObject + Pretty> Display for AST<T> {
 impl<T: MathObject + Pretty> Pretty for AST<T> {
     fn prettify(&self) -> String {
         self.to_string()
-    }
-}
-
-impl<T: MathObject + Pretty> AST<T> {
-    #[must_use]
-    pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Self {
-        Self(self.0.map(|r| r.reduce(reducers)))
     }
 }

@@ -77,7 +77,7 @@ impl FromStr for UnaryFunction {
 }
 
 #[derive(Clone)]
-pub enum Node<T: MathObject + Pretty> {
+pub enum Node<T: MathObject> {
     Literal(T),
     Variable(String),
     BinaryOp {
@@ -92,7 +92,7 @@ pub enum Node<T: MathObject + Pretty> {
 }
 
 // Convenient named constructors.
-impl<T: MathObject + Pretty> Node<T> {
+impl<T: MathObject> Node<T> {
     pub fn literal(v: T) -> Box<Self> {
         Box::new(Self::Literal(v))
     }
@@ -174,12 +174,6 @@ impl<T: MathObject + Pretty> Node<T> {
     }
 }
 
-impl<T: MathObject + Field + Pretty> Node<T> {
-    pub fn neg(rhs: Box<Self>) -> Box<Self> {
-        Self::mul(Self::literal(-T::one()), rhs)
-    }
-}
-
 impl<T: MathObject + Pretty> Node<T> {
     pub fn full_notation(&self) -> String {
         match self {
@@ -232,7 +226,11 @@ impl<T: MathObject + Pretty> Display for Node<T> {
     }
 }
 
-impl<T: MathObject + Pretty + Field> Node<T> {
+impl<T: MathObject + Field> Node<T> {
+    pub fn neg(rhs: Box<Self>) -> Box<Self> {
+        Self::mul(Self::literal(-T::one()), rhs)
+    }
+
     /// Symbolic derivative with respect to `var`.
     pub fn derivative(&self, var: &str) -> Box<Self> {
         match self {

@@ -1,15 +1,13 @@
 use std::str::FromStr;
 
-use astraea::prelude::{MathObject, Pretty};
+use astraea::prelude::MathObject;
 
 use crate::UnaryFunction;
 use crate::node::{BinaryOp, Node};
 use crate::token::{SyntaxError, TokenStream};
 use crate::tree::AST;
 
-pub fn parse_prefix_notation<'a, T: MathObject + Pretty>(
-    s: &'a str,
-) -> Result<AST<T>, SyntaxError<'a>> {
+pub fn parse_prefix_notation<'a, T: MathObject>(s: &'a str) -> Result<AST<T>, SyntaxError<'a>> {
     let mut tokens = TokenStream::new(s);
     let root = parse_token_stream_prefix(&mut tokens)?;
 
@@ -20,7 +18,7 @@ pub fn parse_prefix_notation<'a, T: MathObject + Pretty>(
     Ok(AST(root))
 }
 
-fn parse_token_stream_prefix<'a, T: MathObject + Pretty>(
+fn parse_token_stream_prefix<'a, T: MathObject>(
     stream: &mut TokenStream<'a>,
 ) -> Result<Option<Box<Node<T>>>, SyntaxError<'a>> {
     let root_token = match stream.next() {

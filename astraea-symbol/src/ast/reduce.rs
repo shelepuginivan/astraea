@@ -4,9 +4,13 @@ use super::node::{BinaryOp, Node};
 
 pub type ReduceFn<T> = fn(Node<T>) -> Node<T>;
 
+// Reduces binary addition with additive identity.
+//
+// > a + 0 = a
+// > 0 + a = a
 pub fn reduce_zero_add<T>(node: Node<T>) -> Node<T>
 where
-    T: MathObject + Pretty + AddWithIdentity<T>,
+    T: MathObject + AddWithIdentity<T>,
 {
     if let Node::BinaryOp { operator, lhs, rhs } = node {
         if operator == BinaryOp::Add {
@@ -27,9 +31,13 @@ where
     }
 }
 
+// Reduces binary multiplication with multiplicative identity.
+//
+// > a * 1 = a
+// > 1 * a = a
 pub fn reduce_one_mul<T>(node: Node<T>) -> Node<T>
 where
-    T: MathObject + Pretty + MulWithIdentity<T>,
+    T: MathObject + MulWithIdentity<T>,
 {
     if let Node::BinaryOp { operator, lhs, rhs } = node {
         if operator == BinaryOp::Mul {
@@ -50,7 +58,7 @@ where
     }
 }
 
-impl<T: MathObject + Pretty> Node<T> {
+impl<T: MathObject> Node<T> {
     #[must_use]
     pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Box<Self> {
         match self {

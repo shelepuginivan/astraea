@@ -1,15 +1,13 @@
 use std::collections::LinkedList;
 use std::str::FromStr;
 
-use astraea::prelude::{MathObject, Pretty};
+use astraea::prelude::MathObject;
 
 use crate::node::{BinaryOp, Node, UnaryFunction};
 use crate::token::{SyntaxError, TokenStream};
 use crate::tree::AST;
 
-pub fn parse_postfix_notation<'a, T: MathObject + Pretty>(
-    s: &'a str,
-) -> Result<AST<T>, SyntaxError<'a>> {
+pub fn parse_postfix_notation<'a, T: MathObject>(s: &'a str) -> Result<AST<T>, SyntaxError<'a>> {
     let tokens = TokenStream::new(s);
     let mut stack = LinkedList::new();
 
