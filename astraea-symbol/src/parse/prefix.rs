@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use astraea::prelude::MathObject;
 
-use crate::UnaryFunction;
 use crate::node::{BinaryOp, Node};
 use crate::token::{SyntaxError, TokenStream};
 use crate::tree::AST;
+use crate::{MultiFunction, UnaryFunction};
 
 pub fn parse_prefix_notation<'a, T: MathObject>(s: &'a str) -> Result<AST<T>, SyntaxError<'a>> {
     let mut tokens = TokenStream::new(s);
@@ -67,6 +67,17 @@ fn parse_token_stream_prefix<'a, T: MathObject>(
         };
 
         return Ok(Some(Box::new(Node::UnaryFunctionCall { func, arg })));
+    }
+
+    // Multi functions.
+    if let Ok(func) = MultiFunction::from_str(root_token.value) {
+        let mut args = Vec::new();
+
+        while let Some(node) = parse_token_stream_prefix(stream)? {
+            args.push(node);
+        }
+
+        return Ok(Some(Box::new(Node::MultiFunctionCall { func, args })));
     }
 
     // Literals.

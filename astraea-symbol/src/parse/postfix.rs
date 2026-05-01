@@ -3,6 +3,7 @@ use std::str::FromStr;
 
 use astraea::prelude::MathObject;
 
+use crate::MultiFunction;
 use crate::node::{BinaryOp, Node, UnaryFunction};
 use crate::token::{SyntaxError, TokenStream};
 use crate::tree::AST;
@@ -54,6 +55,18 @@ pub fn parse_postfix_notation<'a, T: MathObject>(s: &'a str) -> Result<AST<T>, S
             };
 
             let node = Box::new(Node::UnaryFunctionCall { func, arg });
+            stack.push_back((token, node));
+            continue;
+        }
+
+        // Multi functions.
+        if let Ok(func) = MultiFunction::from_str(token.value) {
+            let mut args = Vec::new();
+            while let Some(node) = stack.pop_back() {
+                args.push(node.1);
+            }
+
+            let node = Box::new(Node::MultiFunctionCall { func, args });
             stack.push_back((token, node));
             continue;
         }

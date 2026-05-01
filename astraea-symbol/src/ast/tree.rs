@@ -63,8 +63,9 @@ impl<T: MathObject + Pretty> AST<T> {
             let s = match node {
                 Node::Literal(value) => &value.prettify(),
                 Node::Variable(name) => name,
-                Node::UnaryFunctionCall { func, .. } => &func.to_string(),
                 Node::BinaryOp { operator, .. } => &operator.to_string(),
+                Node::UnaryFunctionCall { func, .. } => &func.to_string(),
+                Node::MultiFunctionCall { func, .. } => &func.to_string(),
             };
 
             result.push_str(s);
@@ -89,21 +90,15 @@ impl<T: MathObject + Pretty> AST<T> {
             let s = match node {
                 Node::Literal(value) => &value.prettify(),
                 Node::Variable(name) => name,
-                Node::UnaryFunctionCall { func, .. } => &func.to_string(),
                 Node::BinaryOp { operator, .. } => &operator.to_string(),
+                Node::UnaryFunctionCall { func, .. } => &func.to_string(),
+                Node::MultiFunctionCall { func, .. } => &func.to_string(),
             };
 
             result.push_str(s);
         }
 
         result
-    }
-
-    pub fn full_notation(&self) -> String {
-        self.0
-            .as_ref()
-            .map(|n| n.full_notation())
-            .unwrap_or_default()
     }
 }
 

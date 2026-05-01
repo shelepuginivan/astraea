@@ -85,6 +85,34 @@ impl FromStr for UnaryFunction {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum MultiFunction {
+    Sum,
+    Product,
+}
+
+impl Display for MultiFunction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            Self::Sum => "sum",
+            Self::Product => "product",
+        };
+        write!(f, "{s}")
+    }
+}
+
+impl FromStr for MultiFunction {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "sum" => Ok(Self::Sum),
+            "prod" | "product" => Ok(Self::Product),
+            &_ => Err(ParseError::new(format!("unknown multi function: '{s}'"))),
+        }
+    }
+}
+
 #[derive(Clone, PartialEq, Eq)]
 pub enum Node<T: MathObject> {
     Literal(T),
@@ -97,6 +125,10 @@ pub enum Node<T: MathObject> {
     UnaryFunctionCall {
         func: UnaryFunction,
         arg: Box<Node<T>>,
+    },
+    MultiFunctionCall {
+        func: MultiFunction,
+        args: Vec<Box<Node<T>>>,
     },
 }
 
@@ -184,23 +216,6 @@ impl<T: MathObject> Node<T> {
 }
 
 impl<T: MathObject + Pretty> Node<T> {
-    pub fn full_notation(&self) -> String {
-        match self {
-            Node::Literal(value) => value.prettify(),
-            Node::Variable(name) => name.to_string(),
-            Node::BinaryOp { operator, lhs, rhs } => {
-                format!(
-                    "({} {operator} {})",
-                    lhs.full_notation(),
-                    rhs.full_notation()
-                )
-            }
-            Node::UnaryFunctionCall { func, arg } => {
-                format!("{}({})", func, arg.full_notation())
-            }
-        }
-    }
-
     fn fmt_with_indent(&self, indent: usize, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let spaces = " ".repeat(indent);
 
@@ -223,6 +238,14 @@ impl<T: MathObject + Pretty> Node<T> {
                 writeln!(f, "{spaces}{func} {{")?;
                 arg.fmt_with_indent(indent + 4, f)?;
                 writeln!(f)?;
+                write!(f, "{spaces}}}")
+            }
+            Node::MultiFunctionCall { func, args } => {
+                writeln!(f, "{spaces}{func} {{")?;
+                for arg in args {
+                    arg.fmt_with_indent(indent + 4, f)?;
+                    writeln!(f)?;
+                }
                 write!(f, "{spaces}}}")
             }
         }
@@ -319,6 +342,30 @@ impl<T: MathObject + Field> Node<T> {
                         Node::square(Node::sin(arg.clone())),
                     ),
                 ),
+            },
+            Self::MultiFunctionCall { func, args } => match func {
+                MultiFunction::Sum => Box::new(Self::MultiFunctionCall {
+                    func: MultiFunction::Sum,
+                    args: args.iter().map(|s| s.derivative(var)).collect(),
+                }),
+                MultiFunction::Product => {
+                    let mut new_args = Vec::with_capacity(args.len());
+
+                    for i in 0..args.len() {
+                        let mut product = args.clone();
+                        product[i] = product[i].derivative(var);
+
+                        new_args.push(Box::new(Self::MultiFunctionCall {
+                            func: MultiFunction::Product,
+                            args: product,
+                        }));
+                    }
+
+                    Box::new(Self::MultiFunctionCall {
+                        func: MultiFunction::Sum,
+                        args: new_args,
+                    })
+                }
             },
         }
     }

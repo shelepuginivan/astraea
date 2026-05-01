@@ -31,6 +31,9 @@ impl<'a, T: MathObject> Iterator for PreOrderDFS<'a, T> {
             Node::UnaryFunctionCall { arg, .. } => {
                 self.stack.push_back(&arg);
             }
+            Node::MultiFunctionCall { args, .. } => {
+                self.stack.extend(args.iter().map(AsRef::as_ref).rev());
+            }
             _ => {}
         }
 
@@ -59,6 +62,9 @@ impl<'a, T: MathObject> PostOrderDFS<'a, T> {
                 }
                 Node::UnaryFunctionCall { arg, .. } => {
                     stack.push_back(&arg);
+                }
+                Node::MultiFunctionCall { args, .. } => {
+                    stack.extend(args.iter().map(AsRef::as_ref));
                 }
                 _ => {}
             }
