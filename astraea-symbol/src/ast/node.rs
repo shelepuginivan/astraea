@@ -186,6 +186,13 @@ impl<T: MathObject> Node<T> {
         Self::mul(arg.clone(), arg)
     }
 
+    pub fn ln(arg: Box<Self>) -> Box<Self> {
+        Box::new(Self::UnaryFunctionCall {
+            func: UnaryFunction::Ln,
+            arg,
+        })
+    }
+
     pub fn sin(arg: Box<Self>) -> Box<Self> {
         Box::new(Self::UnaryFunctionCall {
             func: UnaryFunction::Sin,
@@ -321,11 +328,14 @@ impl<T: MathObject + Field> Node<T> {
                 ),
 
                 BinaryOp::Pow => {
-                    let pow = Self::sub(rhs.clone(), Self::literal(T::one()));
+                    let fg = Box::new(self.clone());
 
                     Self::mul(
-                        lhs.derivative(var),
-                        Self::mul(pow.clone(), Self::pow(lhs.clone(), pow)),
+                        fg,
+                        Self::add(
+                            Self::mul(rhs.derivative(var), Self::ln(lhs.clone())),
+                            Self::mul(rhs.clone(), Self::div(lhs.derivative(var), lhs.clone())),
+                        ),
                     )
                 }
             },
