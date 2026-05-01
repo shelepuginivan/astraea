@@ -176,6 +176,37 @@ where
     }
 }
 
+// Reduces binary multiplication with additive identity (absorption law).
+//
+// > a * 0 = 0
+// > 0 * a = 0
+//
+// This reduce requires distribution:
+//
+// > a * 0 = a * (0 + 0) = a * 0 + a * 0 <=> a * 0 = 0
+pub fn reduce_zero_mul<T>(node: Node<T>) -> Node<T>
+where
+    T: MathObject + AddWithIdentity<T> + Distributive,
+{
+    if let Node::BinaryOp { operator, lhs, rhs } = node {
+        if operator == BinaryOp::Mul {
+            if let Node::Literal(v) = lhs.as_ref() {
+                if v.is_zero() {
+                    return *lhs;
+                }
+            }
+            if let Node::Literal(v) = rhs.as_ref() {
+                if v.is_zero() {
+                    return *rhs;
+                }
+            }
+        }
+        Node::BinaryOp { operator, lhs, rhs }
+    } else {
+        node
+    }
+}
+
 impl<T: MathObject> Node<T> {
     #[must_use]
     pub fn reduce(self, reducers: &[ReduceFn<T>]) -> Box<Self> {

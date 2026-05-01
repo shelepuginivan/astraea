@@ -243,6 +243,7 @@ impl<T: MathObject + Field> Node<T> {
             // reduce_literal_div, FIXME: refactor MulIntertible to Div<Output = Self>
             reduce_zero_add,
             reduce_one_mul,
+            reduce_zero_mul,
         ])
     }
 
